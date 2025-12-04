@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Custom MCP Server Configuration Template for lootbox.config.json",
+
+  "mcpServers": {
+    "your_server_name": {
+      "command": "npx",
+      "args": ["-y", "@your-org/mcp-server-package"],
+      "env": {
+        "YOUR_API_KEY": "${YOUR_API_KEY}",
+        "YOUR_OTHER_VAR": "${YOUR_OTHER_VAR}"
+      }
+    }
+  },
+
+  "_documentation": {
+    "description": "Template for adding custom MCP servers to lootbox",
+    "fields": {
+      "command": "The executable to run (npx, uvx, node, python, etc.)",
+      "args": "Command-line arguments. Use -y with npx to auto-install.",
+      "env": "Environment variables. ${VAR} syntax pulls from shell environment."
+    },
+    "common_patterns": {
+      "npm_package": {
+        "command": "npx",
+        "args": ["-y", "@org/package-name"]
+      },
+      "python_uvx": {
+        "command": "uvx",
+        "args": ["mcp-server-package"]
+      },
+      "local_script": {
+        "command": "node",
+        "args": ["/path/to/your/mcp-server.js"]
+      },
+      "tsx_typescript": {
+        "command": "npx",
+        "args": ["tsx", "/path/to/server.ts"]
+      }
+    },
+    "setup_steps": [
+      "1. Replace 'your_server_name' with a descriptive name (will become mcp_your_server_name)",
+      "2. Update command and args for your MCP server package",
+      "3. Set required environment variables in your shell",
+      "4. Copy mcpServers block to your lootbox.config.json",
+      "5. Restart lootbox server",
+      "6. Verify with: lootbox tools | grep mcp_your_server_name"
+    ],
+    "naming_convention": "Server name 'my-server' becomes namespace 'mcp_my_server'",
+    "troubleshooting": [
+      "If server doesn't appear: Check that command runs manually",
+      "If auth fails: Verify env vars are exported before starting lootbox",
+      "If connection times out: Server may need longer to initialize"
+    ]
+  }
+}

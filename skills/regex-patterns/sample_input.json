@@ -1,0 +1,16 @@
+{
+  "validation_tasks": {
+    "email": "user@example.com",
+    "url": "https://www.example.com/path/page.html",
+    "phone": "(555) 123-4567",
+    "credit_card": "4532 1234 5678 9010",
+    "date": "2025-10-21",
+    "date_format": "iso",
+    "password": "SecureP@ss123",
+    "ipv4": "192.168.1.1",
+    "hex_color": "#3498db"
+  },
+  "extraction_text": "Contact us at support@example.com or sales@company.org. Visit our website at https://www.example.com for more info. Follow us @ExampleCo and use #ExampleProduct. Call us at (555) 123-4567 or (555) 987-6543.",
+  "transformation_text": "This Is Sample Text For Transformation",
+  "log_text": "[2025-10-21T10:30:45.123Z] [INFO] Application started successfully\n[2025-10-21T10:30:47.456Z] [ERROR] Database connection failed\n[2025-10-21T10:30:50.789Z] [WARN] Retrying connection attempt 1"
+}

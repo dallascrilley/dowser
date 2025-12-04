@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "my-custom-server": {
+      "command": "node",
+      "args": ["/path/to/mcp_server.js"],
+      "env": {
+        "API_KEY": "your-key-here",
+        "DEBUG": "false"
+      }
+    }
+  }
+}

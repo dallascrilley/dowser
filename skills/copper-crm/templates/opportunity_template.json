@@ -1,0 +1,55 @@
+{
+  "opportunity": {
+    "name": "Deal Name",
+    "primary_company_id": 12345,
+    "primary_contact_id": 67890,
+    "assignee_id": 11111,
+    "close_date": "2025-06-30",
+    "monetary_value": 50000,
+    "currency": "USD",
+    "status": "Open",
+    "pipeline_id": 1,
+    "stage_id": 2,
+    "stage": {
+      "id": 2,
+      "name": "Negotiation",
+      "probability": 75
+    },
+    "interaction_count": 5,
+    "customer_source_id": 3,
+    "loss_reason_id": null,
+    "sources": [
+      {
+        "type": "direct_contact",
+        "display_name": "Direct Contact"
+      }
+    ],
+    "tags": [
+      "hot-lead",
+      "enterprise",
+      "high-priority"
+    ],
+    "details": {
+      "description": "Detailed description of the opportunity",
+      "decision_criteria": "Key factors influencing the deal",
+      "expected_revenue_impact": 50000,
+      "competitive_landscape": "Main competitors in this deal"
+    },
+    "custom_fields": {
+      "deal_size": "Large",
+      "contract_length": "2 Years",
+      "support_level": "Premium",
+      "implementation_complexity": "Medium"
+    },
+    "activities": [
+      {
+        "type": "call",
+        "date": "2025-01-15",
+        "notes": "Initial discovery call",
+        "outcome": "positive"
+      }
+    ],
+    "related_opportunities": [],
+    "follow_up_date": "2025-02-15"
+  }
+}

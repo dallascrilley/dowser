@@ -1,0 +1,141 @@
+{{#IF_PYTHON}}
+#!/usr/bin/env python3
+"""
+{{SCRIPT_NAME}} - {{SCRIPT_DESCRIPTION}}
+
+{{SCRIPT_PURPOSE}}
+
+Usage:
+    python {{SCRIPT_NAME}}.py {{USAGE_PATTERN}}
+
+Examples:
+    {{EXAMPLES}}
+"""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+from typing import Dict, List, Any, Optional
+
+{{ADDITIONAL_IMPORTS}}
+
+
+def main():
+    """Main entry point for {{SCRIPT_NAME}}"""
+    parser = argparse.ArgumentParser(
+        description="{{SCRIPT_DESCRIPTION}}",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__
+    )
+
+    {{ARGUMENT_DEFINITIONS}}
+
+    args = parser.parse_args()
+
+    try:
+        {{MAIN_LOGIC}}
+    except KeyboardInterrupt:
+        print("\n⚠️  Operation cancelled by user", file=sys.stderr)
+        sys.exit(130)
+    except Exception as e:
+        print(f"❌ Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+{{HELPER_FUNCTIONS}}
+
+
+if __name__ == "__main__":
+    main()
+{{/IF_PYTHON}}
+
+{{#IF_BASH}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+# {{SCRIPT_NAME}} - {{SCRIPT_DESCRIPTION}}
+#
+# {{SCRIPT_PURPOSE}}
+#
+# Usage:
+#   ./{{SCRIPT_NAME}}.sh {{USAGE_PATTERN}}
+#
+# Examples:
+#   {{EXAMPLES}}
+
+# Color output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Helper functions
+info() {
+    echo -e "${BLUE}ℹ️  $*${NC}"
+}
+
+success() {
+    echo -e "${GREEN}✅ $*${NC}"
+}
+
+warning() {
+    echo -e "${YELLOW}⚠️  $*${NC}"
+}
+
+error() {
+    echo -e "${RED}❌ $*${NC}" >&2
+}
+
+# Check dependencies
+check_dependencies() {
+    {{DEPENDENCY_CHECKS}}
+}
+
+# Main script logic
+main() {
+    {{MAIN_LOGIC}}
+}
+
+{{HELPER_FUNCTIONS}}
+
+# Run main function
+check_dependencies
+main "$@"
+{{/IF_BASH}}
+
+## Shared Template Variables (used by both Python and Bash)
+
+# {{SCRIPT_NAME}} - Script filename without extension
+# {{SCRIPT_DESCRIPTION}} - One-line description
+# {{SCRIPT_PURPOSE}} - Detailed purpose explanation
+# {{USAGE_PATTERN}} - How to invoke (e.g., "[OPTIONS] INPUT")
+# {{EXAMPLES}} - Usage examples
+# {{MAIN_LOGIC}} - Core script logic
+# {{HELPER_FUNCTIONS}} - Supporting functions
+
+# Python-specific:
+# {{ARGUMENT_DEFINITIONS}} - argparse argument definitions
+# {{ADDITIONAL_IMPORTS}} - Extra import statements
+
+# Bash-specific:
+# {{DEPENDENCY_CHECKS}} - Dependency verification code
+
+## Usage Instructions
+
+**For Python scripts:**
+1. Set IF_PYTHON condition to true
+2. Fill in Python-specific variables
+3. Remove IF_BASH section
+
+**For Bash scripts:**
+1. Set IF_BASH condition to true
+2. Fill in Bash-specific variables
+3. Remove IF_PYTHON section
+
+**Shared variables** (used by both):
+- SCRIPT_NAME, SCRIPT_DESCRIPTION, SCRIPT_PURPOSE
+- USAGE_PATTERN, EXAMPLES
+- MAIN_LOGIC, HELPER_FUNCTIONS
+

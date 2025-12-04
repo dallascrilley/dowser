@@ -1,0 +1,26 @@
+{
+  "module_name": "example_module",
+  "module_id": "EXAMPLE_MODULE",
+  "version": "0.1.0",
+  "level": "moderate",
+  "depends": [
+    {
+      "module": "dependency_module",
+      "contract": "ai_working/dependency_module/DEPENDENCY_MODULE.contract.md"
+    }
+  ],
+  "ask_history": [
+    {
+      "ask": "User's original natural language request",
+      "summary": "Concise distilled intent in 1-2 sentences"
+    }
+  ],
+  "decisions": [
+    "Key architectural choice or assumption",
+    "Important trade-off or constraint",
+    "Risk or uncertainty noted"
+  ],
+  "confidence": 0.85,
+  "created_at": "2025-01-15T10:30:00Z",
+  "updated_at": "2025-01-15T10:30:00Z"
+}

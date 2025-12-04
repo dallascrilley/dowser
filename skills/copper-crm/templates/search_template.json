@@ -1,0 +1,119 @@
+{
+  "search_companies": {
+    "page_number": 1,
+    "page_size": 20,
+    "sort_by": "name",
+    "sort_direction": "asc",
+    "filters": {
+      "name": "Acme",
+      "tags": ["enterprise"],
+      "assignee_id": 12345,
+      "industry": "Technology",
+      "created_after": "2024-01-01",
+      "created_before": "2025-12-31",
+      "annual_revenue_min": 1000000,
+      "annual_revenue_max": 100000000,
+      "custom_fields": {
+        "company_tier": "Enterprise"
+      }
+    },
+    "fields": [
+      "id",
+      "name",
+      "address",
+      "emails",
+      "phone_numbers",
+      "websites",
+      "annual_revenue",
+      "industry",
+      "assignee_id",
+      "tags",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "search_opportunities": {
+    "page_number": 1,
+    "page_size": 20,
+    "sort_by": "close_date",
+    "sort_direction": "asc",
+    "filters": {
+      "name": "Deal Name",
+      "status": "Open",
+      "pipeline_id": 1,
+      "stage_id": 2,
+      "assignee_id": 12345,
+      "tags": ["hot-lead"],
+      "monetary_value_min": 10000,
+      "monetary_value_max": 500000,
+      "close_date_after": "2025-01-01",
+      "close_date_before": "2025-12-31",
+      "company_id": 12345,
+      "custom_fields": {
+        "deal_size": "Large"
+      }
+    },
+    "fields": [
+      "id",
+      "name",
+      "primary_company_id",
+      "assignee_id",
+      "close_date",
+      "monetary_value",
+      "status",
+      "stage_id",
+      "tags",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "search_contacts": {
+    "page_number": 1,
+    "page_size": 20,
+    "sort_by": "last_name",
+    "sort_direction": "asc",
+    "filters": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com",
+      "company_id": 12345,
+      "tags": ["decision-maker"],
+      "job_title": "VP of Sales",
+      "created_after": "2024-01-01",
+      "custom_fields": {
+        "contact_tier": "A"
+      }
+    },
+    "fields": [
+      "id",
+      "first_name",
+      "last_name",
+      "email",
+      "phone_number",
+      "company_id",
+      "job_title",
+      "tags",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "bulk_search": {
+    "criteria": [
+      {
+        "type": "opportunity",
+        "filters": {
+          "status": "Open",
+          "pipeline_id": 1
+        }
+      },
+      {
+        "type": "company",
+        "filters": {
+          "industry": "Technology"
+        }
+      }
+    ],
+    "include_related": true,
+    "export_format": "json"
+  }
+}

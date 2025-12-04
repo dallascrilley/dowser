@@ -1,0 +1,15 @@
+{
+  "name": "pai-local",
+  "description": "Personal AI Infrastructure local plugin marketplace",
+  "owner": {
+    "name": "Dallas Crilley"
+  },
+  "plugins": [
+    {
+      "name": "pai-skills",
+      "source": "..",
+      "description": "Personal skills library with 120+ domain-specific skills",
+      "version": "1.0.0"
+    }
+  ]
+}

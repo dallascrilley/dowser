@@ -1,0 +1,17 @@
+# Cache directory (local analysis cache)
+.cache/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+Thumbs.db
+

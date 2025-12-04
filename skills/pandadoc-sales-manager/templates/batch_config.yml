@@ -1,0 +1,578 @@
+# PandaDoc Batch Processing Configuration
+# This file configures batch operations for creating, updating, or downloading
+# multiple documents at scale.
+#
+# Use batch processing for:
+# - Creating 50+ documents at once
+# - Downloading all completed documents for a date range
+# - Bulk updating document metadata
+# - Processing customer lists from CSV/Excel
+
+# ==============================================================================
+# BATCH OPERATION SETTINGS
+# ==============================================================================
+
+batch:
+
+  # ===========================================================================
+  # BATCH SIZE CONFIGURATION
+  # ===========================================================================
+  # Controls how many documents to process in each batch
+
+  # Default batch size for all operations (can be overridden per operation)
+  default_batch_size: 50
+
+  # Maximum batch size (hard limit to prevent excessive memory usage)
+  max_batch_size: 100
+
+  # Minimum batch size (below this, no batching needed)
+  min_batch_size: 1
+
+  # ===========================================================================
+  # PROCESSING DELAYS (RATE LIMITING)
+  # ===========================================================================
+  # CRITICAL: PandaDoc has rate limits (10 req/min for sandbox)
+  # These delays ensure we don't exceed rate limits
+
+  # Delay between individual requests (seconds)
+  # 10 requests per minute = 1 request per 6 seconds (minimum)
+  # Recommendation: Use 6+ seconds for sandbox, 2+ for production
+  inter_request_delay: 6
+
+  # Delay between batches (seconds)
+  # Process another batch only after this delay
+  inter_batch_delay: 60
+
+  # Jitter: Randomize delay slightly to avoid thundering herd
+  # Range: 0-100 (percentage of inter_request_delay)
+  delay_jitter_percent: 10
+
+  # ===========================================================================
+  # CONCURRENT PROCESSING
+  # ===========================================================================
+  # How many requests to process in parallel
+  # WARNING: Only use if your rate limits allow
+  # Safe defaults: 1 (serial) or 2 (light parallelism)
+
+  # Number of concurrent workers
+  concurrent_workers: 1         # 1 = Serial, no parallelism (safest)
+
+  # Queue type for concurrent processing
+  worker_queue_type: memory     # memory | file | database
+
+  # Worker timeout in seconds
+  worker_timeout: 300           # 5 minutes per document
+
+  # ===========================================================================
+  # ERROR HANDLING
+  # ===========================================================================
+
+  error_handling:
+    # Continue processing batch if individual item fails
+    # true = Skip failed items and continue with rest
+    # false = Stop entire batch on first error
+    continue_on_error: true
+
+    # Log all errors to file
+    log_errors: true
+    error_log_path: logs/batch_errors.log
+
+    # =======================
+    # RETRY CONFIGURATION
+    # =======================
+    # Automatically retry failed items
+
+    # Enable retry for failed documents
+    retry_failed: true
+
+    # Maximum retries per item
+    max_retries_per_item: 3
+
+    # Delay before first retry (seconds)
+    initial_retry_delay: 10
+
+    # Backoff strategy for retries
+    # exponential: 10s, 20s, 40s
+    # linear: 10s, 20s, 30s
+    # fixed: 10s, 10s, 10s
+    retry_backoff_strategy: exponential
+
+    # Only retry on these error codes (empty = retry all)
+    retryable_error_codes:
+      - 429  # Rate limit
+      - 500  # Server error
+      - 502  # Bad gateway
+      - 503  # Service unavailable
+      - 504  # Gateway timeout
+      - 408  # Request timeout
+
+    # Skip these error codes (don't retry, don't continue)
+    fatal_error_codes:
+      - 401  # Unauthorized (API key issue)
+      - 403  # Forbidden
+
+    # =======================
+    # ERROR REPORTING
+    # =======================
+
+    # Generate report of all errors
+    error_report:
+      enabled: true
+      format: csv           # csv | json | excel
+      path: output/batch_errors_report.csv
+
+  # ===========================================================================
+  # PROGRESS TRACKING
+  # ===========================================================================
+  # Track and manage batch progress for resumability
+
+  progress:
+    # Save progress to disk for resuming interrupted batches
+    save_progress: true
+
+    # Where to save progress information
+    progress_file: .batch_progress.json
+
+    # Resume batch from last checkpoint on restart
+    resume_on_restart: true
+
+    # Checkpoint frequency (save progress every N items)
+    checkpoint_interval: 10
+
+    # =======================
+    # PROGRESS REPORTING
+    # =======================
+
+    # Display progress to console
+    show_progress: true
+
+    # Progress display style
+    progress_style: percentage  # percentage | detailed | minimal
+
+    # Show ETA
+    show_eta: true
+
+    # Update frequency (seconds)
+    update_frequency: 5
+
+    # =======================
+    # STATUS FILE
+    # =======================
+
+    # Write batch status to file
+    status_file: batch_status.json
+
+    # Update status file frequency
+    status_update_interval: 5
+
+  # ===========================================================================
+  # OUTPUT CONFIGURATION
+  # ===========================================================================
+
+  output:
+    # Output file format
+    format: csv           # csv | json | excel | parquet
+
+    # Path to write results
+    path: output/batch_results.csv
+
+    # Include timestamp in filename
+    include_timestamp: true
+
+    # Include headers (CSV only)
+    include_headers: true
+
+    # Fields to include in output
+    fields:
+      - id                # Document ID
+      - name              # Document name
+      - status            # Final status
+      - error             # Error message if failed
+      - created_at        # Timestamp
+      - duration_seconds  # Time to process
+
+    # =======================
+    # DETAILED RESULTS
+    # =======================
+
+    # Also write detailed results (one file per item)
+    detailed_results:
+      enabled: false
+      directory: output/detailed/
+      format: json
+
+  # ===========================================================================
+  # MEMORY MANAGEMENT
+  # ===========================================================================
+
+  memory:
+    # Maximum items to keep in memory during processing
+    # Larger = faster but uses more RAM
+    # Smaller = slower but uses less RAM
+    max_items_in_memory: 1000
+
+    # Clear memory periodically
+    clear_memory_interval: 500  # After processing N items
+
+    # Use streaming for large datasets
+    streaming_enabled: true
+    streaming_chunk_size: 100
+
+# ==============================================================================
+# BATCH OPERATION TYPES
+# ==============================================================================
+
+operations:
+
+  # ===========================================================================
+  # BULK DOCUMENT CREATION
+  # ===========================================================================
+  create:
+    # Settings specific to document creation batches
+    enabled: true
+
+    # Batch size for creation
+    batch_size: 50
+
+    # Wait for document.draft status before proceeding
+    wait_for_ready: true
+    ready_status_timeout: 60    # seconds
+
+    # Send documents immediately after creation
+    auto_send: false            # Set to true to auto-send after creation
+
+    # Validation before creation
+    validation:
+      validate_before_create: true
+      validate_required_fields: true
+      validate_template_exists: true
+
+  # ===========================================================================
+  # BULK DOCUMENT SENDING
+  # ===========================================================================
+  send:
+    enabled: true
+    batch_size: 50
+
+    # Verify document is in draft status before sending
+    verify_ready: true
+
+    # Custom message for all documents in batch
+    default_message: "Please review and sign the attached document."
+
+    # Custom subject for all documents
+    default_subject: "Document for Review"
+
+  # ===========================================================================
+  # BULK DOCUMENT DOWNLOAD
+  # ===========================================================================
+  download:
+    enabled: true
+    batch_size: 50
+
+    # Only download completed documents
+    filter_status: document.completed
+
+    # Directory to save files
+    output_directory: downloads/
+
+    # Naming pattern for downloaded files
+    # Variables: {id}, {name}, {status}, {date}, {time}
+    naming_pattern: "{date}_{name}_{id}.pdf"
+
+    # Skip already downloaded files
+    skip_existing: true
+
+    # Resume download on restart
+    resume_enabled: true
+    resume_file: .download_progress.json
+
+  # ===========================================================================
+  # BULK DOCUMENT UPDATES
+  # ===========================================================================
+  update:
+    enabled: true
+    batch_size: 50
+
+    # Only update documents in these statuses
+    allowed_statuses:
+      - document.draft
+      - document.sent
+
+    # Fields that can be updated
+    updatable_fields:
+      - name
+      - metadata
+      - tags
+
+  # ===========================================================================
+  # BULK STATUS CHECK
+  # ===========================================================================
+  status:
+    enabled: true
+    batch_size: 100           # Can check many at once
+
+    # Polling configuration
+    poll_interval: 10         # seconds between polls
+
+    # Maximum polling duration
+    max_poll_time: 600        # 10 minutes
+
+# ==============================================================================
+# INPUT DATA CONFIGURATION
+# ==============================================================================
+# How to read input data for batch operations
+
+input:
+
+  # ===========================================================================
+  # SUPPORTED FORMATS
+  # ===========================================================================
+
+  # CSV Files
+  csv:
+    enabled: true
+
+    # CSV parsing options
+    delimiter: ","
+    quotechar: '"'
+    skip_empty_rows: true
+    skip_comment_rows: true      # Rows starting with #
+    charset: utf-8
+
+    # Column mapping configuration
+    column_mapping:
+      # Map CSV columns to field names
+      # Example: "Company Name": "customer_name"
+      enabled: true
+      mapping_file: config/csv_column_mapping.yml
+
+  # JSON Files
+  json:
+    enabled: true
+
+    # Expected JSON structure
+    # Array of objects: [{"customer_name": "...", ...}, ...]
+    # Or object with data key: {"data": [...]}
+    structure: array            # array | object
+
+    # Data key if structure is object
+    data_key: data
+
+  # Excel Files (.xlsx, .xls)
+  excel:
+    enabled: true
+
+    # Sheet name to read
+    sheet_name: "Data"
+
+    # Starting row (0-indexed)
+    start_row: 0
+
+    # Use first row as headers
+    has_headers: true
+
+  # Database
+  database:
+    enabled: false
+
+    # Database connection string
+    connection_string: "postgresql://user:pass@localhost/db"
+
+    # SQL query to fetch data
+    query: "SELECT * FROM customers WHERE created_at > NOW() - INTERVAL 7 DAY"
+
+  # ===========================================================================
+  # DATA VALIDATION
+  # ===========================================================================
+
+  validation:
+    # Validate input data before processing
+    enabled: true
+
+    # Check for required columns
+    check_required_columns: true
+
+    # Check for duplicate rows
+    check_duplicates: true
+    duplicates_action: skip         # skip | error | warn
+
+    # Validate field values
+    validate_fields: true
+
+    # Generate validation report
+    report_path: output/validation_report.json
+
+# ==============================================================================
+# SCHEDULING
+# ==============================================================================
+# Schedule batch operations to run automatically
+
+scheduling:
+
+  # Enable scheduled batch operations
+  enabled: false
+
+  # Timezone for scheduling
+  timezone: UTC
+
+  # Scheduled operations
+  jobs:
+
+    # Example: Run daily document status check
+    # - name: "Daily Status Check"
+    #   operation: status
+    #   schedule: "0 9 * * *"        # Cron format: 9 AM daily
+    #   config_override:
+    #     batch_size: 100
+    #     concurrent_workers: 5
+
+    # Example: Weekly download of completed documents
+    # - name: "Weekly Download"
+    #   operation: download
+    #   schedule: "0 17 * * 5"        # 5 PM Friday
+    #   config_override:
+    #     filter_status: document.completed
+    #     output_directory: "downloads/weekly/"
+
+# ==============================================================================
+# MONITORING & ALERTING
+# ==============================================================================
+
+monitoring:
+
+  # Enable batch monitoring
+  enabled: true
+
+  # Metrics to track
+  metrics:
+    track_duration: true
+    track_throughput: true
+    track_success_rate: true
+    track_error_rate: true
+
+  # Alert on issues
+  alerts:
+    enabled: true
+
+    # Alert on error rate exceeding threshold
+    error_rate_threshold: 0.05        # 5% error rate
+
+    # Alert on throughput below threshold
+    throughput_threshold: 1           # min items/second
+
+    # Alert on batch duration exceeding threshold
+    max_duration_threshold: 3600      # 1 hour
+
+    # Alert recipients
+    alert_channels:
+      - email: "ops@mycompany.com"
+      # - slack: "#batch-ops"
+      # - webhook: "https://alerts.example.com/webhook"
+
+# ==============================================================================
+# PERFORMANCE TUNING
+# ==============================================================================
+
+performance:
+
+  # Connection pooling for database operations
+  connection_pool:
+    enabled: true
+    pool_size: 5
+    max_overflow: 10
+
+  # Caching of template and field information
+  cache:
+    enabled: true
+    cache_type: memory        # memory | redis
+    ttl_seconds: 3600
+
+  # Compression for large payloads
+  compression:
+    enabled: false
+    algorithm: gzip
+
+  # Memory-efficient streaming for large batches
+  streaming:
+    enabled: true
+    chunk_size: 100
+
+# ==============================================================================
+# EXAMPLE BATCH CONFIGURATIONS
+# ==============================================================================
+# Preset configurations for common batch operations
+
+presets:
+
+  # Fast batch: Process many documents quickly
+  # Use when you have good rate limits and don't mind retries
+  fast:
+    inter_request_delay: 2
+    inter_batch_delay: 30
+    concurrent_workers: 2
+    batch_size: 100
+    error_handling:
+      continue_on_error: true
+      retry_failed: true
+      max_retries_per_item: 2
+
+  # Safe batch: Conservative settings to avoid rate limits
+  # Use when rate limits are tight (sandbox environment)
+  safe:
+    inter_request_delay: 6
+    inter_batch_delay: 60
+    concurrent_workers: 1
+    batch_size: 50
+    error_handling:
+      continue_on_error: true
+      retry_failed: true
+      max_retries_per_item: 3
+
+  # Balanced batch: Good performance with safety
+  # Default recommended configuration
+  balanced:
+    inter_request_delay: 3
+    inter_batch_delay: 45
+    concurrent_workers: 1
+    batch_size: 50
+    error_handling:
+      continue_on_error: true
+      retry_failed: true
+      max_retries_per_item: 3
+
+# ==============================================================================
+# BATCH OPERATION EXAMPLES
+# ==============================================================================
+#
+# Example 1: Create 100 proposals from CSV
+# -----------------------------------------
+# python bulk_create_documents.py \
+#   --template "sales_proposal" \
+#   --customers customers.csv \
+#   --batch-size 50 \
+#   --output proposals_created.csv
+#
+# Example 2: Download all completed documents from this week
+# -----------------------------------------
+# python download_completed.py \
+#   --from "2024-01-08" \
+#   --to "2024-01-15" \
+#   --output ./downloads/week_51 \
+#   --pattern "{date}_{customer}_{id}.pdf"
+#
+# Example 3: Check status of 200 documents
+# -----------------------------------------
+# python check_document_status.py \
+#   --document-ids doc_ids.csv \
+#   --watch \
+#   --interval 30 \
+#   --output status_report.csv
+#
+# Example 4: Custom batch with retries and detailed reporting
+# -----------------------------------------
+# Configuration in batch_config.yml:
+# - Set error_handling.retry_failed: true
+# - Set output.include_timestamp: true
+# - Set error_handling.error_report.enabled: true
+# Then run batch operation with verbose output

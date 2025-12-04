@@ -1,0 +1,421 @@
+# PandaDoc Template Field Mappings
+# This file maps business data fields to PandaDoc template fields.
+#
+# Use this configuration to:
+# 1. Map your CRM/database fields to PandaDoc template fields
+# 2. Define required fields per template
+# 3. Set up field validation rules
+# 4. Configure recipient roles
+# 5. Apply default values
+#
+# Structure: business_field -> template_field (case-sensitive match required)
+
+templates:
+
+  # ===========================================================================
+  # SALES PROPOSAL TEMPLATE
+  # ===========================================================================
+  sales_proposal:
+    # PandaDoc template UUID (from PandaDoc Settings -> Templates)
+    uuid: "abc123-def456-ghi789"
+    name: "Standard Sales Proposal"
+    description: "Professional sales proposal for customer quotes"
+
+    # FIELD MAPPINGS: Business field -> PandaDoc template field
+    # These mappings are used to transform your data into template fields
+    # Format: business_name: "PandaDoc Field Name"
+    field_mappings:
+      # Core business information
+      customer_name: "Company Name"
+      customer_email: "[Client.Email]"
+      customer_phone: "[Client.Phone]"
+      customer_address: "[Client.Address]"
+      customer_contact_name: "[Client.Name]"
+
+      # Proposal details
+      proposal_amount: "Proposal Amount"
+      proposal_date: "Date"
+      expiration_date: "Expiration Date"
+      effective_date: "Effective Date"
+
+      # Terms and conditions
+      discount_percent: "Discount Percentage"
+      payment_terms: "Payment Terms"
+      special_conditions: "Special Conditions"
+
+      # Additional details
+      proposal_notes: "Notes"
+      reference_number: "Reference Number"
+
+    # TOKEN MAPPINGS: System tokens for company/sales rep info
+    # These are PandaDoc system merge fields (read-only)
+    token_mappings:
+      sales_rep_name: "SalesRep.Name"
+      sales_rep_email: "SalesRep.Email"
+      sales_rep_phone: "SalesRep.Phone"
+      company_name: "Company.Name"
+      company_address: "Company.Address"
+      company_phone: "Company.Phone"
+
+    # DEFAULT VALUES: Applied when field not provided
+    defaults:
+      discount_percent: "0%"
+      payment_terms: "Net 30"
+      proposal_notes: ""
+
+    # REQUIRED FIELDS: Must be present for document creation
+    # Document creation will fail if any required field is missing
+    required_fields:
+      - customer_name
+      - customer_email
+      - proposal_amount
+      - proposal_date
+
+    # OPTIONAL FIELDS: Nice to have but not required
+    optional_fields:
+      - customer_phone
+      - customer_address
+      - discount_percent
+      - special_conditions
+
+    # RECIPIENT ROLES: Who signs/reviews this document
+    recipients:
+      - name: "Client"
+        description: "The customer who receives and signs the proposal"
+        signing_order: 2           # Signs second (after internal approval)
+        required: true             # At least one client must be present
+        allow_multiple: true       # Can have multiple clients
+        verification_required: false
+
+      - name: "Manager"
+        description: "Internal manager who approves before sending to client"
+        signing_order: 1           # Signs first (internal approval)
+        required: true             # At least one manager must approve
+        allow_multiple: false      # Only one manager can sign
+        verification_required: false
+
+    # FIELD VALIDATION RULES
+    # Validates data before submitting to PandaDoc
+    validation:
+      customer_email:
+        type: email
+        required: true
+        error_message: "Customer email must be valid"
+
+      proposal_amount:
+        type: currency
+        required: true
+        min: 1
+        max: 999999999
+        error_message: "Proposal amount must be between $1 and $999,999,999"
+
+      discount_percent:
+        type: percentage
+        required: false
+        min: 0
+        max: 100
+        error_message: "Discount must be between 0% and 100%"
+
+      effective_date:
+        type: date
+        required: true
+        format: YYYY-MM-DD
+        error_message: "Effective date must be YYYY-MM-DD format"
+
+  # ===========================================================================
+  # SERVICE AGREEMENT TEMPLATE
+  # ===========================================================================
+  service_agreement:
+    uuid: "xyz789-uvw456-rst123"
+    name: "Service Agreement Template"
+    description: "Legal agreement for ongoing service contracts"
+
+    field_mappings:
+      # Client information
+      customer_name: "Client Company"
+      customer_email: "[Client.Email]"
+      customer_contact: "[Client.Contact.Name]"
+
+      # Service details
+      service_type: "Service Type"
+      service_description: "Service Description"
+      start_date: "Start Date"
+      end_date: "End Date"
+
+      # Pricing
+      monthly_fee: "Monthly Fee"
+      setup_fee: "Setup Fee"
+      total_cost: "Total Cost"
+
+      # Support
+      support_level: "Support Level"
+      sla_response_time: "SLA Response Time"
+
+    token_mappings:
+      company_name: "Company.Name"
+      company_address: "Company.Address"
+      company_phone: "Company.Phone"
+
+    defaults:
+      support_level: "Standard"
+      sla_response_time: "24 hours"
+      setup_fee: "$0.00"
+
+    required_fields:
+      - customer_name
+      - customer_email
+      - service_type
+      - start_date
+      - end_date
+      - monthly_fee
+
+    optional_fields:
+      - service_description
+      - setup_fee
+      - support_level
+      - sla_response_time
+
+    recipients:
+      - name: "Client"
+        description: "The customer who needs to sign the agreement"
+        signing_order: 1
+        required: true
+        allow_multiple: false
+        verification_required: true  # Require email verification
+
+      - name: "Authorized Signatory"
+        description: "Company representative authorized to sign"
+        signing_order: 1
+        required: true
+        allow_multiple: false
+        verification_required: false
+
+    validation:
+      customer_email:
+        type: email
+        required: true
+
+      monthly_fee:
+        type: currency
+        required: true
+        min: 0.01
+
+      start_date:
+        type: date
+        required: true
+        format: YYYY-MM-DD
+
+      end_date:
+        type: date
+        required: true
+        format: YYYY-MM-DD
+        # Validation: end_date must be after start_date (checked in code)
+
+  # ===========================================================================
+  # QUOTE TEMPLATE
+  # ===========================================================================
+  quote:
+    uuid: "quote123-uuid456-xyz789"
+    name: "Quick Quote Template"
+    description: "Simple product quote for fast turnaround"
+
+    field_mappings:
+      customer_name: "Customer Name"
+      customer_email: "Customer Email"
+      quote_number: "Quote Number"
+      quote_date: "Quote Date"
+      expiration_date: "Quote Expires"
+      product_description: "Product/Service"
+      quantity: "Quantity"
+      unit_price: "Unit Price"
+      total_price: "Total Price"
+
+    defaults:
+      quote_date: "${TODAY}"  # Special variable for today's date
+
+    required_fields:
+      - customer_name
+      - customer_email
+      - product_description
+      - total_price
+
+    optional_fields:
+      - quote_number
+      - quantity
+      - unit_price
+
+    recipients:
+      - name: "Client"
+        signing_order: 1
+        required: true
+        allow_multiple: false
+
+    validation:
+      total_price:
+        type: currency
+        required: true
+        min: 0.01
+
+  # ===========================================================================
+  # NDA (NON-DISCLOSURE AGREEMENT) TEMPLATE
+  # ===========================================================================
+  nda:
+    uuid: "nda-template-001-xyz"
+    name: "Non-Disclosure Agreement"
+    description: "Legal NDA for protecting confidential information"
+
+    field_mappings:
+      disclosing_party_name: "Disclosing Party"
+      receiving_party_name: "Receiving Party"
+      receiving_party_email: "Receiving Party Email"
+      effective_date: "Effective Date"
+      term_months: "Term (Months)"
+      confidential_info_description: "Confidential Information"
+
+    required_fields:
+      - disclosing_party_name
+      - receiving_party_name
+      - receiving_party_email
+      - effective_date
+
+    recipients:
+      - name: "Receiving Party"
+        signing_order: 1
+        required: true
+        allow_multiple: false
+
+      - name: "Witness"
+        signing_order: 2
+        required: false
+        allow_multiple: true
+
+    validation:
+      receiving_party_email:
+        type: email
+        required: true
+
+  # ===========================================================================
+  # EMPLOYMENT OFFER LETTER TEMPLATE
+  # ===========================================================================
+  employment_offer:
+    uuid: "employment-offer-uuid"
+    name: "Employment Offer Letter"
+    description: "Standard employment offer letter"
+
+    field_mappings:
+      candidate_name: "Candidate Name"
+      candidate_email: "Candidate Email"
+      position_title: "Position Title"
+      start_date: "Start Date"
+      salary_amount: "Annual Salary"
+      benefits_summary: "Benefits Summary"
+      reporting_manager: "Reporting Manager"
+
+    defaults:
+      benefits_summary: "Standard benefits package"
+
+    required_fields:
+      - candidate_name
+      - candidate_email
+      - position_title
+      - start_date
+      - salary_amount
+
+    recipients:
+      - name: "Candidate"
+        signing_order: 1
+        required: true
+        allow_multiple: false
+
+      - name: "HR"
+        signing_order: 2
+        required: false
+        allow_multiple: false
+
+    validation:
+      candidate_email:
+        type: email
+        required: true
+
+      salary_amount:
+        type: currency
+        required: true
+        min: 0.01
+
+      start_date:
+        type: date
+        required: true
+        format: YYYY-MM-DD
+
+# ==============================================================================
+# GLOBAL FIELD VALIDATION RULES
+# ==============================================================================
+# Define validation patterns used across all templates
+
+validation_patterns:
+  email: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+  phone: "^\\+?1?\\d{10,15}$"
+  postal_code: "^\\d{5}(-\\d{4})?$"
+  currency: "^\\$?\\d{1,3}(,\\d{3})*(\\.\\d{2})?$"
+  percentage: "^\\d{1,3}%?$"
+  date: "^\\d{4}-\\d{2}-\\d{2}$"
+
+# ==============================================================================
+# SPECIAL VARIABLES
+# ==============================================================================
+# These variables can be used in default values and are replaced at runtime
+#
+# ${TODAY} - Today's date in YYYY-MM-DD format
+# ${TOMORROW} - Tomorrow's date
+# ${NOW} - Current date and time
+# ${CURRENT_USER} - Current user's email/name
+# ${CURRENT_COMPANY} - Current company name
+
+# ==============================================================================
+# USAGE EXAMPLES
+# ==============================================================================
+#
+# Example 1: Create a proposal with field mapping
+# -----------------------------------------------
+# from pandadoc_config import load_templates
+# templates = load_templates()
+# proposal_template = templates['sales_proposal']
+#
+# # Your business data
+# data = {
+#   'customer_name': 'Acme Corp',
+#   'customer_email': 'john@acme.com',
+#   'proposal_amount': '$50,000',
+#   'discount_percent': '10%',
+#   'effective_date': '2024-01-15'
+# }
+#
+# # Map business fields to template fields
+# fields = {}
+# for business_field, value in data.items():
+#   template_field = proposal_template['field_mappings'].get(business_field)
+#   if template_field:
+#     fields[template_field] = value
+#
+# # Create document with mapped fields
+# api_client.create_document(
+#   template_uuid=proposal_template['uuid'],
+#   name='Proposal - Acme Corp',
+#   fields=fields,
+#   recipients=[
+#     {'email': 'john@acme.com', 'role': 'Client'},
+#     {'email': 'sales@mycompany.com', 'role': 'Manager'}
+#   ]
+# )
+#
+# Example 2: Validate before creating
+# -----------------------------------------------
+# # Validate required fields are present
+# for field in proposal_template['required_fields']:
+#   if field not in data:
+#     raise ValueError(f"Missing required field: {field}")
+#
+# # Validate email format
+# email = data.get('customer_email')
+# if not re.match(validation_patterns['email'], email):
+#   raise ValueError(f"Invalid email: {email}")

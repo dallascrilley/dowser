@@ -1,0 +1,55 @@
+{
+  "company": {
+    "name": "Company Name",
+    "address": {
+      "street": "123 Main Street",
+      "city": "San Francisco",
+      "state": "CA",
+      "postal_code": "94102",
+      "country": "United States"
+    },
+    "phone_numbers": [
+      {
+        "number": "+1-415-555-1234",
+        "category": "work"
+      }
+    ],
+    "emails": [
+      {
+        "email": "contact@company.com",
+        "category": "work"
+      }
+    ],
+    "websites": [
+      {
+        "url": "https://www.company.com",
+        "category": "work"
+      }
+    ],
+    "socials": [
+      {
+        "url": "https://linkedin.com/company/companyname",
+        "category": "linkedin"
+      }
+    ],
+    "details": {
+      "annual_revenue": "10000000",
+      "number_of_employees": "50-100",
+      "industry": "Technology",
+      "company_type": "SaaS",
+      "founded_year": 2015,
+      "description": "A brief description of the company and what they do."
+    },
+    "tags": [
+      "enterprise",
+      "tech-stack",
+      "high-value"
+    ],
+    "assignee_id": 12345,
+    "custom_fields": {
+      "company_tier": "Enterprise",
+      "market_segment": "Financial Services",
+      "crm_integration": "Salesforce"
+    }
+  }
+}

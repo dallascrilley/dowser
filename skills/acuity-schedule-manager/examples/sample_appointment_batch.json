@@ -1,0 +1,35 @@
+[
+  {
+    "appointmentTypeID": 12345,
+    "datetime": "2025-11-15T09:00:00-0500",
+    "firstName": "Alice",
+    "lastName": "Johnson",
+    "email": "alice.johnson@example.com",
+    "phone": "555-111-2222",
+    "timezone": "America/New_York"
+  },
+  {
+    "appointmentTypeID": 12345,
+    "datetime": "2025-11-15T14:00:00-0500",
+    "firstName": "Bob",
+    "lastName": "Smith",
+    "email": "bob.smith@example.com",
+    "phone": "555-333-4444",
+    "timezone": "America/New_York"
+  },
+  {
+    "appointmentTypeID": 12346,
+    "datetime": "2025-11-16T10:00:00-0500",
+    "firstName": "Carol",
+    "lastName": "Williams",
+    "email": "carol.williams@example.com",
+    "phone": "555-555-6666",
+    "timezone": "America/New_York",
+    "fields": [
+      {
+        "id": 67890,
+        "value": "Referred by Dr. Anderson"
+      }
+    ]
+  }
+]

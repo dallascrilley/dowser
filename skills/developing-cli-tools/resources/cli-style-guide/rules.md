@@ -1,0 +1,24 @@
+# AI-ASSISTED CLI PLUGIN DEVELOPMENT BEST PRACTICES
+
+- Prioritize human readability and usability as the primary goal for all CLI plugin design.
+- Use consistent input and output patterns across commands to enable users to quickly learn new commands.
+- Name topics as plural nouns and commands as verbs, using single lowercase words without spaces, hyphens, or underscores (kebab-case only when unavoidable).
+- Provide descriptions for all topics and commands that fit 80 characters, begin lowercase, and omit ending periods.
+- Prefer flags over arguments for clearer command intent and better autocomplete support.
+- Provide descriptions for all flags in lowercase, concise format without ending periods.
+- Allow arguments to bypass prompts so users can script commands without interactive input.
+- Use `cli.action()` from cli-ux to display action command output with proper spinner and platform support.
+- Output action status messages to stderr as out-of-band information.
+- Use standard colors from heroku-cli-color for consistent noun representation (apps, config vars).
+- Apply color judiciously with only a few contrasting colors to avoid competing for user attention.
+- Reserve yellow and red colors for errors and warning messages.
+- Make human-readable output grep-parseable by using tables with consistent column structure.
+- Generate tables using `cli.table()` from heroku-cli-util.
+- Support `--json` and/or `--terse` flags for machine-readable output when valuable for scripting.
+- Ensure additional information doesn't break existing scripts; avoid modifying existing output after general availability.
+- Output all command output to stdout and only warnings, errors, and out-of-band information to stderr.
+- Do not use native dependencies as they break on Node version updates and cause cross-platform compilation issues.
+- Minimize dependency count to reduce disk space, install time, and plugin performance impact.
+- Use `yarn add --dev` for testing, documentation, and linting packages that users don't need at runtime.
+- Replace `request` package with `http-call` for automatic proxy resolution, retry logic, and common HTTP scenarios.
+- Replace `underscore` package with `lodash` for more functional tools and better Node integration.

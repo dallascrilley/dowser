@@ -1,0 +1,504 @@
+# ============================================================================
+# Acuity Scheduling API - Webhook Configuration Template
+# ============================================================================
+#
+# Purpose: Configure webhook endpoints, event subscriptions, and handling
+# Last Updated: 2025-11-11
+#
+# Setup Steps:
+# 1. Copy this file to webhook_config.yml
+# 2. Configure endpoint URL
+# 3. Set event subscriptions
+# 4. Define handler actions
+# 5. Test with: python -m acuity_schedule_manager.test_webhook
+#
+# ============================================================================
+
+# ============================================================================
+# ENDPOINT CONFIGURATION
+# ============================================================================
+webhook:
+  # Your webhook receiver URL (must be HTTPS accessible from internet)
+  # Acuity will POST events to this URL
+  # Example: https://yourdomain.com/api/webhooks/acuity
+  endpoint_url: "https://yourdomain.com/api/webhooks/acuity"
+
+  # HTTP method (POST or PUT)
+  # POST is standard; most integrations use POST
+  http_method: "POST"
+
+  # Webhook secret for signature verification
+  # Use your admin API key or OAuth token
+  # Located in: Acuity Dashboard → Settings → Integrations → API
+  secret: "${ACUITY_WEBHOOK_SECRET}"
+
+  # Request timeout (seconds)
+  # If your endpoint doesn't respond within this time, webhook is retried
+  timeout_seconds: 30
+
+  # Enable signature verification
+  # CRITICAL for production: prevents malicious webhook injection
+  verify_signature: true
+
+# ============================================================================
+# EVENT SUBSCRIPTIONS
+# ============================================================================
+# Which appointment events to subscribe to
+# Subscribe to only what you need (reduces webhook volume)
+#
+# Available events:
+# - appointment.scheduled : New appointment created
+# - appointment.rescheduled : Appointment time changed
+# - appointment.canceled : Appointment cancelled
+# - appointment.changed : Any appointment modification
+# - order.completed : Product/gift card order finished
+#
+events:
+  # Listen for new appointments
+  # Triggered when: client books new appointment
+  # Payload contains: id, datetime, firstName, lastName, email, phone, etc.
+  appointment_scheduled: true
+
+  # Listen for appointment rescheduling
+  # Triggered when: appointment time is changed
+  # Payload contains: id, new datetime, reason if provided
+  appointment_rescheduled: true
+
+  # Listen for appointment cancellation
+  # Triggered when: appointment is cancelled
+  # Payload contains: id, cancellation date, reason if provided
+  appointment_canceled: true
+
+  # Listen for any appointment modification
+  # Triggered on: any appointment field change
+  # Broader than above events, triggers more frequently
+  appointment_changed: false
+
+  # Listen for product orders/gift card purchases
+  # Triggered when: client completes product order
+  order_completed: false
+
+# ============================================================================
+# HANDLER ACTIONS
+# ============================================================================
+# Define what to do when webhook events are received
+# Each action is optional - enable only what you need
+#
+handlers:
+  # ========================================================================
+  # EMAIL NOTIFICATIONS
+  # ========================================================================
+  email:
+    enabled: false
+
+    # Send customer confirmation email
+    # (In addition to Acuity's built-in confirmation)
+    send_customer_confirmation: false
+    customer_email_template: "templates/customer_confirmation.html"
+
+    # Send staff notification when appointment booked
+    send_staff_notification: false
+    staff_email_recipients:
+      - "staff@yourdomain.com"
+    staff_email_template: "templates/staff_notification.html"
+
+    # Send reminder before appointment
+    # Configure days/hours before
+    send_reminders: false
+    reminder_hours_before: 24
+
+    # Email service to use
+    # Options: acuity_built_in, sendgrid, mailgun, smtp
+    service: "acuity_built_in"
+
+    # Service-specific configuration
+    sendgrid_api_key: "${SENDGRID_API_KEY}"
+    mailgun_domain: "${MAILGUN_DOMAIN}"
+    mailgun_api_key: "${MAILGUN_API_KEY}"
+
+  # ========================================================================
+  # CRM INTEGRATION
+  # ========================================================================
+  crm:
+    enabled: false
+
+    # Sync appointment to CRM as activity/contact
+    sync_to_crm: false
+
+    # Create new contact in CRM if doesn't exist
+    create_new_contacts: true
+
+    # Update existing contact with appointment info
+    update_existing_contacts: true
+
+    # CRM system to integrate with
+    # Options: salesforce, hubspot, copper, pipedrive, custom
+    system: "salesforce"
+
+    # CRM-specific configuration
+    salesforce:
+      instance_url: "https://yourdomain.salesforce.com"
+      client_id: "${SALESFORCE_CLIENT_ID}"
+      client_secret: "${SALESFORCE_CLIENT_SECRET}"
+
+    hubspot:
+      api_key: "${HUBSPOT_API_KEY}"
+      create_deal_on_appointment: false
+      deal_amount_field: "price"
+
+    copper:
+      api_key: "${COPPER_API_KEY}"
+      api_url: "https://api.copper.com"
+
+    # Field mapping: Acuity fields → CRM fields
+    # Define how appointment data maps to CRM contact fields
+    field_mapping:
+      firstName: "FirstName"
+      lastName: "LastName"
+      email: "Email"
+      phone: "Phone"
+      appointmentTypeID: "AppointmentType"
+      datetime: "LastAppointmentDate"
+
+  # ========================================================================
+  # CALENDAR SYNCHRONIZATION
+  # ========================================================================
+  calendar:
+    enabled: false
+
+    # Sync appointments to external calendar
+    # Creates calendar event for each appointment
+    sync_to_external_calendar: false
+
+    # Calendar system to sync with
+    # Options: google, outlook, ics, caldav
+    system: "google"
+
+    # Google Calendar configuration
+    google:
+      credentials_file: "credentials/google_calendar.json"
+      calendar_id: "primary"  # or specific calendar ID
+
+    # Microsoft Outlook configuration
+    outlook:
+      client_id: "${OUTLOOK_CLIENT_ID}"
+      client_secret: "${OUTLOOK_CLIENT_SECRET}"
+      calendar_name: "Calendar"
+
+    # ICS file export (one-way sync)
+    ics:
+      export_path: "calendars/"
+      include_client_details: true
+
+    # CalDAV protocol (for compatible systems)
+    caldav:
+      url: "https://caldav.example.com"
+      username: "${CALDAV_USERNAME}"
+      password: "${CALDAV_PASSWORD}"
+
+  # ========================================================================
+  # SLACK NOTIFICATIONS
+  # ========================================================================
+  slack:
+    enabled: false
+
+    # Send Slack message when appointments booked
+    notify_on_appointment: true
+    slack_webhook_url: "${SLACK_WEBHOOK_URL}"
+    slack_channel: "#appointments"
+    slack_mentions: ""  # e.g., "<!here> " for @here, or "@manager" for specific user
+
+    # Message template
+    message_template: |
+      New appointment: {{ firstName }} {{ lastName }}
+      Type: {{ appointmentTypeName }}
+      Time: {{ datetime }}
+      Contact: {{ email }} / {{ phone }}
+
+    # Send different messages for different events
+    notify_on_reschedule: true
+    notify_on_cancellation: true
+
+  # ========================================================================
+  # CUSTOM WEBHOOK (for chaining to other systems)
+  # ========================================================================
+  custom_webhook:
+    enabled: false
+
+    # Forward webhook to custom endpoint
+    # Useful for triggering your own workflows
+    forward_to_url: "https://your-custom-system.com/webhooks/appointment"
+
+    # Only forward specific events
+    forward_events:
+      - "appointment.scheduled"
+      - "appointment.canceled"
+
+    # Add custom headers to forwarded request
+    custom_headers:
+      Authorization: "Bearer ${CUSTOM_WEBHOOK_TOKEN}"
+      X-Custom-Header: "custom_value"
+
+  # ========================================================================
+  # DATABASE OPERATIONS
+  # ========================================================================
+  database:
+    enabled: false
+
+    # Save webhook event to database for audit trail
+    save_events: true
+    events_table: "acuity_webhook_events"
+
+    # Update local appointment copy in database
+    sync_to_local_db: false
+    appointments_table: "appointments"
+
+    # Sync client information to database
+    sync_clients_to_db: false
+    clients_table: "clients"
+
+    # Database connection
+    # Supports: postgresql, mysql, sqlite
+    connection_type: "postgresql"
+    connection_string: "${DATABASE_URL}"
+
+# ============================================================================
+# QUEUE PROCESSING
+# ============================================================================
+# Configure how webhook events are processed
+# Synchronous (immediate) vs Asynchronous (background worker)
+#
+queue:
+  # Processing mode
+  # sync: Process immediately (simple, but blocks webhook response)
+  # async: Queue for background worker (robust, recommended)
+  processing_mode: "async"
+
+  # Queue backend storage
+  # Options: memory, redis, rabbitmq
+  # - memory: Single instance only, events lost if process crashes
+  # - redis: Distributed, persisted, recommended for production
+  # - rabbitmq: Enterprise-grade, supports priority queues
+  backend: "redis"
+
+  # Backend configuration
+  redis:
+    host: "${REDIS_HOST:localhost}"
+    port: "${REDIS_PORT:6379}"
+    db: "${REDIS_DB:0}"
+    password: "${REDIS_PASSWORD:}"
+
+  rabbitmq:
+    url: "${RABBITMQ_URL:amqp://guest:guest@localhost:5672/}"
+    queue_name: "acuity_webhooks"
+    exchange_name: "acuity"
+
+  # Queue processing settings
+  max_retries: 3
+  retry_backoff_seconds: 60  # Wait time before retry
+  max_wait_in_queue_seconds: 3600  # Discard if queued too long
+  worker_threads: 4  # Number of parallel workers
+
+# ============================================================================
+# DUPLICATE PREVENTION
+# ============================================================================
+# Acuity may deliver same webhook multiple times
+# Prevent processing duplicates
+#
+deduplication:
+  # Enable duplicate detection
+  enabled: true
+
+  # How long to remember seen webhooks (seconds)
+  # After this time, same webhook allowed again (usually not an issue)
+  memory_ttl_seconds: 3600
+
+  # Deduplication key
+  # How to identify duplicate webhooks
+  # Options: event_id (recommended), appointment_id+event_type
+  dedup_key: "event_id"
+
+  # Backend for storing seen webhooks
+  # Options: memory, redis
+  backend: "redis"
+
+# ============================================================================
+# ERROR HANDLING & RETRIES
+# ============================================================================
+# How to handle webhook processing failures
+#
+error_handling:
+  # Retry strategy for failed webhook processing
+  max_retries: 3
+  retry_backoff_base: 2  # Exponential: 1s, 2s, 4s, 8s, 16s...
+
+  # Dead letter queue for permanently failed webhooks
+  # Stores webhooks that exceeded max retries for manual review
+  use_dead_letter_queue: true
+  dead_letter_table: "acuity_webhook_dlq"
+
+  # Failure notifications
+  # Alert when webhook processing fails
+  notify_on_failure: true
+  failure_alert_destination: "slack"  # or "email", "pagerduty"
+
+  # Specific error handlers
+  on_timeout:
+    action: "retry"  # or "skip", "alert"
+    retry_after_seconds: 30
+
+  on_signature_validation_failure:
+    action: "reject"
+    log_suspicious: true
+    alert: true
+
+  on_endpoint_not_found:
+    action: "alert"
+    check_endpoint_health: true
+
+# ============================================================================
+# TESTING & VALIDATION
+# ============================================================================
+# Configuration for testing webhook setup
+#
+testing:
+  # Enable test mode (webhook created but marked for testing only)
+  test_mode: false
+
+  # Use test endpoint during development
+  # (doesn't interfere with production webhooks)
+  test_endpoint_url: "http://localhost:5000/webhooks/test"
+
+  # Sample test events to use for validation
+  test_events:
+    - type: "appointment.scheduled"
+      sample_data:
+        id: "123456789"
+        firstName: "John"
+        lastName: "Doe"
+        email: "john@example.com"
+        phone: "555-0123"
+        appointmentTypeID: "12345"
+        datetime: "2025-11-15T14:00:00-0500"
+
+# ============================================================================
+# MONITORING & LOGGING
+# ============================================================================
+# Track webhook health and debug issues
+#
+monitoring:
+  # Enable webhook event logging
+  log_all_events: true
+  log_file: "logs/webhooks.log"
+
+  # Log request/response bodies (may contain PII)
+  log_payloads: false
+
+  # Health metrics to track
+  metrics:
+    track_delivery_success_rate: true
+    track_processing_duration: true
+    track_queue_depth: true
+
+  # Alerting thresholds
+  alerts:
+    # Alert if success rate drops below %
+    success_rate_threshold: 95
+
+    # Alert if avg processing time exceeds seconds
+    processing_time_threshold_seconds: 5
+
+    # Alert if queue depth exceeds count
+    queue_depth_threshold: 100
+
+# ============================================================================
+# INTEGRATION ENDPOINTS (CRITICAL SETTINGS)
+# ============================================================================
+# The actual external systems to integrate with
+#
+integrations:
+  # Email service endpoints
+  email_service:
+    type: "sendgrid"  # or "mailgun", "smtp", "acuity_built_in"
+    api_key: "${SENDGRID_API_KEY}"
+
+  # CRM service endpoints
+  crm_service:
+    type: "hubspot"
+    base_url: "https://api.hubapi.com"
+    api_key: "${HUBSPOT_API_KEY}"
+
+  # Calendar service endpoints
+  calendar_service:
+    type: "google"
+    credentials_path: "credentials/google_calendar_creds.json"
+
+  # Custom endpoints
+  custom_services:
+    - name: "internal_system"
+      url: "https://internal-api.yourdomain.com/webhooks/appointment"
+      auth_header: "Authorization: Bearer ${INTERNAL_API_TOKEN}"
+
+# ============================================================================
+# ADVANCED CONFIGURATION
+# ============================================================================
+
+# Circuit breaker (prevent cascading failures)
+# If endpoint repeatedly fails, stop sending webhooks temporarily
+circuit_breaker:
+  enabled: true
+  failure_threshold: 10  # Failures before opening circuit
+  reset_timeout_seconds: 300  # Try again after 5 minutes
+  monitor_window_seconds: 60  # Track failures over 1 minute
+
+# Request signing (additional security)
+request_signing:
+  enabled: true
+  algorithm: "sha256"  # Use strong hashing
+  include_timestamp: true
+  timestamp_tolerance_seconds: 300  # Allow 5 minute clock skew
+
+# Webhook versioning (for API evolution)
+api_version: "v1"
+backwards_compatibility: true
+
+# ============================================================================
+# EXAMPLE PRODUCTION SETUP
+# ============================================================================
+# Below is a recommended production configuration
+#
+# webhook:
+#   endpoint_url: "https://yourdomain.com/api/webhooks/acuity"
+#   verify_signature: true
+#
+# events:
+#   appointment_scheduled: true
+#   appointment_rescheduled: true
+#   appointment_canceled: true
+#
+# handlers:
+#   crm:
+#     enabled: true
+#     sync_to_crm: true
+#     system: "hubspot"
+#   email:
+#     enabled: true
+#     send_staff_notification: true
+#   slack:
+#     enabled: true
+#     notify_on_appointment: true
+#
+# queue:
+#   processing_mode: "async"
+#   backend: "redis"
+#   max_retries: 3
+#
+# deduplication:
+#   enabled: true
+#   backend: "redis"
+#
+# error_handling:
+#   max_retries: 3
+#   notify_on_failure: true
+#
+# ============================================================================

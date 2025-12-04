@@ -1,0 +1,10 @@
+{
+  "scenario": "feature_branch_workflow",
+  "context": {
+    "current_branch": "main",
+    "task": "Implement user authentication feature",
+    "team_workflow": "GitHub Flow",
+    "has_uncommitted_changes": false
+  },
+  "request": "Help me create a feature branch, make commits following best practices, and open a pull request"
+}

@@ -1,0 +1,16 @@
+{
+  "appointmentTypeID": 12345,
+  "datetime": "2025-11-15T14:00:00-0500",
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "555-123-4567",
+  "timezone": "America/New_York",
+  "fields": [
+    {
+      "id": 67890,
+      "value": "This is a note about the appointment"
+    }
+  ],
+  "notes": "Please arrive 10 minutes early for check-in"
+}

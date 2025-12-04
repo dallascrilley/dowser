@@ -1,0 +1,3061 @@
+{
+  "version": "1.0",
+  "description": "Global skill activation rules for PAI. Enhances analyze-prompt-skills.ts with enforcement, priority, and file-based triggers.",
+  "notes": {
+    "usage": "This file is read by enhanced analyze-prompt-skills.ts hook",
+    "fallback": "Skills without rules here still work via fuzzy matching",
+    "migration": "Gradually add rules for your 73 existing skills for precise control",
+    "enforcement_types": {
+      "suggest": "Skill suggestion appears but doesn't block execution",
+      "block": "Requires skill to be used before proceeding (guardrail)",
+      "warn": "Shows warning but allows proceeding"
+    },
+    "priority_levels": {
+      "critical": "Highest - Always trigger when matched",
+      "high": "Important - Trigger for most matches",
+      "medium": "Moderate - Trigger for clear matches",
+      "low": "Optional - Trigger only for explicit matches"
+    }
+  },
+  "skills": {
+    "creating-skills": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "TDD for process documentation - test with subagents before writing, iterate until bulletproof. Apply RED-GREEN-REFACTOR to skill creation.",
+      "promptTriggers": {
+        "keywords": [
+          "creating skills",
+          "create skill",
+          "build skill",
+          "new skill",
+          "skill creation",
+          "skill development",
+          "TDD for documentation",
+          "test-driven documentation",
+          "RED-GREEN-REFACTOR",
+          "pressure scenarios",
+          "subagent testing",
+          "skill baseline",
+          "bulletproof skill",
+          "rationalization table",
+          "CSO",
+          "Claude Search Optimization",
+          "when_to_use",
+          "SKILL.md structure",
+          "skill frontmatter",
+          "skill YAML",
+          "progressive disclosure",
+          "token efficiency"
+        ],
+        "intentPatterns": [
+          "(create|build|write|make|author).*?skill",
+          "(how to|how do I).*?(create|build|make).*?skill",
+          "(test|validate|verify).*?skill.*?(subagent|pressure)",
+          "(TDD|test.*?driven).*?(skill|documentation)",
+          "(RED.*?GREEN.*?REFACTOR|baseline.*?test).*?skill",
+          "(bulletproof|rationalization).*?skill",
+          "(optimize|improve).*?skill.*?(discovery|search)",
+          "(frontmatter|YAML|when_to_use).*?skill"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/meta/creating-skills/**",
+          "**/creating-skills/**",
+          "**/SKILL.md"
+        ],
+        "contentPatterns": [
+          "---\\nname:",
+          "when_to_use:",
+          "RED-GREEN-REFACTOR",
+          "pressure scenarios",
+          "baseline behavior",
+          "rationalization",
+          "Claude Search Optimization",
+          "CSO"
+        ]
+      }
+    },
+    "gardening-skills-wiki": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Maintain skills wiki health - check links, naming, cross-references, and coverage. Automated health checks for wiki quality.",
+      "promptTriggers": {
+        "keywords": [
+          "gardening skills",
+          "garden skills",
+          "skills wiki maintenance",
+          "skill health check",
+          "check skill links",
+          "broken skill links",
+          "orphaned skills",
+          "skill naming",
+          "INDEX coverage",
+          "skill INDEX",
+          "validate skills",
+          "skill cross-reference",
+          "backtick wrapped links",
+          "relative skill paths",
+          "garden.sh",
+          "check-links.sh",
+          "check-naming.sh",
+          "check-index-coverage.sh",
+          "kebab-case naming"
+        ],
+        "intentPatterns": [
+          "(check|validate|verify).*?skill.*?(links|health|integrity)",
+          "(garden|maintain|cleanup).*?skills.*?wiki",
+          "(broken|orphaned|missing).*?skill",
+          "(fix|repair).*?skill.*?(link|reference)",
+          "(check|validate).*?INDEX",
+          "(naming|kebab-case).*?skill",
+          "(relative|backtick).*?skill.*?path"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/meta/gardening-skills-wiki/**",
+          "**/skills/**/INDEX.md",
+          "**/garden.sh",
+          "**/check-links.sh",
+          "**/check-naming.sh"
+        ],
+        "contentPatterns": [
+          "garden.sh",
+          "check-links.sh",
+          "kebab-case",
+          "INDEX coverage",
+          "orphaned skill",
+          "backtick-wrapped",
+          "broken link"
+        ]
+      }
+    },
+    "installing-skills": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Fork, clone to ~/.clank, run installer, edit CLAUDE.md. Complete skills system installation workflow.",
+      "promptTriggers": {
+        "keywords": [
+          "install skills",
+          "installing skills",
+          "setup skills",
+          "configure skills",
+          "skills installation",
+          "install clank",
+          "clone clank",
+          "fork clank",
+          "~/.clank",
+          "~/.claude/skills",
+          "install.sh",
+          "symlink skills",
+          "CLAUDE.md configuration",
+          "skills-search tool",
+          "skill system setup"
+        ],
+        "intentPatterns": [
+          "(install|setup|configure).*?skills.*?(system|wiki)",
+          "(install|setup|configure).*?clank",
+          "(fork|clone).*?clank.*?repo",
+          "(run|execute).*?install\\.sh",
+          "(create|add).*?symlink.*?skills",
+          "(update|edit|configure).*?CLAUDE\\.md",
+          "(verify|test).*?skills.*?installation"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/meta/installing-skills/**",
+          "**/install.sh",
+          "**/.clank/**",
+          "**/.claude/CLAUDE.md"
+        ],
+        "contentPatterns": [
+          "install.sh",
+          "~/.clank/clank",
+          "~/.claude/skills",
+          "gh repo fork",
+          "EXTREMELY_IMPORTANT",
+          "skills-search",
+          "symlink"
+        ]
+      }
+    },
+    "backend-dev-guidelines-universal": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Framework-agnostic backend patterns: layered architecture, error handling, testing (adapted for any stack)",
+      "promptTriggers": {
+        "keywords": [
+          "backend",
+          "backend development",
+          "microservice",
+          "controller",
+          "service layer",
+          "service",
+          "repository",
+          "repository pattern",
+          "route",
+          "routing",
+          "API",
+          "endpoint",
+          "middleware",
+          "validation",
+          "database access",
+          "layered architecture",
+          "dependency injection",
+          "error handling",
+          "backend testing"
+        ],
+        "intentPatterns": [
+          "(create|add|implement|build).*?(route|endpoint|API|controller|service|repository)",
+          "(fix|handle|debug).*?(error|exception|backend)",
+          "(add|implement).*?(middleware|validation|error.*?handling)",
+          "(organize|structure|refactor).*?(backend|service|API)",
+          "(how to|best practice).*?(backend|route|controller|service|architecture)",
+          "layered.*?architecture",
+          "separation.*?of.*?concerns"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/{api,backend,server,services}/**/*.{ts,js,py,go}",
+          "**/routes/**/*.{ts,js,py}",
+          "**/controllers/**/*.{ts,js,py}",
+          "**/services/**/*.{ts,js,py}",
+          "**/repositories/**/*.{ts,js,py}"
+        ],
+        "pathExclusions": [
+          "**/*.test.{ts,js,py}",
+          "**/*.spec.{ts,js,py}",
+          "**/node_modules/**",
+          "**/__tests__/**"
+        ],
+        "contentPatterns": [
+          "router\\.",
+          "app\\.(get|post|put|delete|patch)",
+          "export.*Controller",
+          "export.*Service",
+          "class.*Controller",
+          "class.*Service",
+          "class.*Repository",
+          "@Controller",
+          "@Injectable",
+          "@Service"
+        ]
+      }
+    },
+    "frontend-dev-guidelines-tailwind": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "React 18+ best practices with Tailwind CSS and Shadcn/ui patterns",
+      "promptTriggers": {
+        "keywords": [
+          "component",
+          "react component",
+          "UI",
+          "interface",
+          "page",
+          "modal",
+          "dialog",
+          "form",
+          "tailwind",
+          "shadcn",
+          "shadcn/ui",
+          "styling",
+          "className",
+          "frontend",
+          "React",
+          "hooks",
+          "suspense",
+          "error boundary"
+        ],
+        "intentPatterns": [
+          "(create|add|make|build|update|modify|edit).*?(component|UI|page|modal|dialog|form)",
+          "(how to|best practice).*?(component|react|tailwind|shadcn)",
+          "(style|design|layout).*?(component|UI)",
+          "react.*?(hook|pattern|best practice)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/{frontend,client,web,app}/src/**/*.{tsx,jsx}",
+          "**/components/**/*.{tsx,jsx}",
+          "**/pages/**/*.{tsx,jsx}",
+          "**/features/**/*.{tsx,jsx}",
+          "src/**/*.{tsx,jsx}"
+        ],
+        "pathExclusions": [
+          "**/*.test.{tsx,jsx}",
+          "**/*.spec.{tsx,jsx}",
+          "**/*.stories.{tsx,jsx}",
+          "**/node_modules/**",
+          "**/__tests__/**"
+        ],
+        "contentPatterns": [
+          "from 'react'",
+          "className=",
+          "cn\\(",
+          "import.*shadcn",
+          "import.*@/components/ui",
+          "export.*Component",
+          "React\\.FC",
+          "useState",
+          "useEffect"
+        ]
+      }
+    },
+    "PAI": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Primary platform orchestration skill covering global directives and memory workflows.",
+      "promptTriggers": {
+        "keywords": [
+          "pai",
+          "platform ai initiative",
+          "pai agent",
+          "global directive",
+          "memory bank"
+        ],
+        "intentPatterns": [
+          "(how to|explain).*?(PAI|platform ai)",
+          "(update|review).*?memory",
+          "(synchronize|sync).*?PAI"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/PAI/**",
+          "**/.codex/memories/**",
+          "**/@.codex/**"
+        ],
+        "contentPatterns": [
+          "PAI",
+          "platform ai initiative",
+          "memory bank"
+        ]
+      }
+    },
+    "claude-api": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Guides integration with Anthropic Claude API REST + SDK clients.",
+      "promptTriggers": {
+        "keywords": [
+          "claude api",
+          "anthropic sdk",
+          "anthropic client",
+          "messages api",
+          "prompt caching"
+        ],
+        "intentPatterns": [
+          "(call|invoke|integrate).*?(claude|anthropic)",
+          "(debug|fix).*?(anthropic).*?(request|response)",
+          "(configure|authenticate).*?(claude api)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/clients/anthropic/**/*.ts",
+          "**/anthropic/**/*.ts",
+          "**/ai/anthropic/**/*.ts"
+        ],
+        "contentPatterns": [
+          "@anthropic-ai/sdk",
+          "new Anthropic",
+          "client.messages.create"
+        ]
+      }
+    },
+    "architecting-solutions": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "System design playbook for decomposing large features into modular services.",
+      "promptTriggers": {
+        "keywords": [
+          "architecture",
+          "system design",
+          "module breakdown",
+          "design tradeoff",
+          "component diagram"
+        ],
+        "intentPatterns": [
+          "(design|architect).*?(service|system|module)",
+          "(compare|evaluate).*?(approach|pattern)",
+          "(document|spec).*?(architecture|design)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/dev/active/**/*.md",
+          "**/docs/architecture/**/*.md",
+          "**/plan.md"
+        ],
+        "contentPatterns": [
+          "Decision:",
+          "Tradeoff",
+          "Architecture Diagram",
+          "Service Boundary"
+        ]
+      }
+    },
+    "researching-technical-implementations": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Guides structured web + doc research for unknown technical areas.",
+      "promptTriggers": {
+        "keywords": [
+          "tech research",
+          "implementation research",
+          "unknown library",
+          "compare frameworks"
+        ],
+        "intentPatterns": [
+          "(research|investigate|compare).*?(framework|library|protocol)",
+          "(gather|collect).*?references",
+          "(summarize|synthesize).*?findings"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/research/**/*.md",
+          "**/notes/research/**/*.md"
+        ],
+        "contentPatterns": [
+          "TODO: research",
+          "Open Questions",
+          "Findings",
+          "Research Plan"
+        ]
+      }
+    },
+    "project-planning": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Drives plan.md + dev/active documentation cadence (@skill-developer).",
+      "promptTriggers": {
+        "keywords": [
+          "project plan",
+          "task breakdown",
+          "execution plan",
+          "milestones",
+          "deliverables"
+        ],
+        "intentPatterns": [
+          "(draft|write|update).*?(plan|strategy)",
+          "(review|improve).*?(dev docs)",
+          "(synchronize|align).*?tasks"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/dev/active/**/*.md",
+          "docs/plans/**/*.md",
+          "**/plan.md"
+        ],
+        "contentPatterns": [
+          "# Implementation Plan",
+          "Checklist",
+          "Risks",
+          "Milestones"
+        ]
+      }
+    },
+    "web-browser": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Chrome DevTools Protocol automation for browsing, scraping, screenshots, and JavaScript evaluation.",
+      "promptTriggers": {
+        "keywords": [
+          "browser automation",
+          "web scraping",
+          "chrome devtools",
+          "cdp",
+          "headless chrome"
+        ],
+        "intentPatterns": [
+          "(open|navigate|control).*?(browser|chrome)",
+          "(capture|take).*?(screenshot)",
+          "(evaluate|run).*?javascript.*?(page)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/tools/web/**",
+          "**/scripts/web-browser/**",
+          "**/browser-tests/**"
+        ],
+        "contentPatterns": [
+          "Chrome DevTools",
+          "CDP",
+          "browser automation"
+        ]
+      }
+    },
+    "decomposing-complex-tasks": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Breaks down multi-step projects into actionable components with dependency tracking.",
+      "promptTriggers": {
+        "keywords": [
+          "task decomposition",
+          "break down",
+          "workflow planning",
+          "execution strategy",
+          "critical path"
+        ],
+        "intentPatterns": [
+          "(break|decompose).*?(task|project)",
+          "(plan|approach).*?(workflow|initiative)",
+          "(identify|map).*?(dependencies)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "docs/plans/**/*.md",
+          "**/dev/active/**/*.md",
+          "**/plan.md"
+        ],
+        "contentPatterns": [
+          "Task Breakdown",
+          "Dependencies",
+          "Critical Path",
+          "Execution Strategy"
+        ]
+      }
+    },
+    "github-search-assistant": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Guides GitHub repository/code/issue searches and query construction.",
+      "promptTriggers": {
+        "keywords": [
+          "search GitHub",
+          "GitHub query",
+          "find repos",
+          "find issues",
+          "discover projects"
+        ],
+        "intentPatterns": [
+          "(search|find|discover).*?(GitHub|repo|issue|pull request)",
+          "(build|create).*?GitHub.*?query",
+          "(analyze|explore).*?GitHub.*?(activity|trend)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/scripts/github_search.py",
+          "**/references/github-search-syntax.md"
+        ],
+        "contentPatterns": [
+          "github.com/search",
+          "language:",
+          "stars:",
+          "type=repositories"
+        ]
+      }
+    },
+    "extracting-knowledge-concepts": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Extracts atomic concepts, relationships, and tensions from research content.",
+      "promptTriggers": {
+        "keywords": [
+          "knowledge extraction",
+          "atomic concepts",
+          "concept relationships",
+          "knowledge base",
+          "SPO triples"
+        ],
+        "intentPatterns": [
+          "(extract|capture).*?(concept|relationship|knowledge)",
+          "(build|update).*?(knowledge base)",
+          "(document|summarize).*?(tension|uncertainty)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/knowledge/**",
+          "**/notes/knowledge/**",
+          "**/research/**/*.md"
+        ],
+        "contentPatterns": [
+          "\"concepts\": [",
+          "\"relationships\": [",
+          "Subject-Predicate-Object"
+        ]
+      }
+    },
+    "deepwiki-extraction": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Automates DeepWiki navigation to extract repository documentation.",
+      "promptTriggers": {
+        "keywords": [
+          "deepwiki",
+          "extract documentation",
+          "repo docs",
+          "summarize repository"
+        ],
+        "intentPatterns": [
+          "(extract|pull|grab).*?(documentation|docs).*?(repo|repository)",
+          "(navigate|open).*?DeepWiki",
+          "(summarize|analyze).*?repository.*?documentation"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/deepwiki/**",
+          "**/scripts/parse_github_url.py",
+          "**/reference/url-patterns.md"
+        ],
+        "contentPatterns": [
+          "deepwiki.com",
+          "parse_github_url",
+          "Chrome DevTools MCP"
+        ]
+      }
+    },
+    "create-atomic-commits": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Analyzes git diffs to craft focused Conventional Commits.",
+      "promptTriggers": {
+        "keywords": [
+          "atomic commits",
+          "git analysis",
+          "split commits",
+          "organize commits",
+          "conventional commits"
+        ],
+        "intentPatterns": [
+          "(organize|split|group).*?commits",
+          "(analyze|inspect).*?git.*?(diff|changes)",
+          "(create|craft).*?commit.*?series"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/scripts/git-file-timestamps**",
+          "**/scripts/commit/**",
+          "**/docs/commits/**"
+        ],
+        "contentPatterns": [
+          "Conventional Commits",
+          "git diff",
+          "git-file-timestamps"
+        ]
+      }
+    },
+    "adaptive-analyzing": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Selects TRIAGE, DEEP, or SYNTHESIS analysis modes automatically.",
+      "promptTriggers": {
+        "keywords": [
+          "analyze",
+          "synthesize",
+          "triage",
+          "examine",
+          "filter",
+          "combine"
+        ],
+        "intentPatterns": [
+          "(analyze|examine|review).*?(documents|files|code)",
+          "(filter|triage).*?(set|list)",
+          "(combine|merge|synthesize).*?(findings|reports)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/triage-mode-methodology.md",
+          "**/deep-mode-methodology.md",
+          "**/synthesis-mode-methodology.md"
+        ],
+        "contentPatterns": [
+          "[TRIAGE]",
+          "[DEEP]",
+          "[SYNTHESIS]"
+        ]
+      }
+    },
+    "generating-modular-specs": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Translates feature requests into module intents and session records.",
+      "promptTriggers": {
+        "keywords": [
+          "module intent",
+          "module specification",
+          "module scope",
+          "module contract",
+          "session.json"
+        ],
+        "intentPatterns": [
+          "(define|create).*?module",
+          "(convert|translate).*?requirements.*?module",
+          "(document|record).*?module.*?intent"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/ai_working/**/session.json",
+          "**/module_generator/**",
+          "**/templates/session-template.json"
+        ],
+        "contentPatterns": [
+          "\"module_name\"",
+          "MODULE_ID",
+          "\"dependencies\""
+        ]
+      }
+    },
+    "architecting-visualizations": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Designs knowledge graphs, concept constellations, and visualization architectures.",
+      "promptTriggers": {
+        "keywords": [
+          "visualize",
+          "visualization",
+          "concept map",
+          "knowledge graph",
+          "network diagram",
+          "timeline flow"
+        ],
+        "intentPatterns": [
+          "(design|create).*?(visualization|concept map|knowledge graph)",
+          "(architect|plan).*?(interactive|explorable).*?(view|diagram)",
+          "(select|choose).*?(layout|visual metaphor)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/visualizations/**/*.md",
+          "**/viz/**/*.md",
+          "**/knowledge-graphs/**/*.json"
+        ],
+        "contentPatterns": [
+          "force-directed",
+          "concept constellation",
+          "visualization_design",
+          "layout_algorithm"
+        ]
+      }
+    },
+    "write-in-user-voice": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Drafts communications in Dallas Crilley’s authentic tone for emails, follow-ups, and proposals.",
+      "promptTriggers": {
+        "keywords": [
+          "write in my voice",
+          "write like me",
+          "Dallas voice",
+          "draft email for me",
+          "sound like Dallas"
+        ],
+        "intentPatterns": [
+          "(write|draft|compose).*?(email|message|response).*?(my|Dallas).*?(voice|tone)",
+          "(make|ensure).*?(communication).*?sound like me",
+          "(respond|follow up).*?in.*?voice"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/write-in-user-voice/**",
+          "**/communications/templates/**/*.md",
+          "**/email-patterns/**/*.md"
+        ],
+        "contentPatterns": [
+          "Dallas Crilley",
+          "Best,\\nDallas",
+          "I'd be more than happy",
+          "Please take a look when you get the chance"
+        ]
+      }
+    },
+    "web-asset-generator": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Generates favicons, app icons, and social meta images with AskUserQuestion flows.",
+      "promptTriggers": {
+        "keywords": [
+          "web assets",
+          "favicons",
+          "app icons",
+          "og images",
+          "social images",
+          "open graph"
+        ],
+        "intentPatterns": [
+          "(create|generate).*?(favicon|icon|og image|social image)",
+          "(need|want).*?(web assets|meta images|app icons)",
+          "(update|add).*?(open graph|meta tags)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/scripts/generate_favicons.py",
+          "**/scripts/generate_og_images.py",
+          "**/scripts/web_assets/**"
+        ],
+        "contentPatterns": [
+          "AskUserQuestion",
+          "generate_favicons.py",
+          "generate_og_images.py",
+          "favicon.ico"
+        ]
+      }
+    },
+    "tanstack-query": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Provides TanStack Query (React Query) v5 setup, caching, and migration guidance.",
+      "promptTriggers": {
+        "keywords": [
+          "tanstack query",
+          "react query",
+          "useQuery",
+          "useMutation",
+          "QueryClient",
+          "optimistic updates",
+          "infinite query",
+          "v5 migration"
+        ],
+        "intentPatterns": [
+          "(set up|configure).*?(tanstack|react) query",
+          "(migrate|upgrade).*?react query.*?v5",
+          "(debug|fix).*?(stale|cache|mutation).*?react query",
+          "(implement|add).*?(useMutation|useInfiniteQuery|useSuspenseQuery)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/tanstack-query/**",
+          "**/src/hooks/**/use*.ts",
+          "**/src/hooks/**/use*.tsx",
+          "**/query-client/**",
+          "**/src/query/**",
+          "**/react-query/**"
+        ],
+        "contentPatterns": [
+          "@tanstack/react-query",
+          "QueryClientProvider",
+          "staleTime",
+          "gcTime",
+          "useSuspenseQuery"
+        ]
+      }
+    },
+    "synthesizing-insights": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Guides collision-zone thinking, cross-domain pattern recognition, and simplification cascades.",
+      "promptTriggers": {
+        "keywords": [
+          "synthesize insights",
+          "collision zone",
+          "pattern recognition",
+          "simplification cascade",
+          "meta-pattern",
+          "revolutionary insight"
+        ],
+        "intentPatterns": [
+          "(combine|collide).*?(concept|idea)",
+          "(find|discover).*?(meta-pattern|breakthrough)",
+          "(simplify|reduce).*?complexity",
+          "(identify|document).*?simplification cascade"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/synthesizing-insights/**",
+          "**/insights/**/*.md",
+          "**/patterns/**/*.md",
+          "**/collision-zone/**/*.md"
+        ],
+        "contentPatterns": [
+          "collision_experiment",
+          "pattern_recognition",
+          "simplification",
+          "revolutionary_insight"
+        ]
+      }
+    },
+    "skill-creator": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.",
+      "promptTriggers": {
+        "keywords": [
+          "skill creation",
+          "skill-creator",
+          "new skill",
+          "create skill",
+          "skill development",
+          "skill guide",
+          "extend capabilities"
+        ],
+        "intentPatterns": [
+          "(create|make|build).*?new.*?skill",
+          "(update|extend).*?skill",
+          "skill.*?(creation|development).*?guide"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/skill-creator/**"
+        ],
+        "contentPatterns": [
+          "skill creation guide",
+          "modular packages",
+          "specialized knowledge"
+        ]
+      }
+    },
+    "searching-code-structures": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Guides ast-grep syntax-aware searches, refactors, and rule authoring.",
+      "promptTriggers": {
+        "keywords": [
+          "ast-grep",
+          "code pattern",
+          "syntax search",
+          "refactor all",
+          "replace code structure",
+          "AST pattern",
+          "structural search",
+          "sg run",
+          "sg scan"
+        ],
+        "intentPatterns": [
+          "(find|search).*?(code pattern|function|call)",
+          "(replace|refactor).*?code.*?(structure|pattern)",
+          "(create|write).*?ast-grep.*?(rule|yaml)",
+          "(debug|explain).*?ast.*?pattern"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/searching-code-structures/**",
+          "**/rules/**/*.yml",
+          "**/rules/**/*.yaml",
+          "**/scripts/ast-grep/**"
+        ],
+        "contentPatterns": [
+          "sg run",
+          "sg scan",
+          "pattern:",
+          "rule:",
+          "ast-grep"
+        ]
+      }
+    },
+    "researching-web": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Conducts deep web research with advanced queries, source evaluation, and multi-source synthesis.",
+      "promptTriggers": {
+        "keywords": [
+          "research topic",
+          "find information about",
+          "verify claims",
+          "competitive analysis",
+          "analyze trends",
+          "fact check",
+          "web research",
+          "synthesize findings"
+        ],
+        "intentPatterns": [
+          "(research|investigate|analyze).*?(topic|trend|competitor)",
+          "(verify|fact check).*?(claim|information)",
+          "(gather|collect).*?information.*?(sources|web)",
+          "(perform|do).*?competitive analysis"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/researching-web/**",
+          "**/research/logs/**/*.md",
+          "**/competitive-analysis/**/*.md"
+        ],
+        "contentPatterns": [
+          "Search queries used",
+          "Source assessment",
+          "Key findings",
+          "WebFetch"
+        ]
+      }
+    },
+    "optimizing-performance": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Analyzes and improves code/system performance with profiling-first methodology.",
+      "promptTriggers": {
+        "keywords": [
+          "optimize performance",
+          "profiling",
+          "slow endpoint",
+          "high latency",
+          "throughput",
+          "memory leak",
+          "CPU usage",
+          "performance bottleneck",
+          "measure-first",
+          "slow query"
+        ],
+        "intentPatterns": [
+          "(improve|optimize|fix).*?(performance|latency|throughput|memory|CPU)",
+          "(profile|measure).*?(application|endpoint|query)",
+          "(analyze|diagnose).*?(slow|high).*?(api|query|code)",
+          "(reduce|eliminate).*?(bottleneck|latency|resource usage)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/optimizing-performance/**",
+          "**/perf/**",
+          "**/benchmarks/**/*.md",
+          "**/profiling/**/*.md"
+        ],
+        "contentPatterns": [
+          "staleTime",
+          "autocannon",
+          "hyperfine",
+          "EXPLAIN ANALYZE",
+          "Profiling Strategies",
+          "Performance Profile"
+        ]
+      }
+    },
+    "regex-patterns": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Creates, validates, and applies regular expression patterns for validation, extraction, and transformation.",
+      "promptTriggers": {
+        "keywords": [
+          "regex",
+          "regular expression",
+          "pattern matching",
+          "text extraction",
+          "data validation",
+          "log parsing"
+        ],
+        "intentPatterns": [
+          "(create|write|test).*?(regex|regular expression)",
+          "(validate|extract|transform).*?text.*?regex",
+          "(mask|sanitize).*?text.*?pattern"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/regex-patterns/**",
+          "**/scripts/regex_*.py"
+        ],
+        "contentPatterns": [
+          "regex_validator.py",
+          "regex_extractor.py",
+          "regex_transformer.py",
+          "Pattern Explanation"
+        ]
+      }
+    },
+    "automation-scripting": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Guides task automation, cron jobs, ETL pipelines, file watchers, and event-driven scripts.",
+      "promptTriggers": {
+        "keywords": [
+          "automation",
+          "cron job",
+          "workflow automation",
+          "ETL pipeline",
+          "file watcher",
+          "batch processing",
+          "scheduled task"
+        ],
+        "intentPatterns": [
+          "(build|create|design).*?(automation|workflow|pipeline)",
+          "(schedule|run).*?(task|job|cron)",
+          "(watch|monitor).*?files.*?automation"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/automation-scripting/**",
+          "**/automation/**",
+          "**/scripts/automation/**"
+        ],
+        "contentPatterns": [
+          "node-cron",
+          "chokidar",
+          "ETL",
+          "idempotent",
+          "workflow automation"
+        ]
+      }
+    },
+    "using-claude-code": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Explains Claude Code CLI commands, MCP servers, slash commands, and workflow best practices.",
+      "promptTriggers": {
+        "keywords": [
+          "Claude Code",
+          "CLI commands",
+          "MCP server",
+          "slash command",
+          "skills system",
+          "workflow optimization",
+          "Claude CLI"
+        ],
+        "intentPatterns": [
+          "(how to|explain).*?Claude Code",
+          "(configure|setup).*?MCP",
+          "(create|install).*?Claude skill",
+          "(debug|troubleshoot).*?Claude Code"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/using-claude-code/**",
+          "**/CLAUDE.md",
+          "**/AGENTS.md"
+        ],
+        "contentPatterns": [
+          "slash commands",
+          "MCP servers",
+          "file operations",
+          "workflow optimization",
+          "CLI commands"
+        ]
+      }
+    },
+    "git-expert": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Advanced Git workflows, branching strategies, conflict resolution, and history inspection.",
+      "promptTriggers": {
+        "keywords": [
+          "git",
+          "branching",
+          "merge conflict",
+          "rebase",
+          "cherry-pick",
+          "interactive rebase",
+          "gitflow",
+          "git worktree"
+        ],
+        "intentPatterns": [
+          "(resolve|fix).*?git.*?(conflict|issue)",
+          "(undo|revert|reset).*?commit",
+          "(find|search).*?git history",
+          "(explain|compare).*?branching strategy"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/git-expert/**",
+          "**/.git/**"
+        ],
+        "contentPatterns": [
+          "git rebase",
+          "git cherry-pick",
+          "git bisect",
+          "git worktree",
+          "git flow"
+        ]
+      }
+    },
+    "tech-stack-evaluator": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Performs technology comparisons, TCO analysis, security assessment, and stack recommendations.",
+      "promptTriggers": {
+        "keywords": [
+          "tech stack",
+          "compare technologies",
+          "TCO analysis",
+          "stack evaluation",
+          "migration path",
+          "cloud provider comparison"
+        ],
+        "intentPatterns": [
+          "(compare|evaluate).*?(technology|framework|stack)",
+          "(analyze|assess).*?(TCO|cost|security)",
+          "(recommend|select).*?tech stack"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/tech-stack-evaluator/**",
+          "**/evaluations/**/*.md",
+          "**/decision-matrix/**/*.md"
+        ],
+        "contentPatterns": [
+          "TCO analysis",
+          "decision matrix",
+          "confidence level",
+          "migration path",
+          "ecosystem health"
+        ]
+      }
+    },
+    "codex-cli-bridge": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Bridges Claude Code with OpenAI Codex CLI, generating AGENTS.md and codex exec helpers.",
+      "promptTriggers": {
+        "keywords": [
+          "Codex CLI",
+          "AGENTS.md",
+          "codex exec",
+          "Claude bridge",
+          "interop",
+          "codex session"
+        ],
+        "intentPatterns": [
+          "(generate|update).*?AGENTS\\.md",
+          "(bridge|connect).*?(Claude|Codex)",
+          "(run|execute).*?codex exec",
+          "(translate|convert).*?CLAUDE\\.md"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/codex-cli-bridge/**",
+          "**/scripts/codex_executor.py",
+          "**/scripts/agents_md_generator.py"
+        ],
+        "contentPatterns": [
+          "codex exec",
+          "AGENTS.md",
+          "safety_mechanism",
+          "Claude Parser",
+          "Codex CLI"
+        ]
+      }
+    },
+    "aws-solution-architect": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Designs AWS architectures focusing on serverless, scalability, cost optimization, and security.",
+      "promptTriggers": {
+        "keywords": [
+          "AWS architecture",
+          "serverless",
+          "Lambda",
+          "API Gateway",
+          "DynamoDB",
+          "CloudFormation",
+          "Terraform",
+          "cost optimization",
+          "multi-region"
+        ],
+        "intentPatterns": [
+          "(design|architect|optimize).*?AWS",
+          "(build|create).*?serverless.*?(api|backend)",
+          "(generate|write).*?(CloudFormation|CDK|Terraform)",
+          "(reduce|lower).*?AWS.*?cost"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/aws-solution-architect/**",
+          "**/aws/**",
+          "**/iac/**"
+        ],
+        "contentPatterns": [
+          "CloudFormation",
+          "Lambda",
+          "DynamoDB",
+          "EventBridge",
+          "cost optimizer",
+          "architecture_designer"
+        ]
+      }
+    },
+    "brainstorming": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Facilitates creative ideation, divergence, and idea clustering sessions.",
+      "promptTriggers": {
+        "keywords": [
+          "brainstorm",
+          "idea generation",
+          "ideation session"
+        ],
+        "intentPatterns": [
+          "(brainstorm|ideate|generate).*?ideas",
+          "(explore|diverge).*?concepts"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/brainstorming/**"
+        ],
+        "contentPatterns": [
+          "divergent thinking",
+          "creative prompts"
+        ]
+      }
+    },
+    "condition-based-waiting": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Provides techniques for declarative waiting, retries, and conditional orchestration.",
+      "promptTriggers": {
+        "keywords": [
+          "condition based waiting",
+          "wait until",
+          "retry logic"
+        ],
+        "intentPatterns": [
+          "(wait|pause).*?until",
+          "(implement|add).*?retry.*?logic"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/condition-based-waiting/**"
+        ],
+        "contentPatterns": [
+          "wait-until",
+          "conditional wait"
+        ]
+      }
+    },
+    "defense-in-depth": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Implements layered security controls, threat modeling, and blast-radius reduction.",
+      "promptTriggers": {
+        "keywords": [
+          "defense in depth",
+          "layered security",
+          "security posture"
+        ],
+        "intentPatterns": [
+          "(design|implement).*?defense in depth",
+          "(add|improve).*?security layer"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/defense-in-depth/**"
+        ],
+        "contentPatterns": [
+          "security layer",
+          "blast radius"
+        ]
+      }
+    },
+    "dispatching-parallel-agents": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Coordinates multiple agents running in parallel with dependency management.",
+      "promptTriggers": {
+        "keywords": [
+          "parallel agents",
+          "dispatch agents",
+          "multi-agent workflow"
+        ],
+        "intentPatterns": [
+          "(dispatch|run).*?agents.*?parallel",
+          "(coordinate|schedule).*?subagents"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/dispatching-parallel-agents/**"
+        ],
+        "contentPatterns": [
+          "parallel execution",
+          "agent dispatcher"
+        ]
+      }
+    },
+    "executing-plans": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Runs written implementation plans step-by-step with checkpoints and adjustments.",
+      "promptTriggers": {
+        "keywords": [
+          "execute plan",
+          "plan execution",
+          "follow the plan"
+        ],
+        "intentPatterns": [
+          "(execute|follow).*?plan",
+          "(run|carry out).*?implementation steps"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/executing-plans/**"
+        ],
+        "contentPatterns": [
+          "plan checkpoint",
+          "plan execution"
+        ]
+      }
+    },
+    "finishing-a-development-branch": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Wraps up dev branches with final checks, TODO sweeps, and merge readiness.",
+      "promptTriggers": {
+        "keywords": [
+          "finish branch",
+          "development branch complete",
+          "wrap up branch"
+        ],
+        "intentPatterns": [
+          "(finish|complete).*?development branch",
+          "(prepare).*?branch.*?merge"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/finishing-a-development-branch/**"
+        ],
+        "contentPatterns": [
+          "finish branch checklist",
+          "ready to merge"
+        ]
+      }
+    },
+    "receiving-code-review": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Processes review feedback, prioritizes revisions, and tracks follow-up tasks.",
+      "promptTriggers": {
+        "keywords": [
+          "receive code review",
+          "review feedback",
+          "address comments"
+        ],
+        "intentPatterns": [
+          "(process|address).*?code review",
+          "(track|organize).*?review feedback"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/receiving-code-review/**"
+        ],
+        "contentPatterns": [
+          "review feedback",
+          "follow-up task"
+        ]
+      }
+    },
+    "requesting-code-review": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Generates clear review requests with context, diff summaries, and testing notes.",
+      "promptTriggers": {
+        "keywords": [
+          "request code review",
+          "ask for review",
+          "send for review"
+        ],
+        "intentPatterns": [
+          "(request|ask for).*?code review",
+          "(prepare|compose).*?review request"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/requesting-code-review/**"
+        ],
+        "contentPatterns": [
+          "review request template",
+          "testing summary"
+        ]
+      }
+    },
+    "root-cause-tracing": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Guides disciplined root-cause analysis with evidence gathering and hypothesis testing.",
+      "promptTriggers": {
+        "keywords": [
+          "root cause",
+          "rca",
+          "root-cause tracing"
+        ],
+        "intentPatterns": [
+          "(run|perform).*?root cause",
+          "(trace|isolate).*?issue.*?origin"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/root-cause-tracing/**"
+        ],
+        "contentPatterns": [
+          "cause hypothesis",
+          "evidence log"
+        ]
+      }
+    },
+    "subagent-driven-development": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Uses subagents to own milestones, parallelize work, and hand off deliverables.",
+      "promptTriggers": {
+        "keywords": [
+          "subagent development",
+          "subagent-driven",
+          "delegated development"
+        ],
+        "intentPatterns": [
+          "(plan|run).*?subagent.*?development",
+          "(delegate|assign).*?work.*?subagent"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/subagent-driven-development/**"
+        ],
+        "contentPatterns": [
+          "subagent lane",
+          "handoff artifact"
+        ]
+      }
+    },
+    "systematic-debugging": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Applies structured debugging loops, instrumentation, and hypothesis tracking.",
+      "promptTriggers": {
+        "keywords": [
+          "systematic debugging",
+          "debug checklist"
+        ],
+        "intentPatterns": [
+          "(debug|diagnose).*?systematically",
+          "(apply).*?debug checklist"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/systematic-debugging/**"
+        ],
+        "contentPatterns": [
+          "debug loop",
+          "instrumentation plan"
+        ]
+      }
+    },
+    "test-driven-development": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Runs TDD red/green/refactor cycles with test scaffolding and refactor prompts.",
+      "promptTriggers": {
+        "keywords": [
+          "tdd",
+          "test driven development",
+          "red green refactor"
+        ],
+        "intentPatterns": [
+          "(practice|follow).*?tdd",
+          "(write).*?test.*?before code"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/test-driven-development/**"
+        ],
+        "contentPatterns": [
+          "red/green/refactor",
+          "tdd checklist"
+        ]
+      }
+    },
+    "testing-anti-patterns": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Detects fragile, slow, or flaky test patterns and proposes fixes.",
+      "promptTriggers": {
+        "keywords": [
+          "testing anti-patterns",
+          "flaky tests",
+          "test smell"
+        ],
+        "intentPatterns": [
+          "(identify|find).*?testing anti-pattern",
+          "(fix|improve).*?flaky.*?tests"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/testing-anti-patterns/**"
+        ],
+        "contentPatterns": [
+          "test smell catalog",
+          "anti-pattern remediation"
+        ]
+      }
+    },
+    "testing-skills-with-subagents": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Validates skills by delegating evaluation to specialized subagents.",
+      "promptTriggers": {
+        "keywords": [
+          "testing skills with subagents",
+          "subagent testing",
+          "skill QA"
+        ],
+        "intentPatterns": [
+          "(test|validate).*?skill.*?subagent",
+          "(run).*?subagent.*?skill tests"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/testing-skills-with-subagents/**"
+        ],
+        "contentPatterns": [
+          "skill test harness",
+          "subagent evaluator"
+        ]
+      }
+    },
+    "using-git-worktrees": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Manages git worktrees for multi-branch workflows, reviews, and hotfixes.",
+      "promptTriggers": {
+        "keywords": [
+          "git worktree",
+          "using git worktrees",
+          "worktree workflow"
+        ],
+        "intentPatterns": [
+          "(create|manage).*?git worktree",
+          "(use|leverage).*?worktrees.*?flow"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/using-git-worktrees/**"
+        ],
+        "contentPatterns": [
+          "worktree add",
+          "worktree cleanup"
+        ]
+      }
+    },
+    "verification-before-completion": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Enforces verification passes before marking work complete.",
+      "promptTriggers": {
+        "keywords": [
+          "verification before completion",
+          "verify work",
+          "pre-completion checks"
+        ],
+        "intentPatterns": [
+          "(verify|double-check).*?before completion",
+          "(run).*?final verification"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/verification-before-completion/**"
+        ],
+        "contentPatterns": [
+          "verification checklist",
+          "final verification"
+        ]
+      }
+    },
+    "writing-plans": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Produces structured implementation plans, to-do lists, and execution briefs.",
+      "promptTriggers": {
+        "keywords": [
+          "writing plans",
+          "implementation plan",
+          "plan template"
+        ],
+        "intentPatterns": [
+          "(write|draft).*?(implementation|execution) plan",
+          "(structure|format).*?plan"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/writing-plans/**"
+        ],
+        "contentPatterns": [
+          "plan template",
+          "plan sections"
+        ]
+      }
+    },
+    "using-openai-codex-cli": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Web scraping with crawl4ai CLI. Extract clean content from websites, handle JavaScript-heavy sites, configure extraction strategies, and manage output formats.",
+      "promptTriggers": {
+        "keywords": [
+          "crawl4ai",
+          "web scraping",
+          "web crawling",
+          "content extraction",
+          "html scraping",
+          "javascript scraping",
+          "crawl4ai cli",
+          "website scraping",
+          "markdown extraction"
+        ],
+        "intentPatterns": [
+          "(scrape|extract|crawl).*?(website|web.*?page|content)",
+          "(use|run).*?crawl4ai",
+          "(extract|get).*?(html|markdown|text).*?(from|website)",
+          "web.*?(scraping|crawling|extraction)",
+          "(handle|scrape).*?javascript.*?(site|content)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/using-openai-codex-cli/**",
+          "**/scripts/codex-code-review.sh",
+          "**/codex/**/*.md"
+        ],
+        "contentPatterns": [
+          "codex exec",
+          "codex resume",
+          "--skip-git-repo-check",
+          "codex-code-review",
+          "model_reasoning_effort"
+        ]
+      }
+    },
+    "zustand-state-management": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Provides production-tested Zustand + TypeScript patterns, persistence, and hydration fixes.",
+      "promptTriggers": {
+        "keywords": [
+          "zustand",
+          "state management",
+          "persist middleware",
+          "zustand slices",
+          "hydration error",
+          "immer middleware"
+        ],
+        "intentPatterns": [
+          "(set up|configure).*?zustand",
+          "(migrate|move).*?(redux|context).*?zustand",
+          "(fix|debug).*?zustand.*?(hydration|persist|typescript)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/zustand-state-management/**",
+          "**/src/stores/**/*.ts",
+          "**/zustand/**/*.ts"
+        ],
+        "contentPatterns": [
+          "create<",
+          "persist(",
+          "immer",
+          "shallow",
+          "slices pattern",
+          "hydration mismatch"
+        ]
+      }
+    },
+    "claude-action-workflows": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "GitHub Actions workflows for Claude Code Action - PR reviews, issue triage, CI auto-fix",
+      "promptTriggers": {
+        "keywords": [
+          "github actions",
+          "github workflow",
+          "claude code action",
+          "PR review automation",
+          "issue triage",
+          "CI auto-fix",
+          "workflow automation",
+          "@claude assistant",
+          "CLAUDE_CODE_OAUTH_TOKEN",
+          "anthropic_api_key",
+          "claude_args",
+          "automated review",
+          "auto review"
+        ],
+        "intentPatterns": [
+          "(create|add|setup|configure).*?(github.*?action|workflow|claude.*?action)",
+          "(automate|automation).*?(PR|review|issue|triage)",
+          "(add|setup).*?(@claude|claude.*?assistant)",
+          "(fix|debug|troubleshoot).*?(github.*?action|workflow)",
+          "(how to|how do I).*?(github.*?action|claude.*?action|workflow)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          ".github/workflows/**/*.yml",
+          ".github/workflows/**/*.yaml"
+        ],
+        "contentPatterns": [
+          "anthropics/claude-code-action",
+          "CLAUDE_CODE_OAUTH_TOKEN",
+          "claude_args:",
+          "track_progress:",
+          "@claude"
+        ]
+      }
+    },
+    "pandadoc-sales-manager": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Automates PandaDoc document creation, template mapping, webhooks, and CRM sync.",
+      "promptTriggers": {
+        "keywords": [
+          "pandadoc",
+          "sales document",
+          "proposal template",
+          "esignature"
+        ],
+        "intentPatterns": [
+          "(create|send).*?pandadoc",
+          "(automate|sync).*?(proposal|contract)",
+          "(configure|debug).*?pandadoc.*?webhook"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/pandadoc-sales-manager/**"
+        ],
+        "contentPatterns": [
+          "webhook_config.yml",
+          "template_mappings.yml",
+          "bulk_create_documents.py"
+        ]
+      }
+    },
+    "acuity-schedule-manager": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Integrates Acuity Scheduling API for appointments, clients, availability, and webhooks.",
+      "promptTriggers": {
+        "keywords": [
+          "acuity",
+          "appointment booking",
+          "scheduling API",
+          "calendar availability"
+        ],
+        "intentPatterns": [
+          "(book|manage).*?acuity.*?(appointment|client)",
+          "(check|query).*?acuity.*?availability",
+          "(configure).*?acuity.*?webhook"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/acuity-schedule-manager/**"
+        ],
+        "contentPatterns": [
+          "validate_credentials.py",
+          "availability",
+          "webhook handler"
+        ]
+      }
+    },
+    "basecamp-assistant": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Handles Basecamp 4 API auth, projects, todos, messages, and file operations.",
+      "promptTriggers": {
+        "keywords": [
+          "basecamp api",
+          "basecamp 4",
+          "bc3-api",
+          "project management api"
+        ],
+        "intentPatterns": [
+          "(call|use).*?basecamp.*?api",
+          "(automate|integrate).*?basecamp",
+          "(post|fetch).*?basecamp.*?(message|todo|doc)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/basecamp-assistant/**"
+        ],
+        "contentPatterns": [
+          "ACCESS_TOKEN",
+          "ACCOUNT_ID",
+          "basecamp scripts"
+        ]
+      }
+    },
+    "convert-docs-to-skill": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Converts documentation into full Claude skills with scripts/templates/guardrails.",
+      "promptTriggers": {
+        "keywords": [
+          "doc to skill",
+          "create skill from docs",
+          "documentation to skill"
+        ],
+        "intentPatterns": [
+          "(build|create).*?skill.*?(from|using).*?docs",
+          "(turn|transform).*?documentation.*?skill"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/convert-docs-to-skill/**"
+        ],
+        "contentPatterns": [
+          "Skill Creator from Documentation",
+          "create_skill.py",
+          "crawl4ai"
+        ]
+      }
+    },
+    "copper-crm": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Integrates Copper (ProsperWorks) CRM API for contacts, pipelines, opportunities, and sync.",
+      "promptTriggers": {
+        "keywords": [
+          "copper crm",
+          "prosperworks",
+          "CRM API",
+          "copper integration"
+        ],
+        "intentPatterns": [
+          "(sync|integrate).*?copper",
+          "(manage|update).*?copper.*?(contact|pipeline|opportunity)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/copper-crm/**"
+        ],
+        "contentPatterns": [
+          "COPPER_API_KEY",
+          "scripts/test_connection.py",
+          "pipeline metadata"
+        ]
+      }
+    },
+    "connectwise-api-assistant": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Uses ConnectWise CLI/API for agreements, companies, invoices, catalog items, and error handling.",
+      "promptTriggers": {
+        "keywords": [
+          "connectwise",
+          "cw cli",
+          "connectwise manage",
+          "agreement lookup"
+        ],
+        "intentPatterns": [
+          "(search|lookup).*?connectwise",
+          "(debug|fix).*?connectwise.*?(401|403|404|timeout)",
+          "(build|filter).*?conditions query"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/connectwise-api-assistant/**"
+        ],
+        "contentPatterns": [
+          "cw config test",
+          "friendly search",
+          "agreement additions"
+        ]
+      }
+    },
+    "claude-agent-sdk": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Comprehensive guide for @anthropic-ai/claude-agent-sdk - build agents with query(), tool integration, MCP servers, and subagent orchestration.",
+      "promptTriggers": {
+        "keywords": [
+          "claude agent sdk",
+          "@anthropic-ai/claude-agent-sdk",
+          "claude-agent-sdk",
+          "claude sdk",
+          "anthropic agent sdk",
+          "query() method",
+          "agent query",
+          "MCP server integration",
+          "tool integration claude",
+          "subagent orchestration",
+          "agent with tools",
+          "claude code agent",
+          "building claude agents",
+          "anthropic sdk"
+        ],
+        "intentPatterns": [
+          "(use|integrate|implement|build with).*?claude.*?agent.*?sdk",
+          "(use|integrate|implement|build with).*?@anthropic-ai.*?claude-agent-sdk",
+          "(query|tool|MCP).*?integration.*?claude",
+          "(build|create|develop).*?agent.*?claude",
+          "(subagent|orchestration).*?claude",
+          "anthropic.*?sdk"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/agents-and-skills/claude-agent-sdk/**",
+          "**/claude-agent-sdk/**"
+        ],
+        "contentPatterns": [
+          "@anthropic-ai/claude-agent-sdk",
+          "query()",
+          "MCP server",
+          "subagent orchestration",
+          "tool integration"
+        ]
+      }
+    },
+    "agent-observability": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Real-time observability dashboard for multi-agent sessions - WebSocket-based event streaming, swim lane visualization, agent monitoring.",
+      "promptTriggers": {
+        "keywords": [
+          "agent observability",
+          "agent monitoring",
+          "agent dashboard",
+          "real-time agent tracking",
+          "agent visualization",
+          "swim lane visualization",
+          "WebSocket agent events",
+          "agent event streaming",
+          "multi-agent monitoring",
+          "agent debugging",
+          "agent performance monitoring",
+          "observability dashboard"
+        ],
+        "intentPatterns": [
+          "(monitor|observe|track|visualize).*?agent",
+          "(real.*?time|live).*?agent.*?(monitoring|tracking|observability)",
+          "(dashboard|visualization).*?agent",
+          "(WebSocket|event.*?streaming).*?agent",
+          "(debug|troubleshoot).*?agent.*?(session|execution)",
+          "multi.*?agent.*?(monitoring|tracking)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/agents-and-skills/agent-observability/**",
+          "**/agent-observability/**"
+        ],
+        "contentPatterns": [
+          "observability dashboard",
+          "WebSocket",
+          "swim lane",
+          "agent monitoring",
+          "event streaming"
+        ]
+      }
+    },
+    "openai-api": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "OpenAI's stateless APIs: Chat Completions, Embeddings, Images (DALL-E), Audio (Whisper, TTS), Moderation. GPT-5, GPT-4o coverage.",
+      "promptTriggers": {
+        "keywords": [
+          "openai api",
+          "openai chat",
+          "openai embeddings",
+          "openai dall-e",
+          "openai whisper",
+          "openai tts",
+          "openai moderation",
+          "gpt-5",
+          "gpt-4o",
+          "chat completions",
+          "dall-e 3",
+          "whisper api",
+          "text to speech openai",
+          "openai images",
+          "openai audio"
+        ],
+        "intentPatterns": [
+          "(use|integrate|implement).*?openai.*?api",
+          "(chat.*?completion|gpt-5|gpt-4o).*?openai",
+          "(embeddings|dall-e|whisper|tts|moderation).*?openai",
+          "(generate|create).*?(image|audio|speech).*?openai",
+          "(transcribe|translate).*?audio.*?openai",
+          "(moderate|filter).*?content.*?openai"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/coding/openai-api/**",
+          "**/openai-api/**"
+        ],
+        "contentPatterns": [
+          "openai",
+          "chat.completions",
+          "embeddings",
+          "DALL-E",
+          "Whisper",
+          "text-to-speech",
+          "moderation"
+        ]
+      }
+    },
+    "openai-responses": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "OpenAI's Responses API (stateful, launched March 2025) - preserved reasoning state, automatic conversation management, multi-turn dialogue.",
+      "promptTriggers": {
+        "keywords": [
+          "openai responses",
+          "openai responses api",
+          "stateful openai",
+          "openai conversation management",
+          "openai reasoning state",
+          "openai multi-turn",
+          "responses api",
+          "preserved reasoning",
+          "automatic conversation",
+          "openai state management"
+        ],
+        "intentPatterns": [
+          "(use|integrate|implement).*?openai.*?responses.*?api",
+          "(stateful|conversation|multi.*?turn).*?openai",
+          "(preserve|maintain).*?reasoning.*?state.*?openai",
+          "(automatic|managed).*?conversation.*?openai",
+          "openai.*?responses"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/agents-and-skills/openai-responses/**",
+          "**/openai-responses/**"
+        ],
+        "contentPatterns": [
+          "Responses API",
+          "stateful",
+          "preserved reasoning",
+          "automatic conversation",
+          "multi-turn"
+        ]
+      }
+    },
+    "google-gemini-api": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Google Gemini API with correct SDK: @google/genai (NOT deprecated @google/generative-ai) - multimodal inputs, thinking mode, function calling.",
+      "promptTriggers": {
+        "keywords": [
+          "google gemini",
+          "gemini api",
+          "@google/genai",
+          "gemini multimodal",
+          "gemini thinking mode",
+          "gemini function calling",
+          "gemini-pro",
+          "gemini-2.0",
+          "google ai studio",
+          "generative ai google"
+        ],
+        "intentPatterns": [
+          "(use|integrate|implement).*?gemini.*?api",
+          "(use|integrate|implement).*?@google/genai",
+          "(multimodal|thinking.*?mode|function.*?calling).*?gemini",
+          "(google|gemini).*?(ai|generative)",
+          "gemini.*?(pro|2\\.0)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/coding/google-gemini-api/**",
+          "**/google-gemini-api/**"
+        ],
+        "contentPatterns": [
+          "@google/genai",
+          "gemini-pro",
+          "gemini-2.0",
+          "multimodal",
+          "thinking mode",
+          "function calling"
+        ]
+      }
+    },
+    "google-gemini-embeddings": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Gemini embedding model (gemini-embedding-001) for RAG systems - 768 dimensions, 8 task types, Vectorize integration.",
+      "promptTriggers": {
+        "keywords": [
+          "gemini embeddings",
+          "gemini-embedding-001",
+          "google embeddings",
+          "gemini rag",
+          "gemini vectorize",
+          "gemini semantic search",
+          "gemini similarity",
+          "768 dimensions",
+          "task type embeddings",
+          "retrieval augmented generation gemini"
+        ],
+        "intentPatterns": [
+          "(generate|create|use).*?gemini.*?embeddings?",
+          "(rag|retrieval.*?augmented).*?gemini",
+          "(vectorize|semantic.*?search|similarity).*?gemini",
+          "gemini.*?embedding.*?(model|001)",
+          "(task.*?type|768.*?dimension).*?gemini"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/coding/google-gemini-embeddings/**",
+          "**/google-gemini-embeddings/**"
+        ],
+        "contentPatterns": [
+          "gemini-embedding-001",
+          "768 dimensions",
+          "task type",
+          "Vectorize",
+          "RAG"
+        ]
+      }
+    },
+    "fabric-patterns": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Intelligent pattern selector for Fabric CLI (242+ patterns) - categories: EXTRACT, SUMMARIZE, ANALYSIS, DEVELOPMENT, SECURITY, WRITING.",
+      "promptTriggers": {
+        "keywords": [
+          "fabric patterns",
+          "fabric cli",
+          "fabric pattern selector",
+          "fabric extract",
+          "fabric summarize",
+          "fabric analysis",
+          "fabric development",
+          "fabric security",
+          "fabric writing",
+          "fabric tool",
+          "fabric 242 patterns"
+        ],
+        "intentPatterns": [
+          "(use|select|run).*?fabric.*?pattern",
+          "(fabric|pattern).*?(extract|summarize|analysis|development|security|writing)",
+          "fabric.*?(cli|tool)",
+          "(242|pattern.*?selector).*?fabric"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/productivity/fabric-patterns/**",
+          "**/fabric-patterns/**"
+        ],
+        "contentPatterns": [
+          "fabric",
+          "pattern selector",
+          "EXTRACT",
+          "SUMMARIZE",
+          "ANALYSIS",
+          "DEVELOPMENT",
+          "SECURITY",
+          "WRITING"
+        ]
+      }
+    },
+    "cli-tool-developer": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "CLI development with Commander.js, Click, Typer - argument parsing, interactive prompts, terminal UI, progress indicators.",
+      "promptTriggers": {
+        "keywords": [
+          "cli tool developer",
+          "cli development",
+          "commander.js",
+          "click python",
+          "typer",
+          "argument parsing",
+          "interactive prompts",
+          "terminal ui",
+          "progress indicators",
+          "cli design",
+          "command line tool",
+          "build cli"
+        ],
+        "intentPatterns": [
+          "(build|create|develop).*?cli.*?tool",
+          "(use|implement).*?(commander\\.js|click|typer)",
+          "(argument.*?parsing|interactive.*?prompt|terminal.*?ui)",
+          "(progress.*?indicator|spinner).*?cli",
+          "(design|implement).*?command.*?line"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/coding/cli-tool-developer/**",
+          "**/cli-tool-developer/**"
+        ],
+        "contentPatterns": [
+          "Commander.js",
+          "Click",
+          "Typer",
+          "argument parsing",
+          "interactive prompts",
+          "terminal UI"
+        ]
+      }
+    },
+    "developing-cli-tools": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Build CLIs that are human-friendly, scriptable, and composable - TTY detection, stdout/stderr routing, help systems, machine modes.",
+      "promptTriggers": {
+        "keywords": [
+          "developing cli tools",
+          "cli best practices",
+          "human-friendly cli",
+          "scriptable cli",
+          "composable cli",
+          "tty detection",
+          "stdout stderr",
+          "help systems",
+          "machine mode",
+          "cli output routing",
+          "exit codes",
+          "version info cli"
+        ],
+        "intentPatterns": [
+          "(develop|build|create).*?cli.*?(best.*?practice|pattern)",
+          "(human.*?friendly|scriptable|composable).*?cli",
+          "(tty.*?detection|output.*?routing).*?cli",
+          "(help.*?system|machine.*?mode).*?cli",
+          "(exit.*?code|version.*?info).*?cli"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/coding/developing-cli-tools/**",
+          "**/developing-cli-tools/**"
+        ],
+        "contentPatterns": [
+          "TTY detection",
+          "stdout",
+          "stderr",
+          "help system",
+          "machine mode",
+          "scriptable"
+        ]
+      }
+    },
+    "ast-grep": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Structural code search with Abstract Syntax Tree (AST) patterns - translate natural language queries into ast-grep rules for precise code matching.",
+      "promptTriggers": {
+        "keywords": [
+          "ast-grep",
+          "ast grep",
+          "structural code search",
+          "abstract syntax tree",
+          "ast patterns",
+          "ast-grep rules",
+          "code structure search",
+          "syntax tree search",
+          "ast matching",
+          "code pattern matching",
+          "stopBy end",
+          "ast-grep scan"
+        ],
+        "intentPatterns": [
+          "(use|write|create).*?ast.*?grep.*?rule",
+          "(structural|ast|syntax.*?tree).*?(search|matching|pattern)",
+          "(find|locate|search).*?code.*?(structure|pattern)",
+          "(translate|convert).*?(query|pattern).*?ast.*?grep",
+          "stopBy.*?end"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/coding/ast-grep/**",
+          "**/ast-grep/**"
+        ],
+        "contentPatterns": [
+          "ast-grep",
+          "AST pattern",
+          "structural search",
+          "stopBy: end",
+          "kind:",
+          "pattern:"
+        ]
+      }
+    },
+    "prompting": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Prompt engineering and context engineering principles based on Anthropic best practices - clarity, structure, progressive discovery, signal-to-noise optimization.",
+      "promptTriggers": {
+        "keywords": [
+          "prompting",
+          "prompt engineering",
+          "context engineering",
+          "prompt best practices",
+          "anthropic prompting",
+          "signal to noise",
+          "progressive discovery",
+          "just-in-time loading",
+          "prompt structure",
+          "context management",
+          "agent configuration",
+          "llm prompts"
+        ],
+        "intentPatterns": [
+          "(prompt|context).*?engineering",
+          "(best.*?practice|principle).*?(prompt|context)",
+          "(signal.*?to.*?noise|progressive.*?discovery)",
+          "(just.*?in.*?time|jit).*?(loading|context)",
+          "(structure|optimize|design).*?(prompt|context)",
+          "(agent.*?configuration|llm.*?prompt)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/productivity/prompting/**",
+          "**/prompting/**"
+        ],
+        "contentPatterns": [
+          "prompt engineering",
+          "context engineering",
+          "signal-to-noise",
+          "progressive discovery",
+          "just-in-time",
+          "Anthropic"
+        ]
+      }
+    },
+    "managing-hetzner-coolify": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Manage Real News PR infrastructure on Hetzner Cloud and Coolify. Create servers, deploy applications/databases, configure firewalls, troubleshoot issues, and monitor health.",
+      "promptTriggers": {
+        "keywords": [
+          "hetzner",
+          "coolify",
+          "hetzner cloud",
+          "coolify platform",
+          "rnpr-internal",
+          "rnpr-clients",
+          "capture-radio",
+          "server deployment",
+          "cloud infrastructure",
+          "VPS management",
+          "firewall configuration",
+          "database deployment",
+          "server snapshot",
+          "infrastructure health"
+        ],
+        "intentPatterns": [
+          "(create|deploy|manage|configure).*?(hetzner|coolify).*?server",
+          "(deploy|setup|configure).*?(database|postgres|mysql).*?(coolify|hetzner)",
+          "(check|monitor|troubleshoot).*?(infrastructure|server).*?health",
+          "(configure|setup|add).*?firewall.*?rule",
+          "(create|manage).*?server.*?snapshot",
+          "hetzner.*?cloud.*?(server|infrastructure)",
+          "coolify.*?(application|deployment|container)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/cloud-and-infra/managing-hetzner-coolify/**",
+          "**/hetzner-*.sh",
+          "**/coolify-*.sh"
+        ],
+        "contentPatterns": [
+          "hcloud server",
+          "coolify servers",
+          "5.161.214.194",
+          "157.180.85.128",
+          "rnpr-internal",
+          "rnpr-clients"
+        ]
+      }
+    },
+    "cloudflare-full-stack-scaffold": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Production-ready Cloudflare starter with React, Hono, AI SDK, shadcn/ui, Drizzle ORM, and comprehensive tooling. Scaffold full-stack Cloudflare applications with best practices.",
+      "promptTriggers": {
+        "keywords": [
+          "cloudflare pages",
+          "cloudflare workers",
+          "cloudflare full stack",
+          "hono framework",
+          "AI SDK",
+          "drizzle orm",
+          "shadcn/ui",
+          "cloudflare d1",
+          "cloudflare r2",
+          "cloudflare kv",
+          "vite cloudflare",
+          "react cloudflare",
+          "full stack cloudflare"
+        ],
+        "intentPatterns": [
+          "(create|scaffold|build|setup).*?cloudflare.*?(app|application|project)",
+          "(deploy|build).*?full.*?stack.*?cloudflare",
+          "(setup|create|initialize).*?(hono|vite|react).*?cloudflare",
+          "cloudflare.*?(pages|workers).*?(application|project)",
+          "(use|integrate).*?(d1|r2|kv).*?cloudflare"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/cloud-and-infra/cloudflare-full-stack-scaffold/**",
+          "**/wrangler.toml",
+          "**/cloudflare-*.config.*"
+        ],
+        "contentPatterns": [
+          "@cloudflare/workers-types",
+          "wrangler deploy",
+          "hono/cloudflare-pages",
+          "drizzle-orm/d1"
+        ]
+      }
+    },
+    "clerk-auth": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Implement Clerk authentication with React/Next.js. Handle OAuth providers, user management, protected routes, webhooks, and organization features.",
+      "promptTriggers": {
+        "keywords": [
+          "clerk",
+          "clerk auth",
+          "clerk authentication",
+          "clerk react",
+          "clerk nextjs",
+          "clerk webhooks",
+          "clerk organizations",
+          "clerk user management",
+          "@clerk/clerk-react",
+          "@clerk/nextjs",
+          "clerk oauth",
+          "clerk protected routes"
+        ],
+        "intentPatterns": [
+          "(implement|setup|configure|integrate).*?clerk.*?(auth|authentication)",
+          "(add|setup|configure).*?clerk.*?(react|nextjs|next\\.js)",
+          "(setup|configure|handle).*?clerk.*?(webhook|organization|oauth)",
+          "clerk.*?(user|session).*?management",
+          "(protect|secure).*?route.*?clerk"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/integrations-and-saas/clerk-auth/**",
+          "**/.env*.clerk",
+          "**/clerk-*.config.*"
+        ],
+        "contentPatterns": [
+          "@clerk/clerk-react",
+          "@clerk/nextjs",
+          "ClerkProvider",
+          "useUser()",
+          "SignIn",
+          "SignUp"
+        ]
+      }
+    },
+    "airtable-manager": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Airtable REST API manager for CRUD operations, batch processing, field type handling, and automation. Manage bases, tables, records, and attachments with best practices.",
+      "promptTriggers": {
+        "keywords": [
+          "airtable",
+          "airtable api",
+          "airtable rest api",
+          "airtable crud",
+          "airtable base",
+          "airtable table",
+          "airtable records",
+          "airtable automation",
+          "airtable batch",
+          "airtable attachments",
+          "airtable field types"
+        ],
+        "intentPatterns": [
+          "(create|read|update|delete|manage).*?airtable.*?(record|table|base)",
+          "(integrate|connect|setup).*?airtable.*?api",
+          "(batch|bulk).*?airtable.*?operation",
+          "airtable.*?(automation|webhook|sync)",
+          "(upload|download|manage).*?airtable.*?attachment"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/integrations-and-saas/airtable-manager/**",
+          "**/*airtable*.ts",
+          "**/*airtable*.js"
+        ],
+        "contentPatterns": [
+          "api.airtable.com",
+          "AIRTABLE_API_KEY",
+          "AIRTABLE_BASE_ID",
+          "Airtable.base"
+        ]
+      }
+    },
+    "vmix-production-manager": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Automate vMix live production with TCP API and web controller. Control inputs, transitions, overlays, audio, recording, streaming, and create custom automation scripts.",
+      "promptTriggers": {
+        "keywords": [
+          "vmix",
+          "vmix api",
+          "vmix tcp",
+          "vmix automation",
+          "vmix control",
+          "vmix web controller",
+          "vmix inputs",
+          "vmix transitions",
+          "vmix overlays",
+          "vmix recording",
+          "vmix streaming",
+          "live production"
+        ],
+        "intentPatterns": [
+          "(automate|control|manage).*?vmix.*?(production|live|stream)",
+          "(create|build|setup).*?vmix.*?(automation|script|control)",
+          "vmix.*?(api|tcp|web.*?controller)",
+          "(control|manage).*?vmix.*?(input|transition|overlay|audio)",
+          "(start|stop|control).*?vmix.*?(record|stream)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/integrations-and-saas/vmix-production-manager/**",
+          "**/*vmix*.ts",
+          "**/*vmix*.js",
+          "**/*vmix*.py"
+        ],
+        "contentPatterns": [
+          "localhost:8088",
+          "FUNCTION=",
+          "vmix.senecacollege.ca",
+          "vMix TCP API"
+        ]
+      }
+    },
+    "wordpress-management": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Manage WordPress sites and Visual Composer content. Handle REST API operations, post/page management, media uploads, custom post types, and Visual Composer shortcodes.",
+      "promptTriggers": {
+        "keywords": [
+          "wordpress",
+          "wordpress api",
+          "wordpress rest api",
+          "visual composer",
+          "wpbakery",
+          "wordpress posts",
+          "wordpress pages",
+          "wordpress media",
+          "wordpress custom post types",
+          "wordpress shortcodes",
+          "wordpress management"
+        ],
+        "intentPatterns": [
+          "(manage|update|create|edit).*?wordpress.*?(post|page|content)",
+          "(integrate|connect|use).*?wordpress.*?(api|rest.*?api)",
+          "(manage|edit|create).*?visual.*?composer.*?(content|shortcode)",
+          "(upload|manage).*?wordpress.*?(media|image|attachment)",
+          "wordpress.*?(custom.*?post.*?type|cpt)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/integrations-and-saas/wordpress-management/**",
+          "**/*wordpress*.ts",
+          "**/*wordpress*.js",
+          "**/*wp-*.php"
+        ],
+        "contentPatterns": [
+          "/wp-json/",
+          "wp-content",
+          "vc_row",
+          "wpb_",
+          "WP_REST_"
+        ]
+      }
+    },
+    "using-crawl4ai-cli": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Web scraping with crawl4ai CLI. Extract clean content from websites, handle JavaScript-heavy sites, configure extraction strategies, and manage output formats.",
+      "promptTriggers": {
+        "keywords": [
+          "crawl4ai",
+          "web scraping",
+          "web crawling",
+          "content extraction",
+          "html scraping",
+          "javascript scraping",
+          "crawl4ai cli",
+          "website scraping",
+          "markdown extraction"
+        ],
+        "intentPatterns": [
+          "(scrape|extract|crawl).*?(website|web.*?page|content)",
+          "(use|run).*?crawl4ai",
+          "(extract|get).*?(html|markdown|text).*?(from|website)",
+          "web.*?(scraping|crawling|extraction)",
+          "(handle|scrape).*?javascript.*?(site|content)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/research-and-learning/using-crawl4ai-cli/**",
+          "**/*crawl4ai*.sh",
+          "**/*scrape*.sh"
+        ],
+        "contentPatterns": [
+          "crawl4ai",
+          "from crawl4ai import",
+          "AsyncWebCrawler"
+        ]
+      }
+    },
+    "creating-hammerspoon-scripts": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Create macOS automation with Hammerspoon. Build window management, hotkeys, menu bar apps, application launchers, system integrations, and custom workflows using Lua.",
+      "promptTriggers": {
+        "keywords": [
+          "hammerspoon",
+          "hammerspoon script",
+          "hammerspoon automation",
+          "macos automation",
+          "window management",
+          "hotkey automation",
+          "hammerspoon lua",
+          "menu bar app",
+          "application launcher",
+          "macos productivity"
+        ],
+        "intentPatterns": [
+          "(create|build|write).*?hammerspoon.*?(script|automation)",
+          "(automate|manage).*?(window|app|application).*?(hammerspoon|macos)",
+          "(create|setup|configure).*?(hotkey|shortcut).*?hammerspoon",
+          "hammerspoon.*?(menu.*?bar|launcher|integration)",
+          "(build|create).*?macos.*?(automation|productivity).*?tool"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/automation-and-scripting/creating-hammerspoon-scripts/**",
+          "**/.hammerspoon/**/*.lua",
+          "**/hammerspoon-*.lua"
+        ],
+        "contentPatterns": [
+          "hs.hotkey.bind",
+          "hs.window",
+          "hs.application",
+          "hs.menubar"
+        ]
+      }
+    },
+    "managing-context": {
+      "type": "meta",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Context management for multi-agent workflows and long-running projects. Handles context capture, distribution, memory management, and session coordination.",
+      "promptTriggers": {
+        "keywords": [
+          "context",
+          "multi-agent",
+          "agent handoff",
+          "session coordination",
+          "context preservation",
+          "checkpoint",
+          "state management",
+          "compress context",
+          "agent briefing"
+        ],
+        "intentPatterns": [
+          "(manage|preserve|capture).*?context",
+          "(coordinate|handoff).*?agent",
+          "(create|save).*?checkpoint",
+          "(compress|archive).*?context",
+          "session.*?(continuity|resume)",
+          "distribute.*?context"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/managing-context/**",
+          "**/.context/**",
+          "**/CONTEXT.md",
+          "**/HANDOFFS.md",
+          "**/DECISIONS.md"
+        ],
+        "contentPatterns": [
+          "agent handoff",
+          "context checkpoint",
+          "session resume",
+          "context index"
+        ]
+      }
+    },
+    "debugging-systematically": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Hypothesis-driven debugging framework for systematically finding and fixing bugs through evidence gathering, hypothesis testing, and minimal fixes.",
+      "promptTriggers": {
+        "keywords": [
+          "debug",
+          "error",
+          "bug",
+          "KeyError",
+          "TypeError",
+          "race condition",
+          "unexpected behavior",
+          "test failure",
+          "integration failure",
+          "root cause",
+          "hypothesis"
+        ],
+        "intentPatterns": [
+          "(debug|fix|resolve).*?(error|bug|issue)",
+          "(find|identify).*?root cause",
+          "test.*?failing",
+          "unexpected.*?behavior",
+          "(reproduce|investigate).*?(bug|issue)",
+          "hypothesis.*?(test|driven)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/debugging-systematically/**",
+          "**/tests/**",
+          "**/debug/**"
+        ],
+        "contentPatterns": [
+          "root cause",
+          "hypothesis testing",
+          "bug investigation",
+          "regression test"
+        ]
+      }
+    },
+    "linear-github-sync": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Keep Linear and GitHub synchronized when contributing to projects. Use when working on repositories that track issues in Linear - includes project setup, issue management, branch naming, commit messages, and PR linking.",
+      "promptTriggers": {
+        "keywords": [
+          "linear-github-sync",
+          "linear github sync",
+          "linear issue",
+          "linear cli",
+          "linctl",
+          "github branch",
+          "github pr",
+          "issue id",
+          "dal-123"
+        ],
+        "intentPatterns": [
+          "(work on|start|pick up).*?(linear).*?(issue|task)",
+          "(create|make).*?(branch|feature branch).*?(for|from).*?(linear).*?(issue|task)",
+          "(sync|synchronize|link).*?(linear).*?(with|and).*?(github)",
+          "(update|change).*?(linear).*?(issue).*?(status|state)",
+          "(close|complete).*?(linear).*?(issue).*?(after|when).*?(merge|pr)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/integrations-and-saas/linear-github-sync/**",
+          "**/scripts/create_branch_from_issue.sh",
+          "**/scripts/setup_linear_project.sh"
+        ],
+        "contentPatterns": [
+          "linctl",
+          "Linear issue",
+          "Fixes DAL-",
+          "Closes DAL-",
+          "create_branch_from_issue.sh",
+          "setup_linear_project.sh"
+        ]
+      }
+    },
+    "provisioning-codex-environments": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Generate Codex-compatible setup and maintenance scripts for any repository by inspecting languages, package managers, tests, and linters, then emitting optimal setup.sh and maintenance.sh for the codex-universal base image.",
+      "promptTriggers": {
+        "keywords": [
+          "provisioning-codex-environments",
+          "codex provisioning",
+          "codex environment",
+          "codex setup script",
+          "codex maintenance script",
+          "setup.sh",
+          "maintenance.sh",
+          "inspect_repo.py",
+          "generate_scripts.py"
+        ],
+        "intentPatterns": [
+          "(create|generate|write).*?(codex).*?(setup|provisioning|maintenance).*?(script|scripts)",
+          "(set up|configure|provision).*?(codex).*?(environment|env)",
+          "(analyze|inspect).*?repository.*?(to|and).*?(generate).*?(setup|maintenance).*?scripts",
+          "(update|refresh).*?(codex).*?(provisioning|setup).*?scripts.*?(after|when).*?(adding|changing).*?dependencies"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/skills/cloud-and-infra/provisioning-codex-environments/**",
+          "**/scripts/inspect_repo.py",
+          "**/scripts/generate_scripts.py"
+        ],
+        "contentPatterns": [
+          "codex-universal",
+          "setup.sh",
+          "maintenance.sh",
+          "inspect_repo.py",
+          "generate_scripts.py",
+          "Codex environment"
+        ]
+      }
+    }
+  },
+  "globalConfig": {
+    "enableFileTriggersForAllProjects": true,
+    "cacheSkillRules": true,
+    "debugMode": false,
+    "respectSkillFinderDebugEnv": true
+  },
+  "migrationGuide": {
+    "step1": "The 3 skills above are configured. Your other 73 skills still work via fuzzy matching.",
+    "step2": "To add rules for existing skills: Copy a skill object above, update name/keywords/patterns",
+    "step3": "Start with most-used skills (PAI, claude-api, architec-t-solutions, etc.)",
+    "step4": "Use 'suggest' enforcement for most skills, 'block' only for critical guardrails",
+    "example_adding_new_skill": {
+      "your-skill-name": {
+        "type": "domain",
+        "enforcement": "suggest",
+        "priority": "low",
+        "description": "Brief description",
+        "promptTriggers": {
+          "keywords": [
+            "keyword1",
+            "keyword2"
+          ],
+          "intentPatterns": [
+            "regex pattern"
+          ]
+        },
+        "fileTriggers": {
+          "pathPatterns": [
+            "**/*.ext"
+          ],
+          "contentPatterns": [
+            "pattern"
+          ]
+        }
+      }
+    }
+  }
+}

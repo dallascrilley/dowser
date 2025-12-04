@@ -1,0 +1,9 @@
+cache_mode: "bypass"
+wait_until: "networkidle"
+page_timeout: 60000
+delay_before_return_html: 2.0
+scan_full_page: true
+scroll_delay: 0.5
+remove_overlay_elements: true
+magic: true
+verbose: true

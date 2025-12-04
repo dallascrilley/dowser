@@ -1,0 +1,755 @@
+# ============================================================================
+# Acuity Scheduling API - Export Configuration Template
+# ============================================================================
+#
+# Purpose: Configure appointment export presets for reporting, backup, analytics
+# Last Updated: 2025-11-11
+#
+# Supports:
+# - Predefined export presets (monthly_report, daily_backup, revenue_analysis)
+# - Custom date ranges and filtering
+# - Field selection and formatting
+# - Multiple export formats (CSV, JSON, Excel, PDF)
+# - Scheduled exports with post-processing
+#
+# ============================================================================
+
+# ============================================================================
+# EXPORT SCHEDULING
+# ============================================================================
+# Global export schedule settings
+#
+scheduling:
+  enabled: true
+
+  # Timezone for scheduled exports
+  timezone: "UTC"
+
+  # Failed export retry strategy
+  enable_retries: true
+  max_retries: 3
+  retry_delay_minutes: 30
+
+# ============================================================================
+# EXPORT PRESETS
+# ============================================================================
+# Pre-configured export templates for common use cases
+#
+
+presets:
+  # ========================================================================
+  # PRESET 1: MONTHLY REPORT
+  # ========================================================================
+  # Comprehensive monthly business report
+  # Use Case: Management review, KPI tracking, monthly reconciliation
+  #
+  monthly_report:
+    enabled: true
+    description: "Monthly appointment and revenue report for business review"
+
+    # Schedule: Every first day of month at 8 AM
+    schedule:
+      cron_expression: "0 8 1 * *"
+
+    # Date range
+    date_range:
+      # Dynamic: previous month
+      mode: "previous_month"  # or "fixed", "rolling", "last_n_days"
+
+    # What to include in report
+    included_data:
+      # Appointments section
+      appointments: true
+      appointment_fields:
+        - "id"
+        - "datetime"
+        - "appointmentTypeName"
+        - "firstName"
+        - "lastName"
+        - "email"
+        - "phone"
+        - "calendarName"  # Staff member
+        - "duration"
+        - "price"
+        - "priceSold"
+        - "paid"
+        - "confirmed"
+        - "canceled"
+        - "notes"
+
+      # Clients section
+      clients: true
+      client_fields:
+        - "firstName"
+        - "lastName"
+        - "email"
+        - "phone"
+        - "appointment_count"  # Computed field
+        - "total_spent"        # Computed field
+
+      # Summary statistics
+      summary_statistics: true
+      statistics:
+        - "total_appointments"
+        - "completed_appointments"
+        - "cancelled_appointments"
+        - "no_show_count"
+        - "total_revenue"
+        - "average_appointment_value"
+        - "revenue_by_type"
+        - "revenue_by_calendar"
+        - "customer_acquisition_count"
+
+    # Filters to apply
+    filters:
+      exclude_cancelled: true
+      appointment_types: []  # All types if empty
+      calendars: []  # All calendars if empty
+      min_price: null  # No minimum
+      max_price: null  # No maximum
+
+    # Output configuration
+    output:
+      format: "excel"  # csv, json, excel, pdf
+
+      # Column formatting
+      datetime_format: "YYYY-MM-DD HH:mm"
+      currency_format: "$#,##0.00"
+      include_headers: true
+      include_summary_page: true
+
+      # Excel-specific
+      excel:
+        sheets:
+          - name: "Appointments"
+            include_filters: true
+          - name: "Clients"
+          - name: "Summary"
+            include_charts: true
+
+      # PDF-specific
+      pdf:
+        include_charts: true
+        include_logo: true
+        header_text: "Monthly Report"
+        footer_text: "Page {page} of {total_pages}"
+
+    # File naming
+    filename_pattern: "acuity_monthly_report_{year}_{month:02d}.{ext}"
+
+    # Post-export actions
+    post_export_actions:
+      # Upload to cloud storage
+      upload:
+        enabled: true
+        destination: "s3"  # s3, gcs, azure, ftp
+        bucket: "${EXPORT_BUCKET}"
+        path: "reports/monthly/"
+
+      # Email the report
+      email:
+        enabled: true
+        recipients:
+          - "manager@yourdomain.com"
+          - "finance@yourdomain.com"
+        subject: "Acuity Monthly Report - {month} {year}"
+        body_template: "templates/monthly_report_email.html"
+
+      # Webhook notification
+      webhook:
+        enabled: false
+        url: "https://yourdomain.com/webhooks/export-complete"
+
+      # Database archival
+      database:
+        enabled: true
+        table: "exported_reports"
+        fields:
+          export_date: "{datetime}"
+          report_type: "monthly"
+          record_count: "{total_records}"
+          file_path: "{output_file_path}"
+
+  # ========================================================================
+  # PRESET 2: DAILY BACKUP
+  # ========================================================================
+  # Daily full data backup for disaster recovery
+  # Use Case: Data protection, compliance, migration
+  #
+  daily_backup:
+    enabled: true
+    description: "Complete daily backup of all appointments and clients"
+
+    # Schedule: Every day at 2 AM
+    schedule:
+      cron_expression: "0 2 * * *"
+
+    # Date range: All historical data
+    date_range:
+      mode: "all"  # Include all history
+
+    # What to include
+    included_data:
+      appointments: true
+      appointment_fields: "*"  # All fields
+
+      clients: true
+      client_fields: "*"  # All fields
+
+      # Also backup metadata
+      export_metadata: true
+
+    # No filtering - full backup
+    filters:
+      exclude_cancelled: false  # Include everything
+
+    # Output configuration
+    output:
+      format: "json"  # JSON best for backups (preserves all data types)
+
+      # Full detail
+      include_all_fields: true
+      include_nested_objects: true
+
+    # File naming with timestamp
+    filename_pattern: "acuity_backup_{datetime:YYYY_MM_DD_HHmmss}.{ext}"
+
+    # Compression for storage efficiency
+    compression: "gzip"
+
+    # Post-export actions
+    post_export_actions:
+      # Upload to encrypted cloud storage
+      upload:
+        enabled: true
+        destination: "s3"
+        bucket: "${BACKUP_BUCKET}"
+        path: "backups/daily/"
+        enable_server_side_encryption: true
+        storage_class: "GLACIER"  # Cost-effective long-term storage
+
+      # Keep local copies
+      local_backup:
+        enabled: true
+        path: "/backups/acuity/"
+        retention_days: 30
+
+      # Verify backup integrity
+      verify:
+        enabled: true
+        checksum_algorithm: "sha256"
+
+  # ========================================================================
+  # PRESET 3: REVENUE ANALYSIS
+  # ========================================================================
+  # Financial analysis for accounting and business intelligence
+  # Use Case: Revenue tracking, tax reporting, financial analysis
+  #
+  revenue_analysis:
+    enabled: true
+    description: "Financial analysis report by appointment type and provider"
+
+    # Schedule: Weekly on Fridays
+    schedule:
+      cron_expression: "0 10 * * 5"
+
+    # Date range: Last 7 days
+    date_range:
+      mode: "rolling"
+      rolling_days: 7
+
+    # What to include
+    included_data:
+      appointments: true
+      appointment_fields:
+        - "id"
+        - "datetime"
+        - "appointmentTypeName"
+        - "calendarName"
+        - "firstName"
+        - "lastName"
+        - "price"
+        - "priceSold"
+        - "paid"
+        - "payment_status"
+        - "discount_applied"
+
+      # Revenue summary
+      revenue_summary: true
+      summary_fields:
+        - "total_gross_revenue"
+        - "total_net_revenue"
+        - "total_paid"
+        - "total_unpaid"
+        - "total_refunded"
+        - "average_transaction_value"
+        - "revenue_by_appointment_type"
+        - "revenue_by_calendar"
+        - "payment_method_breakdown"
+
+    # Filters
+    filters:
+      # Only completed appointments with payment
+      exclude_cancelled: true
+      appointment_types: []  # All types
+      min_price: 0
+
+    # Output configuration
+    output:
+      format: "excel"
+
+      excel:
+        sheets:
+          - name: "Transactions"
+            include_filters: true
+          - name: "Revenue Summary"
+            include_charts: true
+            chart_types:
+              - "pie"  # Revenue by type
+              - "bar"  # Revenue by calendar
+              - "line" # Daily trend
+          - name: "Payment Status"
+            include_charts: true
+
+    # Currency and number formatting
+    currency_format: "$#,##0.00"
+    number_format: "#,##0"
+
+    # Filename pattern
+    filename_pattern: "acuity_revenue_report_{start_date}_{end_date}.{ext}"
+
+    # Post-export actions
+    post_export_actions:
+      # Upload to accounting software
+      upload:
+        enabled: true
+        destination: "custom"
+        service: "quickbooks"  # if integrated
+        entity_type: "invoice_data"
+
+      # Email to accounting team
+      email:
+        enabled: true
+        recipients:
+          - "accounting@yourdomain.com"
+        subject: "Weekly Revenue Report - {start_date} to {end_date}"
+
+      # Create audit log
+      audit_log:
+        enabled: true
+        log_entry: "Revenue export: ${total_revenue} from {appointment_count} appointments"
+
+# ============================================================================
+# CUSTOM EXPORT CONFIGURATIONS
+# ============================================================================
+# Define additional custom export presets as needed
+#
+
+custom_exports:
+  # Example: Client list export for marketing
+  client_list:
+    enabled: false
+    schedule:
+      cron_expression: "0 0 1 * *"  # Monthly
+    included_data:
+      clients: true
+      client_fields:
+        - "firstName"
+        - "lastName"
+        - "email"
+        - "phone"
+    output:
+      format: "csv"
+    post_export_actions:
+      upload:
+        enabled: true
+        destination: "custom"
+        service: "mailchimp"  # CRM import
+    filename_pattern: "acuity_client_list_{date}.{ext}"
+
+# ============================================================================
+# FILTER DEFINITIONS (Shared across presets)
+# ============================================================================
+# Common filters to apply to exports
+#
+filters:
+  # Appointment type filtering
+  appointment_types:
+    enabled: false
+    # List specific appointment type IDs to include/exclude
+    included:
+      - "12345"  # Consultation
+      - "67890"  # Follow-up
+    excluded: []
+
+  # Staff/Calendar filtering
+  calendars:
+    enabled: false
+    included:
+      - "101"  # John's calendar
+      - "102"  # Sarah's calendar
+    excluded: []
+
+  # Date range with dynamic options
+  date_ranges:
+    today: "today"
+    yesterday: "yesterday"
+    current_week: "week"
+    last_7_days: "7d"
+    current_month: "month"
+    last_30_days: "30d"
+    current_quarter: "quarter"
+    current_year: "year"
+
+  # Status filtering
+  appointment_statuses:
+    include_confirmed: true
+    include_pending: false
+    include_completed: true
+    include_cancelled: false
+    include_no_show: false
+
+  # Payment status
+  payment_statuses:
+    include_paid: true
+    include_unpaid: false
+    include_refunded: false
+
+# ============================================================================
+# COLUMN DEFINITIONS
+# ============================================================================
+# Define how to display columns in exports
+#
+
+columns:
+  # Appointment columns
+  appointment_columns:
+    id:
+      label: "Appointment ID"
+      type: "number"
+      width: 12
+
+    datetime:
+      label: "Date/Time"
+      type: "datetime"
+      format: "YYYY-MM-DD HH:mm"
+      width: 18
+
+    appointmentTypeName:
+      label: "Service Type"
+      type: "text"
+      width: 20
+
+    calendarName:
+      label: "Provider"
+      type: "text"
+      width: 15
+
+    firstName:
+      label: "First Name"
+      type: "text"
+      width: 12
+
+    lastName:
+      label: "Last Name"
+      type: "text"
+      width: 12
+
+    email:
+      label: "Email"
+      type: "text"
+      width: 25
+
+    phone:
+      label: "Phone"
+      type: "text"
+      format: "(###) ###-####"
+      width: 14
+
+    price:
+      label: "Price"
+      type: "currency"
+      format: "$#,##0.00"
+      width: 10
+
+    priceSold:
+      label: "Amount Paid"
+      type: "currency"
+      format: "$#,##0.00"
+      width: 10
+
+    paid:
+      label: "Payment Status"
+      type: "text"
+      mapping:
+        "yes": "Paid"
+        "no": "Unpaid"
+        "pending": "Pending"
+      width: 12
+
+    notes:
+      label: "Notes"
+      type: "text"
+      width: 30
+      wrap_text: true
+
+  # Client columns
+  client_columns:
+    firstName:
+      label: "First Name"
+      type: "text"
+    lastName:
+      label: "Last Name"
+      type: "text"
+    email:
+      label: "Email Address"
+      type: "text"
+    phone:
+      label: "Phone Number"
+      type: "text"
+    appointment_count:
+      label: "# Appointments"
+      type: "number"
+    total_spent:
+      label: "Total Spent"
+      type: "currency"
+    last_appointment:
+      label: "Last Appointment"
+      type: "datetime"
+
+# ============================================================================
+# OUTPUT FORMAT CONFIGURATION
+# ============================================================================
+# Configure how data is formatted in exports
+#
+
+output_formats:
+  # CSV export settings
+  csv:
+    delimiter: ","
+    quote_character: '"'
+    escape_character: '"'
+    encoding: "UTF-8"
+    include_bom: false
+    line_ending: "CRLF"  # CRLF (Windows) or LF (Unix)
+
+  # JSON export settings
+  json:
+    encoding: "UTF-8"
+    indent: 2
+    include_metadata: true
+    include_timestamp: true
+
+  # Excel export settings
+  excel:
+    format: "xlsx"  # or "xls"
+    encoding: "UTF-8"
+    include_auto_filter: true
+    freeze_header_row: true
+    auto_column_width: true
+
+    # Styling
+    styles:
+      header_background: "4472C4"
+      header_text_color: "FFFFFF"
+      number_format: "#,##0.00"
+      date_format: "YYYY-MM-DD"
+
+  # PDF export settings
+  pdf:
+    paper_size: "letter"  # A4, letter
+    orientation: "portrait"  # portrait or landscape
+    margins:
+      top: 1
+      bottom: 1
+      left: 0.75
+      right: 0.75
+    include_page_numbers: true
+    include_footer: true
+    footer_text: "Acuity Scheduling Report"
+
+# ============================================================================
+# POST-EXPORT ACTIONS
+# ============================================================================
+# What to do with exported files
+#
+
+post_export_actions:
+  # Cloud storage upload
+  cloud_upload:
+    enabled: false
+    destination: "s3"  # s3, gcs, azure, ftp
+
+    # AWS S3 configuration
+    s3:
+      bucket: "${AWS_BUCKET}"
+      path: "exports/{export_type}/{year}/{month}/"
+      region: "us-east-1"
+      acl: "private"
+      enable_encryption: true
+
+    # Google Cloud Storage
+    gcs:
+      bucket: "${GCS_BUCKET}"
+      path: "exports/{export_type}/"
+
+    # Azure Blob Storage
+    azure:
+      container: "exports"
+      path: "{export_type}/{date}/"
+
+    # FTP
+    ftp:
+      host: "ftp.example.com"
+      path: "/exports/"
+      username: "${FTP_USERNAME}"
+      password: "${FTP_PASSWORD}"
+
+  # Email delivery
+  email:
+    enabled: false
+    recipients: []
+    cc: []
+    bcc: []
+    subject_template: "Acuity Export: {export_type}"
+    body_template: "templates/export_email.html"
+    attach_file: true
+    compress_attachment: true  # For large files
+
+  # Webhook notification
+  webhook:
+    enabled: false
+    url: ""
+    include_file_url: true
+    include_summary: true
+
+  # Database storage
+  database:
+    enabled: false
+    table: "export_history"
+    columns:
+      export_id: "{uuid}"
+      export_type: "{export_type}"
+      export_date: "{datetime}"
+      record_count: "{total_records}"
+      file_size: "{file_size_mb}"
+      file_path: "{output_path}"
+      status: "completed"
+
+  # Slack notification
+  slack:
+    enabled: false
+    webhook_url: "${SLACK_WEBHOOK_URL}"
+    channel: "#reports"
+    message_template: "Export completed: {export_type} ({record_count} records)"
+
+  # File archival
+  archival:
+    enabled: false
+    archive_format: "tar.gz"  # or "zip"
+    retention_days: 90
+    archive_path: "archives/"
+
+# ============================================================================
+# ERROR HANDLING
+# ============================================================================
+error_handling:
+  # Retry failed exports
+  enable_retries: true
+  max_retries: 3
+  retry_delay_minutes: 30
+
+  # Partial export strategy
+  # complete: All-or-nothing
+  # partial: Export what succeeds, report failures
+  on_partial_failure: "partial"
+
+  # Failure notification
+  notify_on_failure: true
+  failure_recipients:
+    - "admin@yourdomain.com"
+
+  # Log errors
+  log_failures: true
+  log_file: "logs/export_errors.log"
+
+# ============================================================================
+# PERFORMANCE TUNING
+# ============================================================================
+performance:
+  # Batch processing size
+  batch_size: 1000
+
+  # Query timeout (seconds)
+  query_timeout: 600
+
+  # Memory usage optimization
+  stream_data: true  # For large exports
+
+  # Parallel processing
+  enable_parallel: false
+  parallel_workers: 2
+
+# ============================================================================
+# MONITORING & LOGGING
+# ============================================================================
+monitoring:
+  enabled: true
+
+  # Track export metrics
+  track_metrics: true
+  metrics:
+    - export_duration
+    - records_exported
+    - file_size
+    - success_rate
+
+  # Log all export activity
+  log_exports: true
+  log_file: "logs/exports.log"
+
+  # Alert thresholds
+  alerts:
+    export_timeout_minutes: 120
+    max_file_size_mb: 1024
+
+# ============================================================================
+# COMPLIANCE & DATA PRIVACY
+# ============================================================================
+compliance:
+  # Redact sensitive data in exports
+  redact_sensitive_data: false
+
+  # Fields to redact/exclude
+  excluded_fields:
+    # - "stripe_token"  # Example: don't export payment tokens
+    # - "ssn"            # Example: don't export SSNs
+
+  # GDPR compliance
+  gdpr_compliant: false
+  include_data_origin: true
+
+  # Data retention
+  # Delete exports after N days
+  auto_delete_exports_after_days: 30
+
+  # Audit trail
+  maintain_audit_trail: true
+
+# ============================================================================
+# EXAMPLE USAGE
+# ============================================================================
+#
+# To use these presets:
+# 1. Copy this file to export_config.yml
+# 2. Update cloud storage credentials (S3, GCS, etc.)
+# 3. Configure email recipients
+# 4. Run exports:
+#    python -m acuity_schedule_manager.export monthly_report
+#    python -m acuity_schedule_manager.export daily_backup
+#    python -m acuity_schedule_manager.export revenue_analysis
+#
+# For scheduled exports, add to cron:
+#   0 2 * * * python -m acuity_schedule_manager.export_scheduler
+#
+# ============================================================================

@@ -1,0 +1,35 @@
+{
+  "name": "First Last",
+  "email": {
+    "email": "contact@example.com",
+    "category": "work"
+  },
+  "phone_numbers": [
+    {
+      "number": "415-555-1234",
+      "category": "mobile"
+    }
+  ],
+  "title": "Job Title",
+  "company_id": null,
+  "address": {
+    "street": "123 Main St",
+    "city": "San Francisco",
+    "state": "CA",
+    "postal_code": "94105",
+    "country": "US"
+  },
+  "details": "Notes about this person",
+  "tags": [
+    "tag1",
+    "tag2"
+  ],
+  "custom_fields": [],
+  "linkedin_url": "https://linkedin.com/in/example",
+  "socials": [
+    {
+      "url": "https://twitter.com/example",
+      "category": "twitter"
+    }
+  ]
+}

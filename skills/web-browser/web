@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Web Browser CLI - Wrapper Script
+# Delegates to tools/web.js for cleaner command syntax
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+exec node "${SCRIPT_DIR}/tools/web.js" "$@"
+

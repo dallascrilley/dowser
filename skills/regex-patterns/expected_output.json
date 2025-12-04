@@ -1,0 +1,78 @@
+{
+  "validation_results": {
+    "email": {
+      "valid": true,
+      "message": "Valid email address"
+    },
+    "url": {
+      "valid": true,
+      "message": "Valid URL"
+    },
+    "phone": {
+      "valid": true,
+      "message": "Valid US phone: (555) 123-4567"
+    },
+    "credit_card": {
+      "valid": true,
+      "message": "Valid Visa card format"
+    },
+    "date": {
+      "valid": true,
+      "message": "Valid ISO date (YYYY-MM-DD)"
+    },
+    "password": {
+      "valid": true,
+      "message": "Strong password"
+    },
+    "ipv4": {
+      "valid": true,
+      "message": "Valid IPv4 address"
+    },
+    "hex_color": {
+      "valid": true,
+      "message": "Valid hex color: #3498db"
+    }
+  },
+  "extraction_results": {
+    "urls": [
+      "https://www.example.com"
+    ],
+    "emails": [
+      "support@example.com",
+      "sales@company.org"
+    ],
+    "hashtags": [
+      "#ExampleProduct"
+    ],
+    "mentions": [
+      "@ExampleCo"
+    ],
+    "phones": [
+      "(555) 123-4567",
+      "(555) 987-6543"
+    ]
+  },
+  "transformation_results": {
+    "title_case": "This Is Sample Text For Transformation",
+    "camel_case": "thisIsSampleTextForTransformation",
+    "snake_case": "this_is_sample_text_for_transformation",
+    "kebab_case": "this-is-sample-text-for-transformation"
+  },
+  "log_parsing_results": [
+    {
+      "timestamp": "2025-10-21T10:30:45.123Z",
+      "level": "INFO",
+      "message": "Application started successfully"
+    },
+    {
+      "timestamp": "2025-10-21T10:30:47.456Z",
+      "level": "ERROR",
+      "message": "Database connection failed"
+    },
+    {
+      "timestamp": "2025-10-21T10:30:50.789Z",
+      "level": "WARN",
+      "message": "Retrying connection attempt 1"
+    }
+  ]
+}

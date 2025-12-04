@@ -1,0 +1,475 @@
+# PandaDoc Webhook Configuration
+# This file defines webhook subscriptions for real-time document event notifications.
+#
+# Webhooks allow you to receive real-time notifications when documents change status
+# instead of polling the API repeatedly. This reduces API usage and provides instant updates.
+
+# ==============================================================================
+# WEBHOOK SUBSCRIPTIONS
+# ==============================================================================
+# Define each webhook subscription that should be created in PandaDoc
+
+webhooks:
+
+  # ===========================================================================
+  # Document Status Tracking Webhook
+  # ===========================================================================
+  document_tracker:
+    # Webhook subscription name (for reference)
+    name: "Document Status Tracker"
+
+    # Endpoint URL where PandaDoc will send webhook events
+    # MUST be HTTPS in production
+    url: "https://your-server.com/webhooks/pandadoc/status"
+
+    # Enable/disable this webhook subscription
+    active: true
+
+    # =======================
+    # TRIGGER CONFIGURATION
+    # =======================
+    # Events that will trigger this webhook
+    triggers:
+      # Core document lifecycle events
+      - document_state_changed      # Document status changed to any state
+      - document_sent               # Document sent to recipients
+      - document_viewed             # Recipient opened/viewed document
+      - document_completed          # All signatures collected
+      - document_declined           # Recipient declined to sign
+      - document_voided             # Document marked as void
+
+      # Approval workflow events (if using approval flow)
+      - document_waiting_approval   # Awaiting approval
+      - document_approved           # Approved by reviewer
+      - document_rejected           # Rejected by reviewer
+
+      # Payment-related events
+      - document_waiting_pay        # Awaiting payment
+      - document_paid               # Payment received
+
+      # Signature-specific events
+      - recipient_completed         # Individual recipient completed
+      - recipient_declined          # Individual recipient declined
+
+    # =======================
+    # PAYLOAD CONFIGURATION
+    # =======================
+    # What information to include in webhook payload
+    payload:
+      # Document metadata (ID, name, status, dates)
+      - metadata
+
+      # Field values from the document
+      - fields
+
+      # Recipient status information
+      - recipients
+
+      # User information who performed the action
+      - user
+
+      # Document audit trail (optional - can be large)
+      # - audit_trail
+
+    # =======================
+    # WEBHOOK ENDPOINT SETTINGS
+    # =======================
+    endpoint:
+      # Verify webhook signature (REQUIRED for security)
+      # PandaDoc will sign each webhook with shared_key
+      verify_signature: true
+
+      # Shared key for webhook signature verification
+      # Generate a secure random string and store in .env
+      shared_key: ${PANDADOC_WEBHOOK_KEY}
+
+      # HTTP request timeout in seconds
+      # Webhook must respond within this time or be retried
+      timeout: 30
+
+      # Retry failed webhook deliveries
+      retry_failed: true
+
+      # Maximum number of retry attempts
+      # PandaDoc retries with exponential backoff
+      max_retries: 3
+
+      # Wait time between retries (seconds)
+      # PandaDoc uses exponential backoff: 1min, 5min, 30min
+      retry_interval: automatic
+
+      # Accept only these HTTP status codes as successful
+      success_codes: [200, 201, 202, 204]
+
+    # =======================
+    # ERROR HANDLING
+    # =======================
+    error_handling:
+      # Log webhook deliveries
+      log_enabled: true
+      log_file: logs/webhooks/status_tracker.log
+
+      # Alert on repeated failures
+      alert_on_failures: true
+      alert_after_failures: 5
+
+    # =======================
+    # IDEMPOTENCY
+    # =======================
+    # Handle duplicate webhook deliveries (important!)
+    # PandaDoc may send same event multiple times
+    idempotency:
+      # Track webhook IDs to prevent duplicate processing
+      track_ids: true
+      id_storage: memory          # memory | redis | database
+
+      # Ignore duplicate events within time window
+      deduplication_window_seconds: 3600  # 1 hour
+
+  # ===========================================================================
+  # Approval Notifications Webhook
+  # ===========================================================================
+  approval_notifications:
+    name: "Approval Notifications"
+    url: "https://your-server.com/webhooks/pandadoc/approvals"
+    active: true
+
+    # Only approval-related events
+    triggers:
+      - document_waiting_approval
+      - document_approved
+      - document_rejected
+
+    payload:
+      - metadata
+      - recipients        # Who approved/rejected
+      - user              # Who performed action
+
+    endpoint:
+      verify_signature: true
+      shared_key: ${PANDADOC_WEBHOOK_KEY}
+      timeout: 30
+      retry_failed: true
+      max_retries: 3
+
+  # ===========================================================================
+  # Completion Notifications Webhook
+  # ===========================================================================
+  # Triggered only when documents are fully signed/completed
+  completion_notifications:
+    name: "Document Completion Handler"
+    url: "https://your-server.com/webhooks/pandadoc/completions"
+    active: true
+
+    # Only completion events
+    triggers:
+      - document_completed
+
+    payload:
+      - metadata
+      - fields            # All document fields
+      - recipients        # All recipient details
+      - audit_trail       # Full signature trail
+
+    endpoint:
+      verify_signature: true
+      shared_key: ${PANDADOC_WEBHOOK_KEY}
+      timeout: 30
+      retry_failed: true
+      max_retries: 5  # More retries for important completions
+
+  # ===========================================================================
+  # CRM Integration Webhook
+  # ===========================================================================
+  # Sync document status back to your CRM
+  crm_sync:
+    name: "CRM Synchronization"
+    url: "https://your-crm-system.com/api/pandadoc/webhooks"
+    active: false  # Enable when CRM integration is ready
+
+    triggers:
+      - document_sent
+      - document_viewed
+      - document_completed
+      - document_declined
+
+    payload:
+      - metadata
+
+    endpoint:
+      verify_signature: true
+      shared_key: ${PANDADOC_WEBHOOK_KEY}
+      timeout: 60  # CRM might be slower
+      retry_failed: true
+      max_retries: 5
+
+  # ===========================================================================
+  # Email Notification Webhook
+  # ===========================================================================
+  # Send emails for important document events
+  email_notifications:
+    name: "Email Notification Service"
+    url: "https://your-server.com/webhooks/pandadoc/emails"
+    active: false  # Enable when email service is set up
+
+    triggers:
+      - document_sent
+      - document_completed
+      - document_declined
+
+    payload:
+      - metadata
+      - recipients
+
+    endpoint:
+      verify_signature: true
+      shared_key: ${PANDADOC_WEBHOOK_KEY}
+      timeout: 20
+      retry_failed: true
+      max_retries: 3
+
+# ==============================================================================
+# WEBHOOK SECURITY CONFIGURATION
+# ==============================================================================
+# IMPORTANT: Security best practices for webhook handling
+
+webhook_security:
+
+  # =======================
+  # Signature Verification
+  # =======================
+  # PandaDoc signs each webhook with HMAC-SHA256
+  # Verify signature on every webhook request
+  signature_verification:
+    enabled: true
+    algorithm: HMAC-SHA256
+    header_name: "X-Pandadoc-Signature"
+
+    # Generate key with: python -c "import secrets; print(secrets.token_urlsafe(32))"
+    shared_key: ${PANDADOC_WEBHOOK_KEY}
+
+    # Always verify to prevent processing malicious webhooks
+    verify_before_processing: true
+
+  # =======================
+  # HTTPS Requirements
+  # =======================
+  https_required: true
+
+  # Allowed certificate issuers (production)
+  # certificate_validators:
+  #   - "Let's Encrypt"
+  #   - "DigiCert"
+
+  # =======================
+  # IP Allowlist (Optional)
+  # =======================
+  # Only accept webhooks from PandaDoc IP addresses
+  # Get list from PandaDoc: https://api.pandadoc.com/webhook-ips
+  ip_allowlist:
+    enabled: false  # Enable in production
+    ips:
+      # Add PandaDoc webhook server IPs here
+      # - "192.0.2.1"
+      # - "192.0.2.2"
+
+  # =======================
+  # Rate Limiting
+  # =======================
+  # Protect webhook endpoint from abuse
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 1000  # Webhooks are fast, allow high rate
+    requests_per_second: 50
+
+  # =======================
+  # Request Size Limits
+  # =======================
+  request_size_limits:
+    max_body_size_mb: 5
+    max_headers_size_kb: 64
+
+# ==============================================================================
+# WEBHOOK HANDLING PATTERNS
+# ==============================================================================
+
+webhook_handlers:
+
+  # Pattern for webhook processing
+  processing:
+    # Process webhooks asynchronously to respond quickly
+    async_processing: true
+
+    # Queue system for reliable processing
+    queue_type: memory      # Options: memory | redis | database
+
+    # Worker configuration
+    workers: 5              # Number of concurrent workers
+    queue_timeout: 300      # Max time to process webhook (seconds)
+
+  # Pattern for deduplication
+  deduplication:
+    enabled: true
+    # Store webhook IDs to prevent duplicates
+    storage: memory         # Options: memory | redis | database
+    retention_hours: 24     # Keep records for 24 hours
+
+  # Pattern for ordering
+  preserve_order: false     # Process events in order (slower but accurate)
+  # Most webhooks don't need strict ordering, except status transitions
+
+# ==============================================================================
+# EVENT PAYLOAD REFERENCE
+# ==============================================================================
+# Understanding webhook payload structure for each event type
+
+event_payloads:
+
+  # =======================
+  # document_state_changed
+  # =======================
+  document_state_changed:
+    description: "Document status changed to any state"
+    example_fields:
+      event_type: "document_state_changed"
+      timestamp: "2024-01-15T14:30:00Z"
+      document:
+        id: "document_123"
+        name: "Sales Proposal - Acme Corp"
+        status: "document.completed"
+        created_at: "2024-01-15T10:00:00Z"
+
+  # =======================
+  # document_sent
+  # =======================
+  document_sent:
+    description: "Document sent to first recipient"
+    example_fields:
+      event_type: "document_sent"
+      timestamp: "2024-01-15T14:30:00Z"
+      document:
+        id: "document_123"
+        status: "document.sent"
+        sent_at: "2024-01-15T14:30:00Z"
+
+  # =======================
+  # recipient_completed
+  # =======================
+  recipient_completed:
+    description: "Individual recipient completed document"
+    example_fields:
+      event_type: "recipient_completed"
+      timestamp: "2024-01-15T15:30:00Z"
+      document:
+        id: "document_123"
+      recipient:
+        email: "john@acme.com"
+        name: "John Doe"
+        role: "Client"
+        completed_at: "2024-01-15T15:30:00Z"
+
+# ==============================================================================
+# WEBHOOK TESTING
+# ==============================================================================
+
+webhook_testing:
+
+  # Test webhook endpoint with test events
+  test_mode:
+    enabled: false  # Set to true to receive test events
+
+  # Request/response logging for debugging
+  debug_logging:
+    enabled: false  # Enable for development, disable for production
+    log_headers: true
+    log_body: true
+    log_response: true
+
+  # Mock webhook events for testing
+  mock_events:
+    enabled: false
+
+    # Send mock webhooks at intervals
+    schedule:
+      # - cron: "0 0 * * *"  # Daily at midnight
+      #   event: "document_sent"
+
+# ==============================================================================
+# MONITORING & ALERTING
+# ==============================================================================
+
+monitoring:
+
+  # Track webhook delivery metrics
+  metrics:
+    enabled: true
+    metrics_file: logs/webhook_metrics.json
+
+    # Metrics to track
+    track:
+      - delivery_success_rate
+      - avg_response_time
+      - error_rate
+      - retry_rate
+
+  # Alert on webhook issues
+  alerts:
+    enabled: true
+
+    # Alert when delivery fails N times in a row
+    failure_threshold: 5
+
+    # Alert if success rate drops below
+    success_rate_threshold: 95  # percent
+
+    # Alert recipients
+    alert_channels:
+      - email: "ops@mycompany.com"
+      - slack: "#alerts"
+
+# ==============================================================================
+# WEBHOOK INFRASTRUCTURE
+# ==============================================================================
+# Setup requirements for production webhook handling
+
+infrastructure:
+
+  # Webhook server settings
+  server:
+    host: 0.0.0.0
+    port: 8080
+    workers: 5
+
+  # HTTPS/TLS configuration
+  ssl:
+    enabled: true
+    certificate_path: "/etc/ssl/certs/webhook.crt"
+    key_path: "/etc/ssl/private/webhook.key"
+
+  # Database for deduplication and audit
+  database:
+    type: sqlite         # sqlite | postgresql | mysql
+    path: "webhooks.db"
+
+  # Cache for rate limiting and deduplication
+  cache:
+    type: memory         # memory | redis
+    ttl_seconds: 3600    # How long to keep records
+
+# ==============================================================================
+# DEPLOYMENT CHECKLIST
+# ==============================================================================
+# Before deploying webhooks to production:
+#
+# [ ] Generate secure webhook shared key
+# [ ] Store key in environment variable (not in config)
+# [ ] HTTPS certificate installed and valid
+# [ ] Webhook endpoint accessible from internet
+# [ ] Signature verification enabled
+# [ ] Rate limiting configured
+# [ ] Database/cache configured
+# [ ] Monitoring and alerting set up
+# [ ] Error handling tested
+# [ ] Load testing completed
+# [ ] Rollback plan prepared
+# [ ] Documentation updated

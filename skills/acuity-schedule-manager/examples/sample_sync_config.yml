@@ -1,0 +1,192 @@
+# Sample CRM Synchronization Configuration
+# Copy this file and customize for your CRM system
+
+sync:
+  # Schedule (cron expression)
+  schedule: "0 8 * * *"  # Daily at 8am
+
+  # Sync direction
+  direction: acuity_to_crm  # Options: acuity_to_crm, crm_to_acuity, bidirectional
+
+  # Conflict resolution
+  conflict_resolution:
+    strategy: acuity_wins  # Options: acuity_wins, crm_wins, newest_wins, manual
+    notify_on_conflict: true
+
+  # Field mapping - Map Acuity fields to your CRM fields
+  field_mapping:
+    client:
+      # Acuity field -> CRM field
+      email: email
+      firstName: first_name
+      lastName: last_name
+      phone: phone_number
+      notes: customer_notes
+
+    appointment:
+      # Appointment fields
+      id: acuity_appointment_id
+      datetime: appointment_date
+      endTime: appointment_end_date
+      type: service_type
+      price: amount_paid
+      paid: payment_status
+      confirmed: is_confirmed
+      canceled: is_canceled
+
+    activity:
+      # Create activity records in CRM
+      type: appointment
+      subject_template: "Acuity: {appointment_type}"
+      description_template: "Appointment on {datetime} - {status}"
+
+  # Data transformations
+  transformations:
+    phone:
+      # Format phone numbers
+      remove_formatting: true
+      add_country_code: "+1"
+      format: "E164"  # Options: E164, NATIONAL, INTERNATIONAL
+
+    email:
+      # Email transformations
+      lowercase: true
+      trim_whitespace: true
+
+    datetime:
+      # Datetime transformations
+      output_timezone: "UTC"
+      output_format: "ISO8601"
+
+    names:
+      # Name transformations
+      capitalize: true
+      trim_whitespace: true
+
+  # Filters - Which appointments to sync
+  filters:
+    date_range:
+      # Only sync appointments within date range
+      min_date: "2025-01-01"
+      max_date: null  # null = no limit
+
+    appointment_types:
+      # Only sync specific appointment types (empty = all)
+      include: []  # [12345, 12346]
+      exclude: []  # [99999]
+
+    calendars:
+      # Only sync specific calendars (empty = all)
+      include: []  # [67890]
+      exclude: []
+
+    statuses:
+      # Sync appointments with these statuses
+      include_confirmed: true
+      include_canceled: false
+      include_pending: true
+
+  # Error handling
+  error_handling:
+    # Retry configuration
+    max_retries: 3
+    retry_delay: 5  # seconds
+    exponential_backoff: true
+
+    # On error actions
+    on_validation_error: skip  # Options: skip, stop, alert
+    on_api_error: retry  # Options: skip, retry, stop
+    on_conflict: alert  # Options: skip, resolve, alert
+
+    # Logging
+    log_errors: true
+    error_log_path: "/var/log/acuity-sync-errors.log"
+
+    # Alerting
+    alert_on_error: true
+    alert_email: "admin@example.com"
+    alert_threshold: 5  # Alert after N consecutive errors
+
+  # Performance optimization
+  performance:
+    batch_size: 50  # Number of records per batch
+    rate_limit_delay: 0.1  # Delay between API calls (seconds)
+    parallel_requests: false  # Process in parallel (use with caution)
+    max_workers: 5  # If parallel_requests = true
+
+    # Caching
+    cache_clients: true
+    cache_ttl: 3600  # 1 hour
+
+  # Validation
+  validation:
+    # Validate before sync
+    validate_email: true
+    validate_phone: true
+    validate_required_fields: true
+
+    # Required fields for sync
+    required_fields:
+      - email
+      - firstName
+      - lastName
+
+# CRM Configuration - Customize for your CRM system
+crm:
+  type: salesforce  # Options: salesforce, hubspot, pipedrive, custom
+
+  # API credentials (use environment variables)
+  credentials:
+    api_key_env_var: CRM_API_KEY
+    api_url_env_var: CRM_API_URL
+
+  # CRM-specific settings
+  settings:
+    # Salesforce example
+    instance_url: "https://your-instance.salesforce.com"
+    object_types:
+      client: Contact
+      appointment: Event
+
+    # HubSpot example
+    # portal_id: "12345678"
+    # object_types:
+    #   client: contacts
+    #   appointment: meetings
+
+# Logging
+logging:
+  level: INFO  # DEBUG, INFO, WARNING, ERROR
+  file: "/var/log/acuity-sync.log"
+  max_file_size: 10485760  # 10MB
+  backup_count: 5
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Notifications
+notifications:
+  # Email notifications
+  email:
+    enabled: true
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    smtp_user_env_var: SMTP_USER
+    smtp_password_env_var: SMTP_PASSWORD
+    from_email: "noreply@example.com"
+
+    # When to send notifications
+    on_sync_complete: true
+    on_error: true
+    on_conflict: true
+
+    # Recipients
+    recipients:
+      - "admin@example.com"
+
+  # Webhook notifications
+  webhook:
+    enabled: false
+    url: "https://your-server.com/webhook/sync-status"
+    events:
+      - sync_complete
+      - sync_error
+      - conflict_detected

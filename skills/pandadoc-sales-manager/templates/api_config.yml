@@ -1,0 +1,287 @@
+# PandaDoc API Configuration
+# This is the central configuration file for all PandaDoc API settings and credentials.
+#
+# IMPORTANT: Never commit this file with real credentials to version control.
+# Use environment variables or a secure secret manager for sensitive values.
+
+# ==============================================================================
+# ENVIRONMENT SETTINGS
+# ==============================================================================
+
+# Environment to use: 'sandbox' for testing, 'production' for live
+# Sandbox: Testing environment with 10 req/min rate limit
+# Production: Live environment with higher rate limits
+environment: sandbox  # Options: sandbox | production
+
+# ==============================================================================
+# AUTHENTICATION
+# ==============================================================================
+
+authentication:
+  # Authentication type to use
+  type: api_key  # Options: api_key | oauth2
+
+  # ============================================================================
+  # API KEY AUTHENTICATION (Recommended for Server-Side)
+  # ============================================================================
+  # Use environment variable to store the actual API key
+  # Example: export PANDADOC_API_KEY="your_api_key_here"
+  api_key: ${PANDADOC_API_KEY}
+
+  # ============================================================================
+  # OAUTH2 AUTHENTICATION (Recommended for User-Facing Apps)
+  # ============================================================================
+  # Uncomment and configure if using OAuth2 instead of API key
+  # oauth2:
+  #   client_id: ${PANDADOC_CLIENT_ID}
+  #   client_secret: ${PANDADOC_CLIENT_SECRET}
+  #   redirect_uri: http://localhost:8080/callback
+  #   scopes:
+  #     - read      # Read documents, templates, contacts
+  #     - write     # Create, send, update documents
+  #   token_endpoint: https://api.pandadoc.com/oauth2/access_token
+  #   auth_endpoint: https://api.pandadoc.com/oauth2/authorize
+
+# ==============================================================================
+# API SETTINGS
+# ==============================================================================
+
+api:
+  # PandaDoc API base URL
+  base_url: https://api.pandadoc.com
+
+  # API version
+  version: v1
+
+  # HTTP request timeout in seconds
+  # Increase for slow networks or large payloads
+  timeout: 30
+
+  # ===========================================================================
+  # RATE LIMITING
+  # ===========================================================================
+  rate_limit:
+    # Sandbox: 10 requests per minute (mandatory)
+    # Production: Higher limits - contact PandaDoc for exact limits
+    requests_per_minute: 10
+
+    # Strategy for handling rate limit errors
+    # exponential: 60s, 120s, 240s delays (recommended)
+    # linear: 60s, 120s, 180s delays
+    backoff_strategy: exponential
+
+    # Maximum number of retry attempts for rate limit errors (429)
+    max_retries: 3
+
+    # Retry delays in seconds (for exponential backoff)
+    # First retry after 60 seconds, second after 120 seconds, etc.
+    retry_delays: [60, 120, 240]
+
+    # Enable rate limit monitoring
+    monitor_enabled: true
+
+    # Log warnings when approaching rate limit
+    warn_threshold: 0.8  # Warn at 80% of limit
+
+# ==============================================================================
+# ASYNCHRONOUS PROCESSING SETTINGS
+# ==============================================================================
+# Document creation is asynchronous. PandaDoc needs time to process documents.
+# You MUST poll for status before performing operations.
+
+async:
+  # Interval between status polling attempts in seconds
+  # PandaDoc typically needs 2-5 seconds to process documents
+  status_poll_interval: 2
+
+  # Total timeout for status polling in seconds
+  # If document not ready after this time, operation fails
+  status_poll_timeout: 60
+
+  # Maximum number of polling attempts
+  # At 2 seconds per attempt: 30 attempts = 60 seconds total
+  max_poll_attempts: 30
+
+  # Enable detailed polling logs
+  verbose_polling: false
+
+# ==============================================================================
+# LOGGING CONFIGURATION
+# ==============================================================================
+
+logging:
+  # Log level: DEBUG (most verbose) -> INFO -> WARNING -> ERROR (least verbose)
+  # DEBUG: All operations, HTTP details, payload contents (development only)
+  # INFO: Major operations, key decisions (recommended for production)
+  # WARNING: Unusual conditions, rate limits, retries (production)
+  # ERROR: Failures and exceptions only (minimal logging)
+  level: INFO
+
+  # Log message format
+  # Available variables: %(asctime)s, %(name)s, %(levelname)s, %(message)s
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+  # Log file path (relative to current directory)
+  # Leave empty or comment out to disable file logging
+  file: logs/pandadoc.log
+
+  # Maximum log file size in bytes (10MB)
+  # When reached, file is rotated
+  file_max_size: 10485760
+
+  # Number of backup log files to keep
+  file_backup_count: 5
+
+  # Also log to console/stdout
+  console: true
+
+# ==============================================================================
+# HTTP HEADERS
+# ==============================================================================
+# Additional HTTP headers to include in all API requests
+
+http_headers:
+  # Standard headers (automatically set by library)
+  # Authorization: API-Key <key> or Bearer <token>
+  # Content-Type: application/json
+
+  # Optional custom headers
+  # User-Agent: "PandaDoc-Sales-Manager/1.0"
+
+# ==============================================================================
+# DEFAULT VALUES
+# ==============================================================================
+# These defaults are used when not specified in individual requests
+
+defaults:
+  # Document creation defaults
+  document:
+    # Send email notifications to recipients by default
+    silent: false
+
+    # Allow recipients to forward documents to others
+    forwarding_allowed: true
+
+    # Default message when sending documents
+    send_message: "Please review the attached document and sign if you agree."
+
+    # Default email subject
+    send_subject: "Document for Review and Signature"
+
+  # Document download defaults
+  download:
+    # File format for downloads
+    format: pdf  # Options: pdf | docx | combined
+
+    # Add watermark to downloaded documents
+    watermark: false
+
+    # Include completed form fields in download
+    include_fields: true
+
+# ==============================================================================
+# ENVIRONMENT-SPECIFIC CONFIGURATIONS
+# ==============================================================================
+# Uncomment the appropriate environment section below for your use case
+
+# Development Environment
+# - Uses sandbox API
+# - More verbose logging
+# - Longer timeouts (slower network)
+# development:
+#   environment: sandbox
+#   api:
+#     timeout: 60
+#   async:
+#     status_poll_interval: 3
+#     verbose_polling: true
+#   logging:
+#     level: DEBUG
+#     console: true
+#     file: logs/pandadoc_dev.log
+
+# Staging Environment
+# - Uses sandbox or separate production account
+# - Balanced logging
+# - Normal timeouts
+# staging:
+#   environment: sandbox
+#   api:
+#     timeout: 30
+#   logging:
+#     level: INFO
+#     console: true
+#     file: logs/pandadoc_staging.log
+
+# Production Environment
+# - Uses production API
+# - Minimal logging (perf-conscious)
+# - Aggressive rate limiting (safety-first)
+# production:
+#   environment: production
+#   api:
+#     timeout: 30
+#     rate_limit:
+#       requests_per_minute: 10  # Conservative default
+#       monitor_enabled: true
+#   async:
+#     verbose_polling: false
+#   logging:
+#     level: WARNING
+#     console: false
+#     file: logs/pandadoc_production.log
+
+# ==============================================================================
+# VALIDATION & SCHEMA REFERENCE
+# ==============================================================================
+# This configuration file uses YAML format:
+#
+# Strings: Can be quoted or unquoted
+#   Example: name: "John Doe" or name: John Doe
+#
+# Numbers: Without quotes
+#   Example: timeout: 30 (not "30")
+#
+# Booleans: true or false (lowercase, no quotes)
+#   Example: silent: false
+#
+# Lists: Use dashes with indentation
+#   Example:
+#     items:
+#       - item1
+#       - item2
+#
+# Environment Variables: Use ${VAR_NAME} syntax
+#   Example: api_key: ${PANDADOC_API_KEY}
+
+# ==============================================================================
+# SECURITY BEST PRACTICES
+# ==============================================================================
+# 1. NEVER commit API keys to version control
+#    - Always use environment variables for credentials
+#    - Use: export PANDADOC_API_KEY="your_key"
+#
+# 2. ROTATE API KEYS REGULARLY
+#    - Recommended: Every 90 days
+#    - Or after any suspected compromise
+#
+# 3. USE SEPARATE KEYS FOR DIFFERENT ENVIRONMENTS
+#    - Sandbox key for development/testing
+#    - Production key for live use only
+#
+# 4. LIMIT API KEY PERMISSIONS
+#    - Request minimum required permissions from PandaDoc
+#    - Restrict to specific templates if possible
+#
+# 5. MONITOR API KEY USAGE
+#    - Check PandaDoc dashboard regularly
+#    - Alert on unusual activity patterns
+#
+# 6. SECURE LOG FILES
+#    - Ensure log files are not world-readable
+#    - Don't log API keys or sensitive data
+#    - Rotate logs regularly
+#
+# 7. HTTPS ONLY
+#    - All communication with PandaDoc API is over HTTPS
+#    - Verify SSL certificates in production

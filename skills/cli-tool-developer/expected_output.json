@@ -1,0 +1,36 @@
+{
+  "response_type": "Complete CLI implementation with code examples",
+  "files_provided": [
+    "src/index.ts (main CLI entry point)",
+    "src/commands/migrate.ts",
+    "src/commands/rollback.ts",
+    "src/commands/create.ts",
+    "src/config.ts (configuration manager)",
+    "src/utils/errors.ts",
+    "package.json",
+    "tsconfig.json"
+  ],
+  "technologies_used": [
+    "Commander.js for command structure",
+    "Inquirer.js for interactive prompts",
+    "Chalk for colored output",
+    "Ora for spinners",
+    "cli-progress for progress bars",
+    "cosmiconfig for configuration"
+  ],
+  "code_snippet_example": "#!/usr/bin/env node\nimport { Command } from 'commander';\nimport chalk from 'chalk';\nimport { migrateCommand } from './commands/migrate';\nimport { rollbackCommand } from './commands/rollback';\nimport { createCommand } from './commands/create';\n\nconst program = new Command();\n\nprogram\n  .name('dbmigrate')\n  .description('Database migration CLI tool')\n  .version('1.0.0');\n\nprogram\n  .command('migrate')\n  .description('Run pending migrations')\n  .action(migrateCommand);\n\nprogram\n  .command('rollback')\n  .description('Rollback last migration')\n  .action(rollbackCommand);\n\nprogram\n  .command('create')\n  .description('Create a new migration')\n  .action(createCommand);\n\nprogram.parse();",
+  "best_practices_included": [
+    "Proper error handling with custom CLIError class",
+    "Configuration precedence: CLI flags > env vars > config file",
+    "Progress indicators for long operations",
+    "Colored output for better UX (green=success, red=error, yellow=warning)",
+    "Interactive prompts with validation",
+    "POSIX-compliant flags and options",
+    "Proper exit codes",
+    "--help and --version flags",
+    "Composable commands"
+  ],
+  "installation_instructions": "npm install commander inquirer chalk ora cli-progress cosmiconfig\nnpm install -D @types/node @types/inquirer typescript ts-node",
+  "testing_guidance": "Provided examples of testing CLI commands using vitest and execSync",
+  "publishing_guidance": "Configured package.json with 'bin' field for global installation via npm"
+}

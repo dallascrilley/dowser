@@ -1,0 +1,44 @@
+{
+  "name": "AdvancedExtractor",
+  "baseSelector": ".article-card",
+  "fields": [
+    {
+      "name": "title",
+      "selector": "h2.article-title",
+      "type": "text"
+    },
+    {
+      "name": "link",
+      "selector": "a.read-more",
+      "type": "attribute",
+      "attribute": "href"
+    },
+    {
+      "name": "published_date",
+      "selector": "time.published",
+      "type": "attribute",
+      "attribute": "datetime"
+    },
+    {
+      "name": "author",
+      "selector": ".author-name",
+      "type": "text"
+    },
+    {
+      "name": "excerpt",
+      "selector": ".article-excerpt",
+      "type": "text"
+    },
+    {
+      "name": "image_url",
+      "selector": "img.featured-image",
+      "type": "attribute",
+      "attribute": "src"
+    },
+    {
+      "name": "category",
+      "selector": ".category-tag",
+      "type": "text"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "concepts": [
+    {
+      "name": "example_concept",
+      "type": "concept|technique|pattern|problem|tool",
+      "definition": "Clear, working definition from the article",
+      "article_source": "source_filename.md",
+      "confidence": "high|medium|low",
+      "related_concepts": [
+        "related_concept_1",
+        "related_concept_2"
+      ],
+      "open_questions": [
+        "Unanswered question 1",
+        "Unanswered question 2"
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "subject": "concept_a",
+      "predicate": "short_verb_phrase",
+      "object": "concept_b",
+      "source": "source_filename.md",
+      "confidence": 0.8,
+      "type": "dependency|hierarchy|conflict|complement|alternative",
+      "is_inferred": false
+    }
+  ],
+  "tensions": [
+    {
+      "tension_name": "descriptive_name_for_this_tension",
+      "position_a": {
+        "claim": "What position A states",
+        "supporters": [
+          "article1.md",
+          "article2.md"
+        ],
+        "evidence": "Key supporting points from the articles"
+      },
+      "position_b": {
+        "claim": "What position B states (potentially contradictory)",
+        "supporters": [
+          "article3.md"
+        ],
+        "evidence": "Key supporting points from the articles"
+      },
+      "why_productive": "Explanation of why maintaining this tension advances understanding rather than resolving it",
+      "resolution_experiments": [
+        "Potential experiment or test that could help resolve this tension",
+        "Another potential approach to gather evidence"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What we don't know or what remains unclear",
+      "why_matters": "Impact this uncertainty has on understanding",
+      "evidence_needed": "What information or experiments would help resolve this",
+      "related_concepts": [
+        "concept1",
+        "concept2"
+      ],
+      "mentioned_in": [
+        "article1.md"
+      ]
+    }
+  ],
+  "metadata": {
+    "total_concepts": 0,
+    "total_relationships": 0,
+    "total_tensions": 0,
+    "total_uncertainties": 0,
+    "average_confidence": 0.0,
+    "extraction_date": "YYYY-MM-DD",
+    "source_article": "filename.md",
+    "notes": "Any additional metadata or processing notes"
+  }
+}

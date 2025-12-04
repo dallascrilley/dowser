@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Perplexity MCP Server Configuration for lootbox.config.json",
+
+  "mcpServers": {
+    "perplexity": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-perplexity"],
+      "env": {
+        "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"
+      }
+    }
+  },
+
+  "_documentation": {
+    "description": "Perplexity AI search integration via MCP",
+    "setup_steps": [
+      "1. Get API key from https://www.perplexity.ai/settings/api",
+      "2. Export: export PERPLEXITY_API_KEY='pplx-...'",
+      "3. Copy mcpServers block to your lootbox.config.json",
+      "4. Restart lootbox server: Ctrl+C then 'lootbox server'",
+      "5. Verify: lootbox tools | grep mcp_perplexity"
+    ],
+    "usage_example": "lootbox exec 'await tools.mcp_perplexity.search({query: \"latest AI news\"})'",
+    "notes": [
+      "The ${PERPLEXITY_API_KEY} syntax pulls from environment variables",
+      "Namespace will be mcp_perplexity after integration",
+      "Check available functions with: lootbox tools types mcp_perplexity"
+    ]
+  }
+}

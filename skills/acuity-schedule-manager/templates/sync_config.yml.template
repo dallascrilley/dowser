@@ -1,0 +1,651 @@
+# ============================================================================
+# Acuity Scheduling API - CRM Synchronization Configuration Template
+# ============================================================================
+#
+# Purpose: Configure bidirectional sync between Acuity and external CRM systems
+# Last Updated: 2025-11-11
+#
+# This template covers:
+# - Scheduling sync frequency
+# - Bidirectional sync directions
+# - Field mapping (Acuity ↔ CRM)
+# - Data filtering and transformations
+# - Error handling and recovery
+# - Performance tuning
+#
+# ============================================================================
+
+# ============================================================================
+# SYNC SCHEDULING
+# ============================================================================
+# When and how often to run synchronization jobs
+#
+scheduling:
+  # Sync interval in cron format
+  # Format: minute hour day month day-of-week
+  # Run every 5 minutes
+  cron_expression: "*/5 * * * *"
+
+  # Alternative: fixed interval in seconds
+  # Ignored if cron_expression is set
+  fixed_interval_seconds: 300
+
+  # Enable/disable synchronization
+  enabled: true
+
+  # Timezone for cron schedule
+  timezone: "UTC"
+
+  # Maintenance windows (don't sync during business hours)
+  # Useful to avoid impacting live users
+  maintenance_windows:
+    - start_time: "02:00"  # 2 AM
+      end_time: "04:00"    # 4 AM
+      days: ["Sunday"]
+
+  # Maximum sync duration (kill if running too long)
+  max_duration_minutes: 60
+
+  # Concurrent sync instances allowed (1 = single-threaded)
+  max_concurrent_syncs: 1
+
+# ============================================================================
+# SYNC DIRECTION
+# ============================================================================
+# Define which direction(s) to synchronize
+#
+direction:
+  # Sync mode
+  # acuity_to_crm: One-way sync Acuity → CRM (appointments → activities)
+  # crm_to_acuity: One-way sync CRM → Acuity (contacts → clients)
+  # bidirectional: Two-way sync (conflicts handled by rules below)
+  mode: "acuity_to_crm"
+
+  # For bidirectional syncs, conflict resolution
+  # What to do when both systems updated since last sync?
+  conflict_resolution: "acuity_wins"  # or "crm_wins", "manual_review"
+
+  # Sync scope
+  # What to sync
+  sync_scope:
+    # Sync appointment data
+    appointments: true
+
+    # Sync client/contact information
+    clients: true
+
+    # Sync custom fields
+    custom_fields: true
+
+    # Sync appointment notes
+    appointment_notes: true
+
+# ============================================================================
+# FILTERING
+# ============================================================================
+# Control which data gets synced
+#
+filtering:
+  # Date range filtering
+  # Only sync appointments within this range
+  date_filters:
+    enabled: false
+
+    # Sync only appointments in future
+    future_only: true
+
+    # Sync only appointments created after this date
+    min_date: "2025-01-01"
+
+    # Sync only appointments before this date
+    max_date: "2025-12-31"
+
+  # Filter by appointment type
+  # Only sync specific appointment types
+  appointment_type_filters:
+    enabled: false
+    included_types:
+      - "Consultation"
+      - "Follow-up"
+    excluded_types:
+      - "No-show"
+      - "Cancelled"
+
+  # Filter by appointment status
+  status_filters:
+    enabled: true
+    include_confirmed: true
+    include_pending: false
+    include_cancelled: false
+    include_completed: true
+
+  # Filter by calendar/staff
+  calendar_filters:
+    enabled: false
+    included_calendars:
+      - "12345"  # Calendar ID
+      - "67890"
+    excluded_calendars: []
+
+  # Filter by client/contact
+  # Only sync certain client types
+  client_filters:
+    enabled: false
+    excluded_email_domains:
+      - "test.com"
+      - "example.com"
+    min_name_length: 2
+
+  # Filter by tags/labels
+  label_filters:
+    enabled: false
+    included_labels:
+      - "VIP"
+      - "Active"
+    excluded_labels:
+      - "Do Not Contact"
+
+# ============================================================================
+# FIELD MAPPING
+# ============================================================================
+# Define how Acuity fields map to CRM fields
+# Crucial for data synchronization accuracy
+#
+field_mapping:
+  # ========================================================================
+  # CLIENT/CONTACT MAPPING
+  # ========================================================================
+  client_mapping:
+    acuity_field: crm_field_mapping
+
+    # Basic contact information
+    firstName: "first_name"
+    lastName: "last_name"
+    email: "email_address"
+    phone: "phone_number"
+
+    # Additional contact fields
+    notes: "notes"
+    address: "street_address"
+    city: "city"
+    state: "state"
+    zip: "postal_code"
+
+    # Custom field mapping (Acuity custom fields → CRM fields)
+    # Format: "acuity_field_id": "crm_field_name"
+    custom_fields:
+      "field_12345": "custom_attribute_1"
+      "field_67890": "custom_attribute_2"
+
+  # ========================================================================
+  # APPOINTMENT MAPPING
+  # ========================================================================
+  appointment_mapping:
+    acuity_field: crm_field_mapping
+
+    # Appointment basics
+    id: "acuity_appointment_id"
+    datetime: "appointment_date"
+    appointmentTypeID: "appointment_type"
+    appointmentTypeName: "appointment_type_name"
+    confirmed: "is_confirmed"
+    timezone: "timezone"
+
+    # Appointment details
+    duration: "duration_minutes"
+    price: "appointment_cost"
+    priceSold: "price_paid"
+    notes: "appointment_notes"
+
+    # Calendar/Provider
+    calendarID: "provider_id"
+    calendarName: "provider_name"
+
+    # Status fields
+    canceled: "is_cancelled"
+    dateCanceled: "cancellation_date"
+    completed: "is_completed"
+
+    # Payment info
+    paid: "payment_status"  # yes/no/pending
+
+  # ========================================================================
+  # ACTIVITY/HISTORY MAPPING
+  # ========================================================================
+  # How appointments appear as activities in CRM
+  activity_mapping:
+    type: "appointment"
+    title_template: "{appointmentTypeName} - {firstName} {lastName}"
+    description_template: |
+      Appointment Details:
+      Date/Time: {datetime}
+      Duration: {duration} minutes
+      Provider: {calendarName}
+      Price: ${price}
+      Notes: {notes}
+
+    # Activity outcome (success/failure/pending)
+    outcome_mapping:
+      confirmed: "completed"
+      pending: "pending"
+      canceled: "cancelled"
+      no_show: "no_show"
+
+# ============================================================================
+# TRANSFORMATIONS
+# ============================================================================
+# Transform data during sync (formatting, cleaning, etc.)
+#
+transformations:
+  # ========================================================================
+  # PHONE NUMBER TRANSFORMATION
+  # ========================================================================
+  phone:
+    enabled: true
+
+    # Normalize phone format
+    # Options: international, national, e164, rfc3966
+    format: "national"
+
+    # Default country for formatting (for local numbers)
+    default_country: "US"
+
+    # Remove formatting (just digits)
+    remove_formatting: false
+
+    # Validate phone (check if valid)
+    validate: true
+
+  # ========================================================================
+  # NAME TRANSFORMATION
+  # ========================================================================
+  names:
+    enabled: true
+
+    # Capitalize names
+    capitalize: true
+
+    # Split full name into first/last (if needed)
+    split_full_names: true
+
+    # Handle middle names
+    include_middle_name: false
+
+    # Remove titles (Mr., Dr., etc.)
+    remove_titles: true
+    titles_to_remove:
+      - "Mr."
+      - "Mrs."
+      - "Ms."
+      - "Dr."
+      - "Prof."
+
+  # ========================================================================
+  # DATE/TIME TRANSFORMATION
+  # ========================================================================
+  datetime:
+    enabled: true
+
+    # Timezone conversion
+    # Convert from Acuity timezone to CRM timezone
+    convert_timezone: false
+    target_timezone: "UTC"
+
+    # Date format in CRM
+    # Options: iso8601, unix_timestamp, custom
+    output_format: "iso8601"
+
+    # Handle DST transitions
+    handle_dst: true
+
+  # ========================================================================
+  # EMAIL TRANSFORMATION
+  # ========================================================================
+  email:
+    enabled: true
+
+    # Lowercase emails
+    lowercase: true
+
+    # Validate email format
+    validate: true
+
+    # Reject disposable email domains
+    reject_disposable: true
+    disposable_domains:
+      - "tempmail.com"
+      - "guerrillamail.com"
+      - "10minutemail.com"
+
+  # ========================================================================
+  # CUSTOM TRANSFORMATIONS
+  # ========================================================================
+  custom:
+    enabled: false
+
+    # Python script for custom transformation
+    script_path: "transformations/custom_sync.py"
+
+    # Functions to call
+    # Expected signature: transform_field(value, context) -> transformed_value
+    functions:
+      - name: "appointment_type_mapper"
+        input_field: "appointmentTypeID"
+        output_field: "service_category"
+
+# ============================================================================
+# ERROR HANDLING
+# ============================================================================
+# How to handle sync errors
+#
+error_handling:
+  # Strategy for handling individual record failures
+  # skip: Skip failed record, continue with next
+  # retry: Retry failed record
+  # alert: Alert admin and skip
+  # rollback: Undo entire sync batch on any failure
+  strategy: "skip"
+
+  # Maximum retries per record
+  max_retries: 3
+
+  # Retry delay between attempts (seconds)
+  retry_delay_seconds: 60
+
+  # Exponential backoff for retries
+  exponential_backoff: true
+  backoff_base: 2
+
+  # Errors to ignore (don't fail the sync for these)
+  ignorable_errors:
+    - "DUPLICATE_CONTACT"
+    - "FIELD_NOT_FOUND"
+
+  # Errors to alert on immediately
+  critical_errors:
+    - "AUTHENTICATION_FAILED"
+    - "RATE_LIMIT_EXCEEDED"
+    - "DATABASE_ERROR"
+
+  # Dead letter queue for permanently failed records
+  # Store failed records for manual review
+  use_dead_letter_queue: true
+  dlq_table: "sync_dead_letter_queue"
+
+  # Failure notifications
+  notify_on_failure: true
+  failure_notification_destination: "slack"  # or "email", "pagerduty"
+  failure_notification_recipients:
+    - "admin@yourdomain.com"
+
+# ============================================================================
+# PERFORMANCE OPTIMIZATION
+# ============================================================================
+# Tune sync performance
+#
+performance:
+  # Batch size for bulk operations
+  # Larger = faster but uses more memory/API quota
+  batch_size: 100
+
+  # Rate limiting (requests per second)
+  # Acuity limit: 10 req/sec
+  # Keep below limit to avoid blocking real users
+  rate_limit_per_second: 8
+
+  # Connection pool size
+  connection_pool_size: 10
+
+  # Enable parallel processing
+  # Process multiple batches concurrently
+  parallel_processing: false
+  parallel_workers: 4
+
+  # Cache data during sync
+  # Reduce API calls by caching lookups
+  enable_caching: true
+  cache_ttl_seconds: 300
+
+  # Compress data transfer
+  use_compression: true
+
+  # Pagination settings
+  pagination:
+    enabled: true
+    page_size: 100
+    max_pages: 1000  # Prevent infinite loops
+
+# ============================================================================
+# CONFLICT RESOLUTION (for bidirectional sync)
+# ============================================================================
+# How to handle conflicting changes in both systems
+#
+conflict_resolution:
+  # Resolution strategy
+  # acuity_wins: Acuity is source of truth
+  # crm_wins: CRM is source of truth
+  # newer_wins: Whichever has newer timestamp wins
+  # manual_review: Flag for manual resolution
+  # merge: Merge both changes (complex, field-dependent)
+  strategy: "newer_wins"
+
+  # Track last sync timestamp for each record
+  # Used for "newer_wins" strategy
+  track_timestamps: true
+
+  # Fields that can have conflicts
+  # Define resolution per field if needed
+  field_rules:
+    notes: "merge"  # Append both notes
+    phone: "acuity_wins"  # Acuity number is more recent
+    email: "newer_wins"  # Use whichever is newer
+
+  # Audit trail of conflicts
+  log_conflicts: true
+  conflict_log_table: "sync_conflicts"
+
+  # Manual review queue
+  manual_review_queue:
+    enabled: true
+    queue_table: "sync_manual_review"
+    notify_admin: true
+
+# ============================================================================
+# SCHEDULING & RECURRING SYNC
+# ============================================================================
+# Handle recurring/recurring appointments
+#
+recurring:
+  enabled: true
+
+  # When syncing recurring appointments, sync:
+  # all: All instances
+  # upcoming: Only future instances
+  # recent: Only recent instances
+  scope: "upcoming"
+
+  # Look-ahead days for recurring appointments
+  look_ahead_days: 365
+
+  # Update existing recurring series or create individual records
+  merge_series: false
+
+# ============================================================================
+# AUDIT & COMPLIANCE
+# ============================================================================
+# Track all sync operations for compliance
+#
+audit:
+  # Enable audit logging
+  enabled: true
+
+  # Audit log table/file
+  log_destination: "acuity_sync_audit_log"
+
+  # Log what information
+  log_level: "detailed"  # or "minimal"
+
+  # Retention period for logs (days)
+  retention_days: 365
+
+  # Data privacy
+  # Don't log sensitive data (PII)
+  redact_sensitive_data: true
+
+  # Track user actions
+  track_user_actions: true
+
+  # Compliance standards
+  compliance_standards:
+    - "HIPAA"  # If handling health data
+    - "GDPR"   # If serving EU customers
+
+# ============================================================================
+# INITIAL SYNC
+# ============================================================================
+# Configuration for first-time sync (migration)
+#
+initial_sync:
+  # Enable initial full sync
+  # WARNING: This syncs ALL historical data, may take hours
+  enabled: false
+
+  # Date range for initial sync
+  min_date: "2020-01-01"
+  max_date: "2025-11-11"
+
+  # Batch size for initial sync (can be large)
+  batch_size: 500
+
+  # Create backup before initial sync
+  backup_before_sync: true
+
+  # Duplicate handling
+  # What to do if record already exists in CRM
+  on_duplicate: "skip"  # or "update", "error"
+
+# ============================================================================
+# ROLLBACK & RECOVERY
+# ============================================================================
+# Recover from failed syncs
+#
+rollback:
+  # Enable automatic rollback on critical failures
+  enabled: true
+
+  # Keep point-in-time backups
+  backup_snapshots: true
+  backup_frequency: "hourly"
+  backup_retention_days: 7
+
+  # Manual rollback capability
+  allow_manual_rollback: true
+  rollback_retention_days: 30
+
+# ============================================================================
+# INTEGRATION CONFIGURATION
+# ============================================================================
+# CRM system details
+#
+integrations:
+  # CRM system
+  crm:
+    type: "hubspot"  # hubspot, salesforce, pipedrive, copper, custom
+
+    # HubSpot configuration
+    hubspot:
+      api_key: "${HUBSPOT_API_KEY}"
+      api_url: "https://api.hubapi.com"
+      # Map HubSpot fields
+      contact_owner_field: "hubspotownerId"
+      last_sync_timestamp_field: "acuity_last_sync"
+
+    # Salesforce configuration
+    salesforce:
+      instance_url: "https://yourdomain.salesforce.com"
+      client_id: "${SALESFORCE_CLIENT_ID}"
+      client_secret: "${SALESFORCE_CLIENT_SECRET}"
+      # Object mappings
+      contact_object: "Contact"
+      activity_object: "Task"
+
+    # Pipedrive configuration
+    pipedrive:
+      api_token: "${PIPEDRIVE_API_TOKEN}"
+      api_url: "https://api.pipedrive.com"
+      person_object: "persons"
+      activity_object: "activities"
+
+  # Notification system
+  notifications:
+    enabled: true
+    channels:
+      - type: "slack"
+        webhook_url: "${SLACK_WEBHOOK_URL}"
+        channel: "#acuity-sync"
+      - type: "email"
+        recipients:
+          - "admin@yourdomain.com"
+
+# ============================================================================
+# MONITORING & ALERTING
+# ============================================================================
+monitoring:
+  # Track sync metrics
+  enabled: true
+
+  # Metrics to collect
+  metrics:
+    - sync_duration
+    - records_synced
+    - sync_success_rate
+    - errors_count
+    - conflicts_count
+
+  # Performance thresholds
+  thresholds:
+    max_duration_minutes: 60
+    min_success_rate_percent: 95
+    max_errors_per_sync: 10
+
+  # Generate sync reports
+  reports:
+    enabled: true
+    schedule: "daily"
+    format: "email"
+    recipients:
+      - "admin@yourdomain.com"
+
+# ============================================================================
+# EXAMPLE CONFIGURATIONS
+# ============================================================================
+
+# Example 1: Simple one-way sync (Acuity → HubSpot)
+# example_simple:
+#   direction:
+#     mode: "acuity_to_crm"
+#   scheduling:
+#     cron_expression: "*/15 * * * *"  # Every 15 minutes
+#   error_handling:
+#     strategy: "skip"
+#   integrations:
+#     crm:
+#       type: "hubspot"
+
+# Example 2: Full bidirectional sync (Acuity ↔ Salesforce)
+# example_bidirectional:
+#   direction:
+#     mode: "bidirectional"
+#     conflict_resolution: "newer_wins"
+#   scheduling:
+#     cron_expression: "*/5 * * * *"   # Every 5 minutes
+#   error_handling:
+#     strategy: "skip"
+#     notify_on_failure: true
+#   integrations:
+#     crm:
+#       type: "salesforce"
+#   audit:
+#     enabled: true
+
+# ============================================================================

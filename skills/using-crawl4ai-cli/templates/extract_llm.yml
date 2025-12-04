@@ -1,0 +1,7 @@
+type: "llm"
+provider: "openai/gpt-4"
+instruction: "Extract structured data from this page"
+api_token: "your-api-token-here"
+params:
+  temperature: 0.3
+  max_tokens: 1000

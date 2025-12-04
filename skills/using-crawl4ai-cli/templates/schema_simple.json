@@ -1,0 +1,17 @@
+{
+  "name": "SimpleExtractor",
+  "baseSelector": ".item",
+  "fields": [
+    {
+      "name": "title",
+      "selector": "h2",
+      "type": "text"
+    },
+    {
+      "name": "link",
+      "selector": "a",
+      "type": "attribute",
+      "attribute": "href"
+    }
+  ]
+}

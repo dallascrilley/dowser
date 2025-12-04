@@ -1,0 +1,15 @@
+{
+  "request": "I need to build a CLI tool for managing database migrations. The CLI should have:\n1. A 'migrate' command that runs pending migrations with a progress bar\n2. A 'rollback' command that reverts the last migration\n3. A 'create' command that generates a new migration file interactively\n4. Configuration support for database connection (file and env vars)\n5. Beautiful colored output and error handling\n\nUse Commander.js, Inquirer for prompts, and Chalk for colors.",
+  "context": {
+    "framework": "Commander.js",
+    "language": "TypeScript",
+    "features_requested": [
+      "Interactive prompts",
+      "Progress indicators",
+      "Configuration management",
+      "Colored output",
+      "Error handling"
+    ],
+    "use_case": "Database migration tool"
+  }
+}

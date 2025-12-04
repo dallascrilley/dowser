@@ -1,0 +1,72 @@
+{
+  "workflow_steps": [
+    {
+      "step": 1,
+      "action": "Update main branch",
+      "commands": [
+        "git checkout main",
+        "git pull origin main"
+      ],
+      "explanation": "Ensure you're starting from the latest main branch"
+    },
+    {
+      "step": 2,
+      "action": "Create feature branch",
+      "commands": [
+        "git switch -c feature/user-authentication"
+      ],
+      "explanation": "Modern syntax to create and switch to new branch. Uses descriptive naming: feature/user-authentication"
+    },
+    {
+      "step": 3,
+      "action": "Make changes and commit",
+      "commands": [
+        "# Make your code changes...",
+        "git add -p",
+        "git commit -m \"feat: add user authentication endpoints\n\n- Implement login and logout endpoints\n- Add JWT token generation\n- Create user session management\n\nCloses #123\""
+      ],
+      "explanation": "Use interactive staging (-p) to review changes. Follow Conventional Commits (feat:) with detailed body"
+    },
+    {
+      "step": 4,
+      "action": "Push to remote",
+      "commands": [
+        "git push -u origin feature/user-authentication"
+      ],
+      "explanation": "Push branch and set upstream tracking (-u flag)"
+    },
+    {
+      "step": 5,
+      "action": "Create pull request",
+      "commands": [
+        "# On GitHub, click 'Compare & pull request'",
+        "# Or use GitHub CLI:",
+        "gh pr create --title \"feat: Add user authentication\" --body \"Implements user authentication with JWT tokens. Closes #123\""
+      ],
+      "explanation": "Create PR on GitHub or using gh CLI"
+    }
+  ],
+  "best_practices": {
+    "commit_message_format": "type: subject\n\nbody\n\nfooter",
+    "commit_types": ["feat", "fix", "docs", "style", "refactor", "test", "chore"],
+    "branch_naming": "type/description (e.g., feature/user-auth, fix/login-bug)",
+    "pr_guidelines": [
+      "Keep PRs focused and reasonably sized",
+      "Write clear description with context",
+      "Reference related issues",
+      "Request appropriate reviewers"
+    ]
+  },
+  "safety_notes": [
+    "Always pull from main before creating feature branch",
+    "Use --force-with-lease instead of --force if you need to force push",
+    "Review changes with 'git diff --staged' before committing",
+    "Never commit secrets or sensitive data"
+  ],
+  "next_steps": [
+    "Wait for code review feedback",
+    "Address review comments in new commits",
+    "Once approved, merge using GitHub's merge button (or rebase and merge)",
+    "Delete feature branch after merge"
+  ]
+}
