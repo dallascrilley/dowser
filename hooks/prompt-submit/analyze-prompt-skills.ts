@@ -102,30 +102,13 @@ const IS_PLUGIN_CONTEXT =
   PROJECT_DIR.includes('/.claude/plugins/cache/');
 
 /**
- * Get metrics directory by resolving the canonical .claude location from the skills symlink
- * Falls back to ~/.claude/metrics if resolution fails
+ * Get metrics file path - uses plugin's lib directory
+ * Metrics track how often each skill is suggested by the hook
  */
 function getMetricsPath(): string {
-  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
-  if (!homeDir) {
-    throw new Error('HOME environment variable not set - cannot determine metrics path');
-  }
-
-  const skillsSymlink = path.join(homeDir, '.claude', 'skills');
-
-  try {
-    // Resolve symlink to find canonical .claude directory (e.g., /Users/dallascrilley/PAI/.claude)
-    if (fs.existsSync(skillsSymlink)) {
-      const realSkillsPath = fs.realpathSync(skillsSymlink);
-      const canonicalClaudeDir = path.dirname(realSkillsPath); // Get parent of skills/
-      return path.join(canonicalClaudeDir, 'metrics', 'skill-hit-counts.json');
-    }
-  } catch (error) {
-    // Symlink resolution failed, fall through to default
-  }
-
-  // Fallback: use ~/.claude/metrics directly
-  return path.join(homeDir, '.claude', 'metrics', 'skill-hit-counts.json');
+  // Use plugin's lib directory for metrics (alongside skill-rules.json)
+  const pluginLibDir = path.join(__dirname, '..', '..', 'lib');
+  return path.join(pluginLibDir, 'skill-metrics.json');
 }
 
 const METRICS_FILE = getMetricsPath();
