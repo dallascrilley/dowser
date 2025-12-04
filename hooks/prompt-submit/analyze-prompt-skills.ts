@@ -365,15 +365,22 @@ function recordSearch(query: string): void {
  */
 function recordGap(query: string, bestScore: number): void {
   if (!query || query.length < 5) return; // Skip very short queries
+  const debug = process.env.SKILL_ANALYZER_DEBUG === '1';
   try {
     fs.mkdirSync(METRICS_DIR, { recursive: true });
     const metrics = loadMetrics();
-    // Normalize query for deduplication
+    // Normalize query for deduplication (truncate to first 100 chars to avoid excessively long keys)
     const normalizedQuery = query.toLowerCase().trim().slice(0, 100);
     metrics.gaps[normalizedQuery] = (metrics.gaps[normalizedQuery] || 0) + 1;
     saveMetrics(metrics);
+    if (debug) {
+      console.error(`📉 Recorded gap: "${normalizedQuery}" (best score: ${bestScore})`);
+    }
   } catch (error) {
-    // Silently fail - gap tracking is non-critical
+    if (debug) {
+      console.error('⚠️  Failed to record gap:', error);
+    }
+    // Non-critical - silently fail in normal operation
   }
 }
 

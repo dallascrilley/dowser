@@ -31,25 +31,30 @@ function loadMetrics(): SkillMetrics {
     return { suggestions: {}, activations: {}, searches: {}, gaps: {}, lastUpdated: '' };
   }
 
-  const data = JSON.parse(fs.readFileSync(METRICS_FILE, 'utf-8'));
+  try {
+    const data = JSON.parse(fs.readFileSync(METRICS_FILE, 'utf-8'));
 
-  // Handle legacy flat format
-  if (!data.suggestions && !data.activations) {
-    return {
-      suggestions: data,
-      activations: {},
-      searches: {},
-      gaps: {},
-      lastUpdated: new Date().toISOString()
-    };
+    // Handle legacy flat format
+    if (!data.suggestions && !data.activations) {
+      return {
+        suggestions: data,
+        activations: {},
+        searches: {},
+        gaps: {},
+        lastUpdated: new Date().toISOString()
+      };
+    }
+
+    // Ensure gaps exists
+    if (!data.gaps) {
+      data.gaps = {};
+    }
+
+    return data;
+  } catch (error) {
+    console.error(`Error parsing metrics file: ${error}`);
+    return { suggestions: {}, activations: {}, searches: {}, gaps: {}, lastUpdated: '' };
   }
-
-  // Ensure gaps exists
-  if (!data.gaps) {
-    data.gaps = {};
-  }
-
-  return data;
 }
 
 function printTable(title: string, data: Record<string, number>, limit: number) {
