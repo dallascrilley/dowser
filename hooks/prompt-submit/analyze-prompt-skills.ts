@@ -544,24 +544,53 @@ function getSkillRoots(): Array<{ path: string; sourceType: 'project' | 'user' |
     roots.push({ path: paiPluginSkillsDir, sourceType: 'plugin' });
   }
 
-  // Other plugin skills directories (~/.claude/plugins/<plugin>/skills) - plugin level
+  // Recursively find all skills directories under ~/.claude/plugins
+  // This catches: cache/<plugin>/skills, marketplaces/<marketplace>/skills, <plugin>/skills, etc.
   const pluginBase = path.join(homeDir, '.claude', 'plugins');
   if (fs.existsSync(pluginBase)) {
-    try {
-      const pluginDirs = fs.readdirSync(pluginBase, { withFileTypes: true });
-      for (const plugin of pluginDirs) {
-        if (plugin.isDirectory()) {
-          const skillsDir = path.join(pluginBase, plugin.name, 'skills');
-          if (fs.existsSync(skillsDir)) {
-            roots.push({ path: skillsDir, sourceType: 'plugin' });
+    const foundSkillDirs = new Set<string>();
+
+    function findSkillsDirs(dir: string, depth = 0): void {
+      // Limit recursion depth to avoid infinite loops and excessive scanning
+      if (depth > 5) return;
+
+      try {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!entry.isDirectory()) continue;
+
+          const fullPath = path.join(dir, entry.name);
+
+          // If this is a "skills" directory, add it
+          if (entry.name === 'skills') {
+            // Avoid duplicates (e.g., pai-skills already added above)
+            if (!foundSkillDirs.has(fullPath) && fullPath !== paiPluginSkillsDir) {
+              foundSkillDirs.add(fullPath);
+              roots.push({ path: fullPath, sourceType: 'plugin' });
+              if (debug) {
+                console.error(`✓ Found plugin skills at ${fullPath}`);
+              }
+            }
+          } else {
+            // Recurse into subdirectories (but skip common non-skill directories)
+            const skipDirs = [
+              'node_modules', '.git', 'dist', 'build', 'coverage',
+              'examples', 'test', 'tests', '__tests__', 'docs', 'references',
+              'repos', 'marketplaces'  // repos contain source code, marketplaces are indexes
+            ];
+            // Skip temp directories (temp_git_*, temp_*)
+            const isTempDir = entry.name.startsWith('temp_');
+            if (!skipDirs.includes(entry.name) && !isTempDir) {
+              findSkillsDirs(fullPath, depth + 1);
+            }
           }
         }
-      }
-    } catch (error) {
-      if (debug) {
-        console.error(`⚠️  Failed to read plugins directory: ${pluginBase}`, error);
+      } catch (error) {
+        // Silently skip directories we can't read
       }
     }
+
+    findSkillsDirs(pluginBase);
   }
 
   // Project-level skills directory ($CLAUDE_PROJECT_DIR/.claude/skills) - highest priority
