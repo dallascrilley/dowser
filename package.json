@@ -1,0 +1,14 @@
+{
+  "name": "pai-skills",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "fuse.js": "^7.1.0",
+    "glob": "^10.0.0",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.0.0"
+  }
+}

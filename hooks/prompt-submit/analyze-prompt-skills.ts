@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
 /**
  * Enhanced Skill Analyzer Hook for UserPromptSubmit
- * Hybrid System: Combines fuzzy matching with declarative skill-rules.json
+ * Hybrid System: Combines Fuse.js fuzzy matching with declarative skill-rules.json
  *
  * Features:
+ * - Fuse.js fuzzy search with configurable threshold (typo tolerance)
  * - Token-based exact matching for skill names and descriptions
- * - Fuzzy name matching with Levenshtein distance (typo tolerance)
  * - Keyword scoring for common technical terms
  * - Description relevance scoring with deduplication
  * - Process-lifetime caching with mtime-based invalidation
@@ -22,6 +22,7 @@ import { glob } from 'glob';
 import matter from 'gray-matter';
 import * as fs from 'fs';
 import * as path from 'path';
+import Fuse from 'fuse.js';
 
 interface HookInput {
   session_id?: string;
@@ -1141,28 +1142,110 @@ function scoreSkillRelevanceFuzzy(skill: Skill, prompt: string): number {
 }
 
 /**
- * Hybrid scoring: Combines rules-based and fuzzy matching
- * Rules-based scoring gets priority, fuzzy matching fills in gaps
+ * Get or create Fuse.js instance for skill search
+ * Lazily initialized and cached
  */
-function scoreSkillRelevance(skill: Skill, prompt: string, rules: SkillRules | null): { score: number; source: 'rules' | 'fuzzy' | 'hybrid' } {
+function getFuseInstance(skills: Skill[]): Fuse<Skill> {
+  // Create hash of skills to check if we need to rebuild
+  const hash = skills.map(s => s.name).sort().join('|');
+  
+  if (fuseInstance && fuseSkillsHash === hash) {
+    return fuseInstance;
+  }
+  
+  // Rebuild Fuse index
+  fuseInstance = new Fuse(skills, FUSE_OPTIONS);
+  fuseSkillsHash = hash;
+  
+  return fuseInstance;
+}
+
+/**
+ * Score skills using Fuse.js fuzzy search
+ * Returns scores normalized to our 0-100 scale
+ */
+function scoreSkillsWithFuse(
+  skills: Skill[],
+  query: string
+): Map<string, { fuseScore: number; fuseMatch: Fuse.FuseResult<Skill> | null }> {
+  const debug = process.env.SKILL_ANALYZER_DEBUG === '1';
+  const debugFuzzy = process.env.SKILL_ANALYZER_DEBUG_FUZZY === '1';
+  const results = new Map<string, { fuseScore: number; fuseMatch: Fuse.FuseResult<Skill> | null }>();
+  
+  // Initialize all skills with 0 score
+  for (const skill of skills) {
+    results.set(skill.name, { fuseScore: 0, fuseMatch: null });
+  }
+  
+  if (!query || query.length < 2) {
+    return results;
+  }
+  
+  const fuse = getFuseInstance(skills);
+  
+  // Fuse.js search returns results sorted by score (lower is better)
+  // Score of 0 = perfect match, 1 = no match
+  const fuseResults = fuse.search(query);
+  
+  if (debugFuzzy && fuseResults.length > 0) {
+    console.error(`\n🔎 Fuse.js results for "${query}":`);
+  }
+  
+  for (const result of fuseResults) {
+    // Convert Fuse score (0=best, 1=worst) to our scale (higher=better)
+    // Score of 0.0 → 20 points, 0.2 → 16, 0.4 → 12, 0.6 → 8, 0.8 → 4
+    const normalizedScore = Math.round((1 - (result.score || 0)) * 20);
+    
+    results.set(result.item.name, { fuseScore: normalizedScore, fuseMatch: result });
+    
+    if (debugFuzzy) {
+      console.error(`  ${result.item.name}: raw=${result.score?.toFixed(3)}, normalized=${normalizedScore}`);
+    }
+  }
+  
+  return results;
+}
+
+/**
+ * Hybrid scoring: Combines rules-based, token-based, and Fuse.js fuzzy matching
+ */
+function scoreSkillRelevanceHybrid(
+  skill: Skill, 
+  prompt: string, 
+  rules: SkillRules | null,
+  fuseScores: Map<string, { fuseScore: number; fuseMatch: Fuse.FuseResult<Skill> | null }>
+): { score: number; source: 'rules' | 'fuzzy' | 'fuse' | 'hybrid' } {
   const rulesScore = scoreSkillFromRules(skill, prompt, rules);
   const fuzzyScore = scoreSkillRelevanceFuzzy(skill, prompt);
-
+  const fuseData = fuseScores.get(skill.name) || { fuseScore: 0, fuseMatch: null };
+  
   // If skill has rules and matched, prioritize rules-based score
   if (rulesScore > 0) {
-    // Add small bonus from fuzzy matching (max 30% of fuzzy score)
-    const hybridScore = rulesScore + Math.floor(fuzzyScore * 0.3);
+    // Add bonuses from fuzzy and fuse matching
+    const hybridScore = rulesScore + Math.floor(fuzzyScore * 0.3) + Math.floor(fuseData.fuseScore * 0.3);
     return {
       score: hybridScore,
-      source: fuzzyScore > 0 ? 'hybrid' : 'rules'
+      source: (fuzzyScore > 0 || fuseData.fuseScore > 0) ? 'hybrid' : 'rules'
     };
   }
-
-  // Fall back to fuzzy matching for skills without rules
-  return {
-    score: fuzzyScore,
-    source: 'fuzzy'
-  };
+  
+  // Combine token-based and Fuse.js scores
+  // Take the higher of the two as the base, add a smaller bonus from the other
+  let combinedScore: number;
+  let source: 'fuzzy' | 'fuse' | 'hybrid';
+  
+  if (fuzzyScore > fuseData.fuseScore) {
+    combinedScore = fuzzyScore + Math.floor(fuseData.fuseScore * 0.4);
+    source = fuseData.fuseScore > 0 ? 'hybrid' : 'fuzzy';
+  } else if (fuseData.fuseScore > fuzzyScore) {
+    combinedScore = fuseData.fuseScore + Math.floor(fuzzyScore * 0.4);
+    source = fuzzyScore > 0 ? 'hybrid' : 'fuse';
+  } else {
+    combinedScore = fuzzyScore;
+    source = 'fuzzy';
+  }
+  
+  return { score: combinedScore, source };
 }
 
 /**
@@ -1177,7 +1260,7 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
   const debug = process.env.SKILL_ANALYZER_DEBUG === '1';
 
   if (debug) {
-    console.error('\n🔍 HYBRID DEBUG MODE ENABLED (Fuzzy + Rules)');
+    console.error('\n🔍 HYBRID DEBUG MODE ENABLED (Token + Fuse.js + Rules)');
     console.error(`Searching skill roots: ${roots.map(r => `${r.path} (${r.sourceType})`).join(', ')}`);
   }
 
@@ -1227,9 +1310,12 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
     return { skills: [], scoredSkills: [] };
   }
 
+  // Get Fuse.js scores for all skills
+  const fuseScores = scoreSkillsWithFuse(allSkills, prompt);
+
   const scoredSkills = allSkills
     .map((skill) => {
-      const { score, source } = scoreSkillRelevance(skill, prompt, rules);
+      const { score, source } = scoreSkillRelevanceHybrid(skill, prompt, rules, fuseScores);
       return { skill, score, source };
     })
     .filter(({ score }) => score > 0)
@@ -1245,7 +1331,7 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
     } else {
       scoredSkills.slice(0, 10).forEach(({ skill, score, source }, index) => {
         const marker = index < limit ? '✓' : ' ';
-        const sourceIcon = source === 'rules' ? '📋' : source === 'fuzzy' ? '🔍' : '🔀';
+        const sourceIcon = source === 'rules' ? '📋' : source === 'fuse' ? '🔎' : source === 'fuzzy' ? '🔍' : '🔀';
         console.error(`${marker} ${index + 1}. [Score: ${score}] ${sourceIcon} ${source.toUpperCase()} - ${skill.name}`);
         if (skill.description) {
           const desc = skill.description.length > 100
@@ -1326,6 +1412,33 @@ async function readStdinWithTimeout(timeout: number = 5000): Promise<string> {
   });
 }
 
+/**
+ * Fuse.js configuration for fuzzy search
+ * - threshold: 0.4 allows reasonable typos (lower = stricter matching)
+ * - distance: 100 allows matches anywhere in the string
+ * - minMatchCharLength: 2 for short queries like "ai", "db"
+ */
+const FUSE_OPTIONS: Fuse.IFuseOptions<Skill> = {
+  keys: [
+    { name: 'name', weight: 0.4 },
+    { name: 'folderName', weight: 0.35 },
+    { name: 'description', weight: 0.15 },
+    { name: 'whenToUse', weight: 0.1 },
+  ],
+  threshold: 0.4,          // 0 = perfect match, 1 = match anything
+  distance: 100,           // How far apart characters can be
+  minMatchCharLength: 2,   // Enable short queries
+  includeScore: true,      // Get match scores
+  ignoreLocation: true,    // Don't penalize matches later in string
+  useExtendedSearch: true, // Enable advanced search patterns
+};
+
+let fuseInstance: Fuse<Skill> | null = null;
+let fuseSkillsHash: string = '';
+
+/**
+ * Main hook function
+ */
 async function main() {
   const debug = process.env.SKILL_ANALYZER_DEBUG === '1';
   if (debug) {
