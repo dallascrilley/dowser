@@ -23,6 +23,7 @@ import matter from 'gray-matter';
 import * as fs from 'fs';
 import * as path from 'path';
 import Fuse from 'fuse.js';
+import { TfIdf } from 'natural';
 
 interface HookInput {
   session_id?: string;
@@ -97,6 +98,102 @@ interface SkillRulesCacheEntry {
 const skillCache = new Map<string, CacheEntry>();
 const rulesCache = new Map<string, SkillRulesCacheEntry>();
 const PROJECT_DIR = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+
+// TF-IDF cache for term weighting
+let tfidfInstance: TfIdf | null = null;
+let tfidfSkillsHash: string | null = null;
+/** TF-IDF scoring is ON by default. Disable via SKILL_ANALYZER_TFIDF=0 */
+const TFIDF_ENABLED = process.env.SKILL_ANALYZER_TFIDF !== '0';
+/** Debug TF-IDF scoring via SKILL_ANALYZER_DEBUG_TFIDF=1 */
+const DEBUG_TFIDF_ENABLED = process.env.SKILL_ANALYZER_DEBUG_TFIDF === '1';
+
+/**
+ * Build or get cached TF-IDF instance from skills corpus
+ * TF-IDF weights terms by uniqueness: common terms like "implement" get low weight,
+ * rare terms like "tailwind" get high weight
+ */
+function getTfIdfInstance(skills: Skill[]): TfIdf {
+  // Create simple hash of skill names to detect cache invalidation
+  const currentHash = skills.map(s => s.name).sort().join('|');
+
+  if (tfidfInstance && tfidfSkillsHash === currentHash) {
+    return tfidfInstance;
+  }
+
+  if (DEBUG_TFIDF_ENABLED) {
+    console.error(`\n🔬 Building TF-IDF corpus from ${skills.length} skills`);
+  }
+
+  tfidfInstance = new TfIdf();
+
+  // Add each skill as a document with combined searchable text
+  for (const skill of skills) {
+    const doc = [
+      skill.name,
+      skill.folderName,
+      skill.description || '',
+      skill.whenToUse || ''
+    ].join(' ').toLowerCase();
+
+    tfidfInstance.addDocument(doc);
+  }
+
+  tfidfSkillsHash = currentHash;
+
+  if (DEBUG_TFIDF_ENABLED) {
+    console.error(`✓ TF-IDF corpus built with ${skills.length} documents`);
+  }
+
+  return tfidfInstance;
+}
+
+/**
+ * Get TF-IDF weighted scores for query against all skills
+ * Returns map of skill name -> TF-IDF score
+ */
+function scoreSkillsWithTfIdf(skills: Skill[], query: string): Map<string, number> {
+  const results = new Map<string, number>();
+
+  // Initialize all skills with 0
+  for (const skill of skills) {
+    results.set(skill.name, 0);
+  }
+
+  if (!TFIDF_ENABLED || !query || query.length < 2) {
+    return results;
+  }
+
+  const tfidf = getTfIdfInstance(skills);
+  const queryLower = query.toLowerCase();
+
+  if (DEBUG_TFIDF_ENABLED) {
+    console.error(`\n📊 TF-IDF scores for: "${query}"`);
+  }
+
+  // TF-IDF returns scores per document
+  // Higher score = query terms appear frequently in doc but rarely across corpus
+  let maxScore = 0;
+  const rawScores: number[] = [];
+
+  tfidf.tfidfs(queryLower, (i: number, measure: number) => {
+    rawScores[i] = measure;
+    if (measure > maxScore) maxScore = measure;
+  });
+
+  // Normalize scores to 0-25 range (similar weight to other scoring methods)
+  for (let i = 0; i < skills.length; i++) {
+    const skill = skills[i];
+    const rawScore = rawScores[i] || 0;
+    const normalizedScore = maxScore > 0 ? Math.round((rawScore / maxScore) * 25) : 0;
+    results.set(skill.name, normalizedScore);
+
+    if (DEBUG_TFIDF_ENABLED && normalizedScore > 0) {
+      console.error(`  ${skill.name}: raw=${rawScore.toFixed(3)}, normalized=${normalizedScore}`);
+    }
+  }
+
+  return results;
+}
 const PLUGIN_CACHE_FRAGMENT = `${path.sep}.claude${path.sep}plugins${path.sep}cache`;
 const IS_PLUGIN_CONTEXT =
   PROJECT_DIR.includes(PLUGIN_CACHE_FRAGMENT) ||
@@ -775,6 +872,21 @@ const EXCLUDED_TOKENS = new Set([
 ]);
 
 /**
+ * Overly common tokens that should receive REDUCED weight (not excluded)
+ * These appear in many skill descriptions and cause false positives
+ * when they match skill names via partial matching
+ */
+const LOW_WEIGHT_TOKENS = new Set([
+  'implement', 'implementing', 'implementation',  // Matches "implementing-modules" too broadly
+  'create', 'creating', 'build', 'building',      // Very generic action words
+  'make', 'making', 'setup', 'setting',
+  'add', 'adding', 'write', 'writing',
+  'how', 'what', 'when', 'where', 'why',          // Question words
+  'best', 'good', 'better',                        // Quality words
+  'new', 'old', 'update', 'change',
+]);
+
+/**
  * Short technical tokens (2 chars) that should be kept despite length filter
  * These are meaningful in technical contexts
  */
@@ -1015,7 +1127,9 @@ function scoreSkillRelevanceFuzzy(skill: Skill, prompt: string): number {
     // Check if any token from prompt is contained in skill name
     for (const token of promptTokens) {
       if (nameLower.includes(token) && token.length >= 4) {
-        score += 6;  // Token match in name
+        // Reduce weight for overly common tokens
+        const tokenWeight = LOW_WEIGHT_TOKENS.has(token) ? 2 : 6;
+        score += tokenWeight;  // Token match in name
         break;  // Only count once
       }
     }
@@ -1026,8 +1140,9 @@ function scoreSkillRelevanceFuzzy(skill: Skill, prompt: string): number {
   if (folderLower === promptLower) {
     // Exact folder name match (e.g., prompt: "brainstorming" matches folder "brainstorming")
     score += 12;
-  } else if (promptTokens.some(token => token === folderLower)) {
+  } else if (promptTokens.some(token => token === folderLower && !LOW_WEIGHT_TOKENS.has(token))) {
     // Token exactly matches folder name (e.g., "use brainstorming skill" has token "brainstorming")
+    // Skip low-weight tokens for exact folder match bonus
     score += 12;
   } else if (folderLower.includes(promptLower) && promptLower.length >= 4) {
     // Partial folder match (full prompt in folder)
@@ -1036,7 +1151,9 @@ function scoreSkillRelevanceFuzzy(skill: Skill, prompt: string): number {
     // Check if any token is contained in folder name or vice versa
     for (const token of promptTokens) {
       if ((folderLower.includes(token) || token.includes(folderLower)) && token.length >= 4) {
-        score += 4;  // Partial folder match
+        // Reduce weight for overly common tokens in folder matching
+        const tokenWeight = LOW_WEIGHT_TOKENS.has(token) ? 1 : 4;
+        score += tokenWeight;  // Partial folder match
         break;
       }
     }
@@ -1046,7 +1163,9 @@ function scoreSkillRelevanceFuzzy(skill: Skill, prompt: string): number {
   const nameTokens = tokenizeSkillName(skill.name);
   for (const token of promptTokens) {
     if (nameTokens.some(nt => nt.includes(token) || token.includes(nt))) {
-      score += 3;
+      // Reduce weight for overly common tokens
+      const tokenWeight = LOW_WEIGHT_TOKENS.has(token) ? 1 : 3;
+      score += tokenWeight;
     }
   }
 
@@ -1207,44 +1326,63 @@ function scoreSkillsWithFuse(
 }
 
 /**
- * Hybrid scoring: Combines rules-based, token-based, and Fuse.js fuzzy matching
+ * Hybrid scoring: Combines rules-based, token-based, Fuse.js fuzzy matching, and TF-IDF
+ * TF-IDF adds term weighting: common terms get low weight, unique terms get high weight
  */
 function scoreSkillRelevanceHybrid(
-  skill: Skill, 
-  prompt: string, 
+  skill: Skill,
+  prompt: string,
   rules: SkillRules | null,
-  fuseScores: Map<string, { fuseScore: number; fuseMatch: Fuse.FuseResult<Skill> | null }>
-): { score: number; source: 'rules' | 'fuzzy' | 'fuse' | 'hybrid' } {
+  fuseScores: Map<string, { fuseScore: number; fuseMatch: Fuse.FuseResult<Skill> | null }>,
+  tfidfScores: Map<string, number>
+): { score: number; source: 'rules' | 'fuzzy' | 'fuse' | 'tfidf' | 'hybrid' } {
   const rulesScore = scoreSkillFromRules(skill, prompt, rules);
   const fuzzyScore = scoreSkillRelevanceFuzzy(skill, prompt);
   const fuseData = fuseScores.get(skill.name) || { fuseScore: 0, fuseMatch: null };
-  
+  const tfidfScore = tfidfScores.get(skill.name) || 0;
+
   // If skill has rules and matched, prioritize rules-based score
   if (rulesScore > 0) {
-    // Add bonuses from fuzzy and fuse matching
-    const hybridScore = rulesScore + Math.floor(fuzzyScore * 0.3) + Math.floor(fuseData.fuseScore * 0.3);
+    // Add bonuses from fuzzy, fuse, and TF-IDF matching
+    const hybridScore = rulesScore +
+      Math.floor(fuzzyScore * 0.3) +
+      Math.floor(fuseData.fuseScore * 0.3) +
+      Math.floor(tfidfScore * 0.2);
     return {
       score: hybridScore,
-      source: (fuzzyScore > 0 || fuseData.fuseScore > 0) ? 'hybrid' : 'rules'
+      source: (fuzzyScore > 0 || fuseData.fuseScore > 0 || tfidfScore > 0) ? 'hybrid' : 'rules'
     };
   }
-  
-  // Combine token-based and Fuse.js scores
-  // Take the higher of the two as the base, add a smaller bonus from the other
+
+  // Combine token-based, Fuse.js, and TF-IDF scores
+  // Use TF-IDF to re-weight: high TF-IDF means query has unique terms that match this skill
   let combinedScore: number;
-  let source: 'fuzzy' | 'fuse' | 'hybrid';
-  
-  if (fuzzyScore > fuseData.fuseScore) {
-    combinedScore = fuzzyScore + Math.floor(fuseData.fuseScore * 0.4);
-    source = fuseData.fuseScore > 0 ? 'hybrid' : 'fuzzy';
-  } else if (fuseData.fuseScore > fuzzyScore) {
-    combinedScore = fuseData.fuseScore + Math.floor(fuzzyScore * 0.4);
-    source = fuzzyScore > 0 ? 'hybrid' : 'fuse';
-  } else {
-    combinedScore = fuzzyScore;
-    source = 'fuzzy';
+  let source: 'fuzzy' | 'fuse' | 'tfidf' | 'hybrid';
+
+  // Find the maximum base score
+  const scores = [
+    { value: fuzzyScore, name: 'fuzzy' as const },
+    { value: fuseData.fuseScore, name: 'fuse' as const },
+    { value: tfidfScore, name: 'tfidf' as const }
+  ].sort((a, b) => b.value - a.value);
+
+  const primary = scores[0];
+  const secondary = scores[1];
+  const tertiary = scores[2];
+
+  if (primary.value === 0) {
+    return { score: 0, source: 'fuzzy' };
   }
-  
+
+  // Primary score + smaller bonuses from others
+  combinedScore = primary.value +
+    Math.floor(secondary.value * 0.3) +
+    Math.floor(tertiary.value * 0.2);
+
+  // Determine source based on which methods contributed
+  const hasMultiple = secondary.value > 0;
+  source = hasMultiple ? 'hybrid' : primary.name;
+
   return { score: combinedScore, source };
 }
 
@@ -1313,9 +1451,12 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
   // Get Fuse.js scores for all skills
   const fuseScores = scoreSkillsWithFuse(allSkills, prompt);
 
+  // Get TF-IDF scores for all skills (weights terms by uniqueness)
+  const tfidfScores = scoreSkillsWithTfIdf(allSkills, prompt);
+
   const scoredSkills = allSkills
     .map((skill) => {
-      const { score, source } = scoreSkillRelevanceHybrid(skill, prompt, rules, fuseScores);
+      const { score, source } = scoreSkillRelevanceHybrid(skill, prompt, rules, fuseScores, tfidfScores);
       return { skill, score, source };
     })
     .filter(({ score }) => score > 0)
@@ -1331,7 +1472,7 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
     } else {
       scoredSkills.slice(0, 10).forEach(({ skill, score, source }, index) => {
         const marker = index < limit ? '✓' : ' ';
-        const sourceIcon = source === 'rules' ? '📋' : source === 'fuse' ? '🔎' : source === 'fuzzy' ? '🔍' : '🔀';
+        const sourceIcon = source === 'rules' ? '📋' : source === 'fuse' ? '🔎' : source === 'fuzzy' ? '🔍' : source === 'tfidf' ? '📊' : '🔀';
         console.error(`${marker} ${index + 1}. [Score: ${score}] ${sourceIcon} ${source.toUpperCase()} - ${skill.name}`);
         if (skill.description) {
           const desc = skill.description.length > 100
