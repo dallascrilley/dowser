@@ -774,6 +774,87 @@ const EXCLUDED_TOKENS = new Set([
 ]);
 
 /**
+ * Short technical tokens (2 chars) that should be kept despite length filter
+ * These are meaningful in technical contexts
+ */
+const SHORT_TECHNICAL_TOKENS = new Set([
+  'ai', 'ui', 'ux', 'db', 'ci', 'cd', 'qa', 'pr', 'mr', 'vm', 'os', 'io',
+  'js', 'ts', 'py', 'go', 'rs', 'rb',  // Languages
+  'ws', 'fs', 'kv',  // Tech abbreviations
+]);
+
+/**
+ * Acronym expansions - map common acronyms to their full forms
+ * Allows "tdd" to match "test-driven-development"
+ */
+const ACRONYM_EXPANSIONS: Record<string, string[]> = {
+  'tdd': ['test-driven-development', 'test driven development', 'test-driven'],
+  'bdd': ['behavior-driven-development', 'behavior driven development'],
+  'api': ['application programming interface', 'rest api', 'graphql'],
+  'sdk': ['software development kit'],
+  'cli': ['command line interface', 'command-line'],
+  'gui': ['graphical user interface'],
+  'ux': ['user experience', 'user-experience'],
+  'ui': ['user interface', 'user-interface'],
+  'ci': ['continuous integration'],
+  'cd': ['continuous deployment', 'continuous delivery'],
+  'cicd': ['continuous integration', 'continuous deployment'],
+  'db': ['database', 'databases'],
+  'sql': ['structured query language', 'database'],
+  'orm': ['object relational mapping', 'database'],
+  'jwt': ['json web token', 'authentication', 'auth'],
+  'oauth': ['authentication', 'auth', 'authorization'],
+  'ssr': ['server side rendering', 'server-side-rendering'],
+  'ssg': ['static site generation', 'static-site-generation'],
+  'spa': ['single page application', 'single-page-application'],
+  'pwa': ['progressive web app', 'progressive-web-app'],
+  'mcp': ['model context protocol'],
+  'llm': ['large language model', 'ai', 'language model'],
+  'rag': ['retrieval augmented generation', 'retrieval-augmented-generation'],
+  'crud': ['create read update delete'],
+  'rest': ['representational state transfer', 'api'],
+  'grpc': ['remote procedure call', 'api'],
+  'ws': ['websocket', 'websockets', 'real-time'],
+  'wss': ['websocket', 'websockets', 'secure websocket'],
+  'k8s': ['kubernetes'],
+  'tf': ['terraform', 'infrastructure'],
+  'aws': ['amazon web services', 'cloud'],
+  'gcp': ['google cloud platform', 'cloud'],
+  'cf': ['cloudflare'],
+};
+
+/**
+ * Synonym/related term expansions for better semantic matching
+ * Bidirectional - "debug" finds skills mentioning "troubleshoot" and vice versa
+ */
+const SYNONYM_GROUPS: string[][] = [
+  ['debug', 'debugging', 'troubleshoot', 'troubleshooting', 'fix', 'fixing', 'error', 'errors', 'bug', 'bugs'],
+  ['test', 'testing', 'tests', 'spec', 'specs', 'unit', 'integration', 'e2e'],
+  ['plan', 'planning', 'design', 'designing', 'architect', 'architecture'],
+  ['deploy', 'deployment', 'deploying', 'ship', 'shipping', 'release', 'releasing'],
+  ['build', 'building', 'create', 'creating', 'make', 'making', 'implement', 'implementing'],
+  ['refactor', 'refactoring', 'cleanup', 'clean', 'simplify', 'simplifying'],
+  ['auth', 'authentication', 'login', 'signin', 'sign-in', 'authorization'],
+  ['perf', 'performance', 'optimize', 'optimization', 'speed', 'fast'],
+  ['docs', 'documentation', 'document', 'documenting', 'readme'],
+  ['config', 'configuration', 'configure', 'configuring', 'setup', 'setting'],
+  ['validate', 'validation', 'validating', 'verify', 'verification', 'check'],
+  ['parse', 'parsing', 'extract', 'extracting', 'transform', 'transforming'],
+  ['fetch', 'fetching', 'request', 'requesting', 'call', 'calling', 'invoke'],
+  ['store', 'storing', 'save', 'saving', 'persist', 'persisting', 'cache', 'caching'],
+  ['format', 'formatting', 'style', 'styling', 'lint', 'linting'],
+];
+
+// Build reverse lookup for synonyms
+const SYNONYM_MAP = new Map<string, Set<string>>();
+for (const group of SYNONYM_GROUPS) {
+  const groupSet = new Set(group);
+  for (const term of group) {
+    SYNONYM_MAP.set(term, groupSet);
+  }
+}
+
+/**
  * Meta keywords that indicate the prompt is about skills/agents/Claude Code
  * When these appear, we should NOT exclude 'skill'/'skills' from tokenization
  */
@@ -801,25 +882,64 @@ function isMetaSkillContext(promptLower: string): boolean {
 }
 
 /**
+ * Expand acronyms and add synonyms to a token list
+ * Returns expanded tokens that should be searched for
+ */
+function expandTokens(tokens: string[]): string[] {
+  const expanded = new Set<string>(tokens);
+
+  for (const token of tokens) {
+    // Expand acronyms
+    const acronymExpansions = ACRONYM_EXPANSIONS[token];
+    if (acronymExpansions) {
+      for (const expansion of acronymExpansions) {
+        // Add both full expansion and individual words
+        expanded.add(expansion);
+        for (const word of expansion.split(/[\s-]+/)) {
+          if (word.length >= 3) expanded.add(word);
+        }
+      }
+    }
+
+    // Add synonyms
+    const synonyms = SYNONYM_MAP.get(token);
+    if (synonyms) {
+      for (const synonym of synonyms) {
+        expanded.add(synonym);
+      }
+    }
+  }
+
+  return [...expanded];
+}
+
+/**
  * Normalize and tokenize text for matching
  * Excludes common words that cause false positives
  * Context-aware: keeps 'skill'/'skills' for meta-skill queries
+ * Expands acronyms and synonyms for better matching
  */
 function tokenize(text: string, keepSkillTokens: boolean = false): string[] {
-  const tokens = text
+  const rawTokens = text
     .toLowerCase()
     .replace(/[^\w\s-]/g, ' ')  // Replace punctuation with spaces
     .split(/\s+/)
-    .filter(t => t.length >= 3);
-  
-  return [...new Set(
-    tokens.filter(t => {
-      if (EXCLUDED_TOKENS.has(t)) return false;
-      // Only exclude 'skill'/'skills' if NOT in meta context
-      if (!keepSkillTokens && (t === 'skill' || t === 'skills')) return false;
-      return true;
-    })
-  )];
+    .filter(t => t.length >= 2);  // Allow 2-char tokens initially
+
+  // Filter tokens
+  const filteredTokens = rawTokens.filter(t => {
+    if (EXCLUDED_TOKENS.has(t)) return false;
+    // Only exclude 'skill'/'skills' if NOT in meta context
+    if (!keepSkillTokens && (t === 'skill' || t === 'skills')) return false;
+    // Keep 2-char tokens only if they're technical abbreviations
+    if (t.length === 2 && !SHORT_TECHNICAL_TOKENS.has(t)) return false;
+    return true;
+  });
+
+  // Expand acronyms and synonyms
+  const expandedTokens = expandTokens(filteredTokens);
+
+  return [...new Set(expandedTokens)];
 }
 
 /**

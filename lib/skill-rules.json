@@ -313,7 +313,7 @@
     "PAI": {
       "type": "domain",
       "enforcement": "suggest",
-      "priority": "critical",
+      "priority": "low",
       "description": "Primary platform orchestration skill covering global directives and memory workflows.",
       "promptTriggers": {
         "keywords": [
