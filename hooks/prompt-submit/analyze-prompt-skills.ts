@@ -24,10 +24,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 interface HookInput {
-  session_id: string;
-  prompt: string;
-  transcript_path: string;
-  hook_event_name: string;
+  session_id?: string;
+  prompt?: string;
+  userMessage?: string;  // Claude Code sends this
+  transcript_path?: string;
+  hook_event_name?: string;
 }
 
 interface Skill {
@@ -1025,8 +1026,16 @@ async function main() {
     const input = await readStdinWithTimeout();
     const data: HookInput = JSON.parse(input);
 
+    // Claude Code sends userMessage, fallback to prompt for backwards compatibility
+    const userPrompt = data.userMessage || data.prompt || '';
+
+    if (!userPrompt) {
+      console.log(JSON.stringify({}));
+      return;
+    }
+
     // Analyze prompt for relevant skills
-    const { skills: relevantSkills, scoredSkills } = await findRelevantSkills(data.prompt, 3);
+    const { skills: relevantSkills, scoredSkills } = await findRelevantSkills(userPrompt, 3);
 
     if (relevantSkills.length > 0) {
       recordSkillHits(relevantSkills.map(skill => skill.name));
