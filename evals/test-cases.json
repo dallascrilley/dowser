@@ -1,0 +1,257 @@
+{
+  "version": "1.0",
+  "description": "Skill search evaluation test cases. Each case has a query and expected skills that should rank highly.",
+  "metrics": {
+    "precision_at_k": "What % of top-k results are relevant?",
+    "recall_at_k": "What % of expected skills appear in top-k?",
+    "mrr": "Mean Reciprocal Rank - where does first relevant result appear?",
+    "ndcg": "Normalized Discounted Cumulative Gain - quality of ranking"
+  },
+  "test_cases": [
+    {
+      "id": "acronym-tdd",
+      "category": "acronym_expansion",
+      "query": "tdd",
+      "expected": ["test-driven-development"],
+      "notes": "Acronym should expand to full term"
+    },
+    {
+      "id": "acronym-cicd",
+      "category": "acronym_expansion",
+      "query": "ci/cd pipeline",
+      "expected": ["ci-deployment-engineer"],
+      "notes": "CI/CD acronym expansion"
+    },
+    {
+      "id": "acronym-k8s",
+      "category": "acronym_expansion",
+      "query": "k8s deployment",
+      "expected": [],
+      "notes": "K8s should expand to kubernetes - may not have skill yet"
+    },
+    {
+      "id": "acronym-api",
+      "category": "acronym_expansion",
+      "query": "api design",
+      "expected": ["backend-dev-guidelines-universal", "architecting-solutions"],
+      "notes": "API is common, should match backend/architecture skills"
+    },
+    {
+      "id": "synonym-debug",
+      "category": "synonym_matching",
+      "query": "help me debug",
+      "expected": ["debugging-systematically", "systematic-debugging"],
+      "notes": "Debug should match debugging skills"
+    },
+    {
+      "id": "synonym-fix-bug",
+      "category": "synonym_matching",
+      "query": "fix this bug",
+      "expected": ["debugging-systematically", "systematic-debugging"],
+      "notes": "Fix/bug are synonyms of debug"
+    },
+    {
+      "id": "synonym-troubleshoot",
+      "category": "synonym_matching",
+      "query": "troubleshoot the error",
+      "expected": ["debugging-systematically", "systematic-debugging"],
+      "notes": "Troubleshoot should match debugging"
+    },
+    {
+      "id": "synonym-plan",
+      "category": "synonym_matching",
+      "query": "plan this feature",
+      "expected": ["writing-plans", "executing-plans", "architecting-solutions", "brainstorming"],
+      "notes": "Plan synonyms: design, architect"
+    },
+    {
+      "id": "synonym-deploy",
+      "category": "synonym_matching",
+      "query": "deploy to production",
+      "expected": ["ci-deployment-engineer"],
+      "notes": "Deploy synonyms: ship, release"
+    },
+    {
+      "id": "exact-folder-brainstorming",
+      "category": "exact_match",
+      "query": "brainstorming",
+      "expected": ["brainstorming"],
+      "notes": "Exact folder name match"
+    },
+    {
+      "id": "exact-folder-tdd-full",
+      "category": "exact_match",
+      "query": "test-driven-development",
+      "expected": ["test-driven-development"],
+      "notes": "Exact folder name match with hyphens"
+    },
+    {
+      "id": "exact-name-gemini",
+      "category": "exact_match",
+      "query": "google gemini api",
+      "expected": ["google-gemini-api"],
+      "notes": "Exact skill name match"
+    },
+    {
+      "id": "exact-name-openai",
+      "category": "exact_match",
+      "query": "openai api",
+      "expected": ["openai-api", "openai-responses"],
+      "notes": "Should match OpenAI skills"
+    },
+    {
+      "id": "domain-react-forms",
+      "category": "domain_specific",
+      "query": "help me with forms in react",
+      "expected": ["react-hook-form-zod"],
+      "notes": "React + forms should match react-hook-form-zod"
+    },
+    {
+      "id": "domain-cloudflare-workers",
+      "category": "domain_specific",
+      "query": "setup cloudflare workers",
+      "expected": ["cloudflare-full-stack-scaffold", "Cloudflare Worker Base Stack"],
+      "notes": "Cloudflare workers setup"
+    },
+    {
+      "id": "domain-tailwind",
+      "category": "domain_specific",
+      "query": "tailwind css styling",
+      "expected": ["tailwind-v4-shadcn", "frontend-dev-guidelines-tailwind"],
+      "notes": "Tailwind CSS skills"
+    },
+    {
+      "id": "domain-database",
+      "category": "domain_specific",
+      "query": "database schema design",
+      "expected": ["architecting-databases", "drizzle-orm-d1"],
+      "notes": "Database architecture skills"
+    },
+    {
+      "id": "domain-auth",
+      "category": "domain_specific",
+      "query": "add authentication",
+      "expected": ["clerk-auth"],
+      "notes": "Auth/authentication skills"
+    },
+    {
+      "id": "task-write-tests",
+      "category": "task_based",
+      "query": "write tests",
+      "expected": ["test-driven-development", "testing-anti-patterns"],
+      "notes": "Testing task"
+    },
+    {
+      "id": "task-code-review",
+      "category": "task_based",
+      "query": "review my code",
+      "expected": ["requesting-code-review", "receiving-code-review"],
+      "notes": "Code review task"
+    },
+    {
+      "id": "task-create-skill",
+      "category": "task_based",
+      "query": "create a new skill",
+      "expected": ["skill-creator", "creating-skills", "writing-skills"],
+      "notes": "Skill creation task"
+    },
+    {
+      "id": "task-refactor",
+      "category": "task_based",
+      "query": "refactor this code",
+      "expected": ["refactoring-safely"],
+      "notes": "Refactoring task"
+    },
+    {
+      "id": "typo-brainstorm",
+      "category": "typo_tolerance",
+      "query": "brianstorming",
+      "expected": ["brainstorming"],
+      "notes": "Common typo - transposed letters"
+    },
+    {
+      "id": "typo-debugging",
+      "category": "typo_tolerance",
+      "query": "debigging",
+      "expected": ["debugging-systematically", "systematic-debugging"],
+      "notes": "Typo in debugging"
+    },
+    {
+      "id": "typo-cloudflare",
+      "category": "typo_tolerance",
+      "query": "cloudflair workers",
+      "expected": ["cloudflare-full-stack-scaffold"],
+      "notes": "Common misspelling of Cloudflare"
+    },
+    {
+      "id": "natural-how-do-i",
+      "category": "natural_language",
+      "query": "how do I implement dark mode",
+      "expected": ["tailwind-v4-shadcn", "frontend-dev-guidelines-tailwind"],
+      "notes": "Natural language question"
+    },
+    {
+      "id": "natural-whats-best",
+      "category": "natural_language",
+      "query": "what's the best way to handle errors",
+      "expected": ["debugging-systematically"],
+      "notes": "Natural language - error handling"
+    },
+    {
+      "id": "natural-can-you-help",
+      "category": "natural_language",
+      "query": "can you help me with git workflow",
+      "expected": ["git-expert", "using-git-worktrees"],
+      "notes": "Natural language with git"
+    },
+    {
+      "id": "negative-pai-unrelated",
+      "category": "negative",
+      "query": "fix this bug",
+      "not_expected": ["PAI"],
+      "notes": "PAI should NOT appear for unrelated queries"
+    },
+    {
+      "id": "negative-pai-tests",
+      "category": "negative",
+      "query": "write tests",
+      "not_expected": ["PAI"],
+      "notes": "PAI should NOT appear for testing queries"
+    },
+    {
+      "id": "negative-random-match",
+      "category": "negative",
+      "query": "database design",
+      "not_expected": ["react-hook-form-zod", "tailwind-v4-shadcn"],
+      "notes": "Frontend skills should NOT match database queries"
+    },
+    {
+      "id": "compound-react-testing",
+      "category": "compound",
+      "query": "test react components",
+      "expected": ["test-driven-development", "frontend-dev-guidelines-tailwind"],
+      "notes": "Compound query - testing + react"
+    },
+    {
+      "id": "compound-api-cloudflare",
+      "category": "compound",
+      "query": "build api on cloudflare",
+      "expected": ["cloudflare-full-stack-scaffold", "backend-dev-guidelines-universal"],
+      "notes": "Compound query - api + cloudflare"
+    },
+    {
+      "id": "short-ai",
+      "category": "short_query",
+      "query": "ai",
+      "expected": ["claude-api", "openai-api", "google-gemini-api"],
+      "notes": "Very short query - should still work with 2-char tokens"
+    },
+    {
+      "id": "short-db",
+      "category": "short_query",
+      "query": "db",
+      "expected": ["architecting-databases", "drizzle-orm-d1"],
+      "notes": "2-char technical abbreviation"
+    }
+  ]
+}
