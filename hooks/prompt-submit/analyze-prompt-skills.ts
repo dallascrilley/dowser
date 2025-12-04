@@ -247,24 +247,191 @@ function matchesIntentPatterns(promptLower: string, rule: SkillRule): boolean {
   return false;
 }
 
-function recordSkillHits(skillNames: string[]): void {
+/**
+ * Metrics structure for tracking skill usage
+ */
+interface SkillMetrics {
+  suggestions: Record<string, number>;  // Hook suggested this skill
+  activations: Record<string, number>;  // Skill was actually loaded via Skill tool
+  searches: Record<string, number>;     // User searched for this (gap analysis)
+  gaps: Record<string, number>;         // Low-relevance queries (potential missing skills)
+  lastUpdated: string;
+  lastGapNotification?: string;         // When we last notified about gaps
+}
+
+/** Minimum score for a skill to be considered a "good match" */
+const GAP_THRESHOLD = 15;
+
+/** How many gap queries before we notify */
+const GAP_NOTIFICATION_THRESHOLD = 10;
+
+/** Minimum hours between gap notifications */
+const GAP_NOTIFICATION_COOLDOWN_HOURS = 24;
+
+function getEmptyMetrics(): SkillMetrics {
+  return {
+    suggestions: {},
+    activations: {},
+    searches: {},
+    gaps: {},
+    lastUpdated: new Date().toISOString()
+  };
+}
+
+function loadMetrics(): SkillMetrics {
+  if (!fs.existsSync(METRICS_FILE)) {
+    return getEmptyMetrics();
+  }
+  try {
+    const data = JSON.parse(fs.readFileSync(METRICS_FILE, 'utf-8'));
+    // Handle legacy flat format (just skill: count)
+    if (!data.suggestions && !data.activations) {
+      // Migrate legacy data - assume all were suggestions
+      return {
+        suggestions: data,
+        activations: {},
+        searches: {},
+        gaps: {},
+        lastUpdated: new Date().toISOString()
+      };
+    }
+    // Ensure gaps exists (may be missing from older format)
+    if (!data.gaps) {
+      data.gaps = {};
+    }
+    return data;
+  } catch {
+    return getEmptyMetrics();
+  }
+}
+
+function saveMetrics(metrics: SkillMetrics): void {
+  metrics.lastUpdated = new Date().toISOString();
+  fs.writeFileSync(METRICS_FILE, JSON.stringify(metrics, null, 2));
+}
+
+/**
+ * Record skill suggestions (from hook)
+ */
+function recordSkillSuggestions(skillNames: string[]): void {
   if (!skillNames.length) return;
   try {
     fs.mkdirSync(METRICS_DIR, { recursive: true });
-    let data: Record<string, number> = {};
-    if (fs.existsSync(METRICS_FILE)) {
-      try {
-        data = JSON.parse(fs.readFileSync(METRICS_FILE, 'utf-8'));
-      } catch {
-        data = {};
-      }
-    }
+    const metrics = loadMetrics();
     for (const name of skillNames) {
-      data[name] = (data[name] || 0) + 1;
+      metrics.suggestions[name] = (metrics.suggestions[name] || 0) + 1;
     }
-    fs.writeFileSync(METRICS_FILE, JSON.stringify(data, null, 2));
+    saveMetrics(metrics);
   } catch (error) {
     console.error('⚠️  Failed to record skill metrics:', error);
+  }
+}
+
+/**
+ * Record skill activation (when skill is loaded via Skill tool)
+ * Called externally via: bun run hooks/prompt-submit/analyze-prompt-skills.ts --record-activation "skill-name"
+ */
+function recordSkillActivation(skillName: string): void {
+  if (!skillName) return;
+  try {
+    fs.mkdirSync(METRICS_DIR, { recursive: true });
+    const metrics = loadMetrics();
+    metrics.activations[skillName] = (metrics.activations[skillName] || 0) + 1;
+    saveMetrics(metrics);
+  } catch (error) {
+    console.error('⚠️  Failed to record skill activation:', error);
+  }
+}
+
+/**
+ * Record search query (for gap analysis - what skills are users looking for?)
+ * Called externally via: bun run hooks/prompt-submit/analyze-prompt-skills.ts --record-search "query"
+ */
+function recordSearch(query: string): void {
+  if (!query) return;
+  try {
+    fs.mkdirSync(METRICS_DIR, { recursive: true });
+    const metrics = loadMetrics();
+    metrics.searches[query] = (metrics.searches[query] || 0) + 1;
+    saveMetrics(metrics);
+  } catch (error) {
+    console.error('⚠️  Failed to record search:', error);
+  }
+}
+
+/**
+ * Record a gap - query where best match was below threshold
+ * These represent potential skills we should create
+ */
+function recordGap(query: string, bestScore: number): void {
+  if (!query || query.length < 5) return; // Skip very short queries
+  try {
+    fs.mkdirSync(METRICS_DIR, { recursive: true });
+    const metrics = loadMetrics();
+    // Normalize query for deduplication
+    const normalizedQuery = query.toLowerCase().trim().slice(0, 100);
+    metrics.gaps[normalizedQuery] = (metrics.gaps[normalizedQuery] || 0) + 1;
+    saveMetrics(metrics);
+  } catch (error) {
+    // Silently fail - gap tracking is non-critical
+  }
+}
+
+/**
+ * Check if we should notify about gaps and return notification message if so
+ */
+function checkGapNotification(): string | null {
+  try {
+    const metrics = loadMetrics();
+    const totalGaps = Object.values(metrics.gaps).reduce((a, b) => a + b, 0);
+
+    // Check if we have enough gaps to notify
+    if (totalGaps < GAP_NOTIFICATION_THRESHOLD) {
+      return null;
+    }
+
+    // Check cooldown
+    if (metrics.lastGapNotification) {
+      const lastNotification = new Date(metrics.lastGapNotification);
+      const hoursSince = (Date.now() - lastNotification.getTime()) / (1000 * 60 * 60);
+      if (hoursSince < GAP_NOTIFICATION_COOLDOWN_HOURS) {
+        return null;
+      }
+    }
+
+    // Generate notification
+    const topGaps = Object.entries(metrics.gaps)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    if (topGaps.length === 0) {
+      return null;
+    }
+
+    // Update last notification time
+    metrics.lastGapNotification = new Date().toISOString();
+    saveMetrics(metrics);
+
+    const gapList = topGaps
+      .map(([query, count]) => `  • "${query}" (${count}x)`)
+      .join('\n');
+
+    return `\n⚠️ **Skill Gap Analysis** (${totalGaps} low-relevance queries detected)\n\nTop queries without good skill matches:\n${gapList}\n\nConsider creating skills for these topics. Run \`bun run scripts/view-metrics.ts --gaps\` for full list.`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Clear gaps after notification (optional - call after user acknowledges)
+ */
+function clearGaps(): void {
+  try {
+    const metrics = loadMetrics();
+    metrics.gaps = {};
+    saveMetrics(metrics);
+  } catch {
+    // Silently fail
   }
 }
 
@@ -1053,18 +1220,35 @@ async function main() {
     // Analyze prompt for relevant skills
     const { skills: relevantSkills, scoredSkills } = await findRelevantSkills(userPrompt, 3);
 
+    // Check if top match is below threshold (skill gap)
+    const topScore = scoredSkills.length > 0 ? scoredSkills[0].score : 0;
+    if (topScore < GAP_THRESHOLD) {
+      recordGap(userPrompt, topScore);
+    }
+
     if (relevantSkills.length > 0) {
-      recordSkillHits(relevantSkills.map(skill => skill.name));
+      recordSkillSuggestions(relevantSkills.map(skill => skill.name));
       const skillSummary = formatSkillSuggestions(relevantSkills, scoredSkills);
+
+      // Check if we should notify about gaps
+      const gapNotification = checkGapNotification();
 
       // Output to stderr for console display
       console.error(skillSummary);
+      if (gapNotification) {
+        console.error(gapNotification);
+      }
 
       // Return the skills as additional context
+      let additionalContext = `\n\n${skillSummary}\n\nConsider using the Skill tool to load these skills if they're relevant to the task.`;
+      if (gapNotification) {
+        additionalContext += gapNotification;
+      }
+
       const response = {
         hookSpecificOutput: {
           hookEventName: 'UserPromptSubmit',
-          additionalContext: `\n\n${skillSummary}\n\nConsider using the Skill tool to load these skills if they're relevant to the task.`,
+          additionalContext,
         },
       };
 
@@ -1079,4 +1263,36 @@ async function main() {
   }
 }
 
-main();
+// CLI mode for recording metrics externally
+const args = process.argv.slice(2);
+if (args[0] === '--record-activation' && args[1]) {
+  recordSkillActivation(args[1]);
+  console.log(`Recorded activation: ${args[1]}`);
+} else if (args[0] === '--record-search' && args[1]) {
+  recordSearch(args[1]);
+  console.log(`Recorded search: ${args[1]}`);
+} else if (args[0] === '--show-metrics') {
+  const metrics = loadMetrics();
+  console.log(JSON.stringify(metrics, null, 2));
+} else if (args[0] === '--show-gaps') {
+  const metrics = loadMetrics();
+  const gaps = Object.entries(metrics.gaps).sort((a, b) => b[1] - a[1]);
+  console.log(`\n📊 Skill Gaps (queries with low relevance scores < ${GAP_THRESHOLD})`);
+  console.log('='.repeat(60));
+  console.log(`Total gap queries: ${gaps.reduce((a, [_, c]) => a + c, 0)}`);
+  console.log(`Unique queries: ${gaps.length}`);
+  console.log('='.repeat(60) + '\n');
+  if (gaps.length === 0) {
+    console.log('No gaps recorded yet.');
+  } else {
+    gaps.forEach(([query, count], i) => {
+      console.log(`${String(i + 1).padEnd(4)} ${String(count).padStart(4)}x  "${query}"`);
+    });
+  }
+} else if (args[0] === '--clear-gaps') {
+  clearGaps();
+  console.log('Gaps cleared.');
+} else {
+  // Normal hook mode - read from stdin
+  main();
+}
