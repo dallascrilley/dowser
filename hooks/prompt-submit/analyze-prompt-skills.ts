@@ -926,16 +926,15 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
     allSkills.push(...skills);
   }
 
-  // Deduplicate by folder name - prefer pai-skills over other plugins (pai-skills comes first)
+  // Deduplicate by folder name - later sources win (superpowers > pai-skills, project > all)
   // Folder name is consistent across sources (e.g., "using-git-worktrees" folder)
   // whereas display names may differ ("Using Git Worktrees" vs "using-git-worktrees")
+  // Order: user → pai-skills → cache/superpowers → project (last wins)
   const seenFolders = new Map<string, number>();
   for (let i = 0; i < allSkills.length; i++) {
     const folder = allSkills[i].folderName.toLowerCase();
-    // First one wins (pai-skills is added before cache plugins)
-    if (!seenFolders.has(folder)) {
-      seenFolders.set(folder, i);
-    }
+    // Last one wins (superpowers comes after pai-skills, project comes last)
+    seenFolders.set(folder, i);
   }
   const uniqueIndices = new Set(seenFolders.values());
   const deduplicatedSkills = allSkills.filter((_, i) => uniqueIndices.has(i));
