@@ -2,13 +2,20 @@
 
 Run health checks on the PAI skills wiki.
 
-## Instructions
+## ⚡ EXECUTE IMMEDIATELY
 
-1. Execute the garden.sh script from the plugin scripts directory
-2. **Read the JSON report file** printed at the end of output (path: `/tmp/garden-report-*.json`)
-3. Report issues from the JSON data - DO NOT re-read individual SKILL.md files
-4. Offer to fix errors, applying edits directly using frontmatter data from JSON
-5. Summarize the health status
+**When this command is invoked, you MUST execute the script immediately using run_terminal_cmd. Do not ask permission or show instructions - just run it.**
+
+```bash
+~/PAI/.claude/plugins/pai-skills/scripts/garden.sh
+```
+
+## Workflow After Execution
+
+1. **Read the JSON report file** from the output (path: `/tmp/garden-report-*.json`)
+2. **Report issues** from the JSON data - DO NOT re-read individual SKILL.md files
+3. **Offer to fix errors** using frontmatter data from JSON (extract only frontmatter, use claude-haiku-4-5 for simple edits)
+4. **Summarize** the health status
 
 ## CRITICAL: Use JSON Report
 
@@ -19,7 +26,25 @@ The garden.sh script outputs a JSON report containing **all frontmatter data** f
 - Character counts for length validation
 - All issues with type, code, and message
 
-**Only read a SKILL.md file when you need to EDIT it.**
+**When editing SKILL.md files, ONLY read the frontmatter section, not the full file.**
+
+### Extracting Frontmatter Only
+
+For simple frontmatter edits (shortening when_to_use, adding version, etc.), extract only the frontmatter:
+
+```bash
+# Option 1: Use the helper script
+~/PAI/.claude/plugins/pai-skills/scripts/extract-frontmatter.sh /path/to/SKILL.md
+
+# Option 2: Use sed directly
+sed -n '/^---$/,/^---$/p' /path/to/SKILL.md
+
+# Option 3: Use the utility function (if sourced)
+source ~/PAI/.claude/plugins/pai-skills/scripts/garden-json-utils.sh
+extract_frontmatter "/path/to/SKILL.md"
+```
+
+**NEVER read the full SKILL.md file for frontmatter-only edits.** The full file content is not needed and wastes tokens.
 
 ## Usage
 
@@ -88,9 +113,25 @@ The garden.sh script outputs a JSON report containing **all frontmatter data** f
 2. Group issues by type (errors first, then warnings)
 3. For each fix:
    - Use frontmatter data from JSON to understand current state
-   - Read SKILL.md only when editing
+   - **For frontmatter-only edits:** Extract only frontmatter (see above), use `claude-haiku-4-5` model
+   - **For complex edits:** Read full file only if absolutely necessary, use default model
    - Apply minimal targeted edit
 4. Re-run to verify fixes
+
+## Model Selection for Edits
+
+**Use `claude-haiku-4-5` for simple frontmatter edits:**
+- Shortening `when_to_use` to < 300 chars
+- Adding missing `version: "1.0.0"`
+- Truncating `short_description` to < 300 chars
+- Adding missing `when_to_use` field (simple text)
+
+**Use default model for complex edits:**
+- Edits requiring understanding of full file content
+- Structural changes beyond frontmatter
+- Multi-field edits with dependencies
+
+**Simple edits = frontmatter-only changes = use haiku model**
 
 ## Quick Reference
 

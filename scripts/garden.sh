@@ -64,3 +64,6 @@ jq -n \
 echo ""
 echo "📋 JSON report: $REPORT_FILE"
 echo "   Use this report to fix issues without re-reading SKILL.md files."
+echo ""
+echo "💡 For frontmatter-only edits: Extract only frontmatter (sed -n '/^---$/,/^---$/p' SKILL.md)"
+echo "   Use claude-haiku-4-5 model for simple edits like shortening when_to_use fields."

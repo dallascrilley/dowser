@@ -88,5 +88,17 @@ export_skills_json() {
     echo "$GARDEN_JSON_SKILLS"
 }
 
+# Extract only frontmatter from a SKILL.md file (between --- markers)
+# Usage: extract_frontmatter "/path/to/SKILL.md"
+extract_frontmatter() {
+    local skill_file="$1"
+    if [[ ! -f "$skill_file" ]]; then
+        echo "Error: File not found: $skill_file" >&2
+        return 1
+    fi
+    # Extract content between first two --- markers (inclusive)
+    sed -n '/^---$/,/^---$/p' "$skill_file"
+}
+
 # Initialize on source
 init_json_output
