@@ -55,15 +55,30 @@ async function main() {
       paiSkillPath = join(paiDir, 'skills/PAI/SKILL.md');
     }
 
-    // Verify PAI skill file exists
+    // Verify PAI skill file exists - if not, warn but don't fail
     if (!existsSync(paiSkillPath)) {
-      console.error(`❌ PAI skill not found at: ${paiSkillPath}`);
-      console.error(`💡 Create your PAI skill file or check PAI_DIR environment variable`);
-      console.error(`   Tried: ${join(paiDir, '.claude/skills/PAI/SKILL.md')}`);
+      const triedPaths = [join(paiDir, '.claude/skills/PAI/SKILL.md')];
       if (paiDir.endsWith('.claude')) {
-        console.error(`   Also tried: ${join(paiDir, 'skills/PAI/SKILL.md')}`);
+        triedPaths.push(join(paiDir, 'skills/PAI/SKILL.md'));
       }
-      process.exit(1);
+
+      // Log warning to stderr (visible in debug mode)
+      console.error(`⚠️ PAI skill not found. Tried: ${triedPaths.join(', ')}`);
+      console.error(`💡 Create your PAI skill file or check PAI_DIR environment variable`);
+
+      // Output a warning system message but exit successfully so plugin continues to load
+      const warningMessage = `<system-reminder>
+PAI Context Loading Warning
+
+PAI skill file not found at expected locations:
+${triedPaths.map(p => `- ${p}`).join('\n')}
+
+The pai-skills plugin is active but PAI context was not loaded.
+To fix: Create your PAI skill file at one of the paths above, or set PAI_DIR environment variable.
+</system-reminder>`;
+
+      console.log(warningMessage);
+      process.exit(0);  // Exit successfully - don't break the plugin
     }
 
     console.error('📚 Reading PAI core context from skill file...');
@@ -107,8 +122,21 @@ This context is now active for this session. Follow all instructions, preference
     console.error('✅ PAI context injected into session');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error in load-core-context hook:', error);
-    process.exit(1);
+    // Log error but don't fail the plugin - graceful degradation
+    console.error('⚠️ Error in load-core-context hook:', error);
+
+    // Output warning so user knows something went wrong
+    const errorMessage = `<system-reminder>
+PAI Context Loading Error
+
+An error occurred while loading PAI context: ${error instanceof Error ? error.message : String(error)}
+
+The pai-skills plugin is active but PAI context was not loaded.
+Check the PAI skill file exists and is readable.
+</system-reminder>`;
+
+    console.log(errorMessage);
+    process.exit(0);  // Exit successfully - don't break the plugin
   }
 }
 

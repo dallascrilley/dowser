@@ -1,11 +1,10 @@
 {
   "name": "pai-skills",
   "version": "1.0.0",
-  "description": "Personal skills library with 120+ domain-specific skills for PAI. Consolidates skill discovery, hooks, and maintenance utilities.",
+  "description": "Personal skills library with 120+ domain-specific skills",
   "author": {
     "name": "Dallas Crilley"
   },
-  "license": "UNLICENSED",
-  "private": true,
-  "keywords": ["skills", "pai", "personal", "automation", "workflows"]
+  "keywords": ["skills", "context", "suggestion", "PAI", "personal-ai"],
+  "repository": "https://github.com/dallascrilley/PAI"
 }

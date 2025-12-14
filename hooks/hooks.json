@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./prompt-submit/analyze-prompt-skills.ts"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/prompt-submit/analyze-prompt-skills.ts\""
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./session-start/load-core-context.ts"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/session-start/load-core-context.ts\""
           }
         ]
       }

@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "pai-skills",
-      "source": "..",
+      "source": "./",
       "description": "Personal skills library with 120+ domain-specific skills",
       "version": "1.0.0"
     }

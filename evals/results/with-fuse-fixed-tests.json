@@ -1,0 +1,1970 @@
+{
+  "timestamp": "2025-12-04T11:53:00.333Z",
+  "total_cases": 35,
+  "passed": 30,
+  "failed": 5,
+  "pass_rate": 0.8571428571428571,
+  "avg_precision_at_3": 0.30476190476190473,
+  "avg_recall_at_3": 0.7547619047619047,
+  "avg_mrr": 0.7666666666666667,
+  "by_category": {
+    "acronym_expansion": {
+      "total": 4,
+      "passed": 3,
+      "pass_rate": 0.75
+    },
+    "synonym_matching": {
+      "total": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    "exact_match": {
+      "total": 4,
+      "passed": 4,
+      "pass_rate": 1
+    },
+    "domain_specific": {
+      "total": 5,
+      "passed": 5,
+      "pass_rate": 1
+    },
+    "task_based": {
+      "total": 4,
+      "passed": 4,
+      "pass_rate": 1
+    },
+    "typo_tolerance": {
+      "total": 3,
+      "passed": 3,
+      "pass_rate": 1
+    },
+    "natural_language": {
+      "total": 3,
+      "passed": 2,
+      "pass_rate": 0.6666666666666666
+    },
+    "negative": {
+      "total": 3,
+      "passed": 3,
+      "pass_rate": 1
+    },
+    "compound": {
+      "total": 2,
+      "passed": 1,
+      "pass_rate": 0.5
+    },
+    "short_query": {
+      "total": 2,
+      "passed": 1,
+      "pass_rate": 0.5
+    }
+  },
+  "results": [
+    {
+      "id": "acronym-tdd",
+      "category": "acronym_expansion",
+      "query": "tdd",
+      "expected": [
+        "test-driven-development"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "test-driven-development",
+          "score": 38,
+          "path": ""
+        },
+        {
+          "name": "subagent-driven-development",
+          "score": 25,
+          "path": ""
+        },
+        {
+          "name": "lootbox-tools-development",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "test-driven-development",
+          "score": 38,
+          "path": ""
+        },
+        {
+          "name": "subagent-driven-development",
+          "score": 25,
+          "path": ""
+        },
+        {
+          "name": "lootbox-tools-development",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 1,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Acronym should expand to full term"
+    },
+    {
+      "id": "acronym-cicd",
+      "category": "acronym_expansion",
+      "query": "ci/cd pipeline",
+      "expected": [
+        "verification-before-completion",
+        "finishing-a-development-branch"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "automation-scripting",
+          "score": 14,
+          "path": ""
+        },
+        {
+          "name": "using-openai-codex-cli",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "using-gemini-cli",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "automation-scripting",
+          "score": 14,
+          "path": ""
+        },
+        {
+          "name": "using-openai-codex-cli",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "using-gemini-cli",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 0,
+        "precision_at_10": 0,
+        "recall_at_10": 0,
+        "mrr": 0,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": false,
+      "notes": "CI/CD - match deployment-related skills that exist"
+    },
+    {
+      "id": "acronym-k8s",
+      "category": "acronym_expansion",
+      "query": "k8s deployment",
+      "expected": [],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "automation-scripting",
+          "score": 14,
+          "path": ""
+        },
+        {
+          "name": "managing-hetzner-coolify",
+          "score": 14,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "automation-scripting",
+          "score": 14,
+          "path": ""
+        },
+        {
+          "name": "managing-hetzner-coolify",
+          "score": 14,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 1,
+        "precision_at_10": 0,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "K8s should expand to kubernetes - may not have skill yet"
+    },
+    {
+      "id": "acronym-api",
+      "category": "acronym_expansion",
+      "query": "api design",
+      "expected": [
+        "backend-dev-guidelines-universal",
+        "architecting-solutions"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "wp-rest-api",
+          "score": 40,
+          "path": ""
+        },
+        {
+          "name": "specification-architect",
+          "score": 32,
+          "path": ""
+        },
+        {
+          "name": "architecting-solutions",
+          "score": 25,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "wp-rest-api",
+          "score": 40,
+          "path": ""
+        },
+        {
+          "name": "specification-architect",
+          "score": 32,
+          "path": ""
+        },
+        {
+          "name": "architecting-solutions",
+          "score": 25,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 0.5,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 0.5,
+        "mrr": 0.3333333333333333,
+        "first_relevant_rank": 3,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "API is common, should match backend/architecture skills"
+    },
+    {
+      "id": "synonym-debug",
+      "category": "synonym_matching",
+      "query": "help me debug",
+      "expected": [
+        "debugging-systematically",
+        "systematic-debugging"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "debugging-systematically",
+          "score": 40,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 31,
+          "path": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 29,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "debugging-systematically",
+          "score": 40,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 31,
+          "path": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 29,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.6666666666666666,
+        "recall_at_3": 1,
+        "precision_at_10": 0.6666666666666666,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Debug should match debugging skills"
+    },
+    {
+      "id": "synonym-fix-bug",
+      "category": "synonym_matching",
+      "query": "fix this bug",
+      "expected": [
+        "debugging-systematically",
+        "systematic-debugging"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "debugging-systematically",
+          "score": 38,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 31,
+          "path": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 29,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "debugging-systematically",
+          "score": 38,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 31,
+          "path": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 29,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.6666666666666666,
+        "recall_at_3": 1,
+        "precision_at_10": 0.6666666666666666,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Fix/bug are synonyms of debug"
+    },
+    {
+      "id": "synonym-troubleshoot",
+      "category": "synonym_matching",
+      "query": "troubleshoot the error",
+      "expected": [
+        "debugging-systematically",
+        "systematic-debugging"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "debugging-systematically",
+          "score": 30,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 25,
+          "path": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "debugging-systematically",
+          "score": 30,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 25,
+          "path": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.6666666666666666,
+        "recall_at_3": 1,
+        "precision_at_10": 0.6666666666666666,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Troubleshoot should match debugging"
+    },
+    {
+      "id": "synonym-plan",
+      "category": "synonym_matching",
+      "query": "plan this feature",
+      "expected": [
+        "writing-plans",
+        "executing-plans",
+        "architecting-solutions",
+        "brainstorming"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "specification-architect",
+          "score": 29,
+          "path": ""
+        },
+        {
+          "name": "architecting-solutions",
+          "score": 22,
+          "path": ""
+        },
+        {
+          "name": "aws-solution-architect",
+          "score": 21,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "specification-architect",
+          "score": 29,
+          "path": ""
+        },
+        {
+          "name": "architecting-solutions",
+          "score": 22,
+          "path": ""
+        },
+        {
+          "name": "aws-solution-architect",
+          "score": 21,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 0.25,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 0.25,
+        "mrr": 0.5,
+        "first_relevant_rank": 2,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Plan synonyms: design, architect"
+    },
+    {
+      "id": "synonym-deploy",
+      "category": "synonym_matching",
+      "query": "deploy to production",
+      "expected": [
+        "verification-before-completion",
+        "finishing-a-development-branch"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "vmix-production-manager",
+          "score": 15,
+          "path": ""
+        },
+        {
+          "name": "automation-scripting",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "vmix-production-manager",
+          "score": 15,
+          "path": ""
+        },
+        {
+          "name": "automation-scripting",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 0,
+        "precision_at_10": 0,
+        "recall_at_10": 0,
+        "mrr": 0,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": false,
+      "notes": "Deploy - match completion/deployment workflow skills"
+    },
+    {
+      "id": "exact-folder-brainstorming",
+      "category": "exact_match",
+      "query": "brainstorming",
+      "expected": [
+        "brainstorming"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "brainstorming",
+          "score": 36,
+          "path": ""
+        },
+        {
+          "name": "openai-api",
+          "score": 10,
+          "path": ""
+        },
+        {
+          "name": "write-in-user-voice",
+          "score": 10,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "brainstorming",
+          "score": 36,
+          "path": ""
+        },
+        {
+          "name": "openai-api",
+          "score": 10,
+          "path": ""
+        },
+        {
+          "name": "write-in-user-voice",
+          "score": 10,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 1,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Exact folder name match"
+    },
+    {
+      "id": "exact-folder-tdd-full",
+      "category": "exact_match",
+      "query": "test-driven-development",
+      "expected": [
+        "test-driven-development"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "test-driven-development",
+          "score": 36,
+          "path": ""
+        },
+        {
+          "name": "subagent-driven-development",
+          "score": 18,
+          "path": ""
+        },
+        {
+          "name": "lootbox-tools-development",
+          "score": 12,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "test-driven-development",
+          "score": 36,
+          "path": ""
+        },
+        {
+          "name": "subagent-driven-development",
+          "score": 18,
+          "path": ""
+        },
+        {
+          "name": "lootbox-tools-development",
+          "score": 12,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 1,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Exact folder name match with hyphens"
+    },
+    {
+      "id": "exact-name-gemini",
+      "category": "exact_match",
+      "query": "google gemini api",
+      "expected": [
+        "google-gemini-api"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "Google Gemini API",
+          "score": 57,
+          "path": ""
+        },
+        {
+          "name": "wp-rest-api",
+          "score": 40,
+          "path": ""
+        },
+        {
+          "name": "using-gemini-cli",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "Google Gemini API",
+          "score": 57,
+          "path": ""
+        },
+        {
+          "name": "wp-rest-api",
+          "score": 40,
+          "path": ""
+        },
+        {
+          "name": "using-gemini-cli",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 1,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Exact skill name match"
+    },
+    {
+      "id": "exact-name-openai",
+      "category": "exact_match",
+      "query": "openai api",
+      "expected": [
+        "openai-api",
+        "openai-responses"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "wp-rest-api",
+          "score": 40,
+          "path": ""
+        },
+        {
+          "name": "openai-api",
+          "score": 31,
+          "path": ""
+        },
+        {
+          "name": "openai-responses",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "wp-rest-api",
+          "score": 40,
+          "path": ""
+        },
+        {
+          "name": "openai-api",
+          "score": 31,
+          "path": ""
+        },
+        {
+          "name": "openai-responses",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.6666666666666666,
+        "recall_at_3": 1,
+        "precision_at_10": 0.6666666666666666,
+        "recall_at_10": 1,
+        "mrr": 0.5,
+        "first_relevant_rank": 2,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Should match OpenAI skills"
+    },
+    {
+      "id": "domain-react-forms",
+      "category": "domain_specific",
+      "query": "help me with forms in react",
+      "expected": [
+        "react-hook-form-zod"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "react-hook-form-zod",
+          "score": 29,
+          "path": ""
+        },
+        {
+          "name": "frontend-dev-guidelines-tailwind",
+          "score": 28,
+          "path": ""
+        },
+        {
+          "name": "clerk-auth",
+          "score": 12,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "react-hook-form-zod",
+          "score": 29,
+          "path": ""
+        },
+        {
+          "name": "frontend-dev-guidelines-tailwind",
+          "score": 28,
+          "path": ""
+        },
+        {
+          "name": "clerk-auth",
+          "score": 12,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 1,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "React + forms should match react-hook-form-zod"
+    },
+    {
+      "id": "domain-cloudflare-workers",
+      "category": "domain_specific",
+      "query": "setup cloudflare workers",
+      "expected": [],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "cloudflare-full-stack-scaffold",
+          "score": 22,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 16,
+          "path": ""
+        },
+        {
+          "name": "clerk-auth",
+          "score": 16,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "cloudflare-full-stack-scaffold",
+          "score": 22,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 16,
+          "path": ""
+        },
+        {
+          "name": "clerk-auth",
+          "score": 16,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 1,
+        "precision_at_10": 0,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "No cloudflare skill exists yet - test acknowledges gap"
+    },
+    {
+      "id": "domain-tailwind",
+      "category": "domain_specific",
+      "query": "tailwind css styling",
+      "expected": [
+        "tailwind-v4-shadcn",
+        "frontend-dev-guidelines-tailwind"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "frontend-dev-guidelines-tailwind",
+          "score": 34,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 26,
+          "path": ""
+        },
+        {
+          "name": "artifacts-builder",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "frontend-dev-guidelines-tailwind",
+          "score": 34,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 26,
+          "path": ""
+        },
+        {
+          "name": "artifacts-builder",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 0.5,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 0.5,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Tailwind CSS skills"
+    },
+    {
+      "id": "domain-database",
+      "category": "domain_specific",
+      "query": "database schema design",
+      "expected": [
+        "architecting-solutions"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "specification-architect",
+          "score": 32,
+          "path": ""
+        },
+        {
+          "name": "architecting-solutions",
+          "score": 22,
+          "path": ""
+        },
+        {
+          "name": "aws-solution-architect",
+          "score": 22,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "specification-architect",
+          "score": 32,
+          "path": ""
+        },
+        {
+          "name": "architecting-solutions",
+          "score": 22,
+          "path": ""
+        },
+        {
+          "name": "aws-solution-architect",
+          "score": 22,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 1,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 1,
+        "mrr": 0.5,
+        "first_relevant_rank": 2,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Database architecture - no dedicated DB skill, use general arch"
+    },
+    {
+      "id": "domain-auth",
+      "category": "domain_specific",
+      "query": "add authentication",
+      "expected": [
+        "clerk-auth"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "clerk-auth",
+          "score": 21,
+          "path": ""
+        },
+        {
+          "name": "Designing Before Coding",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "architecting-solutions",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "clerk-auth",
+          "score": 21,
+          "path": ""
+        },
+        {
+          "name": "Designing Before Coding",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "architecting-solutions",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 1,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Auth/authentication skills"
+    },
+    {
+      "id": "task-write-tests",
+      "category": "task_based",
+      "query": "write tests",
+      "expected": [
+        "test-driven-development",
+        "testing-anti-patterns"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "test-driven-development",
+          "score": 36,
+          "path": ""
+        },
+        {
+          "name": "testing-anti-patterns",
+          "score": 25,
+          "path": ""
+        },
+        {
+          "name": "testing-skills-with-subagents",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "test-driven-development",
+          "score": 36,
+          "path": ""
+        },
+        {
+          "name": "testing-anti-patterns",
+          "score": 25,
+          "path": ""
+        },
+        {
+          "name": "testing-skills-with-subagents",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.6666666666666666,
+        "recall_at_3": 1,
+        "precision_at_10": 0.6666666666666666,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Testing task"
+    },
+    {
+      "id": "task-code-review",
+      "category": "task_based",
+      "query": "review my code",
+      "expected": [
+        "requesting-code-review",
+        "receiving-code-review"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "requesting-code-review",
+          "score": 20,
+          "path": ""
+        },
+        {
+          "name": "receiving-code-review",
+          "score": 20,
+          "path": ""
+        },
+        {
+          "name": "using-claude-code",
+          "score": 15,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "requesting-code-review",
+          "score": 20,
+          "path": ""
+        },
+        {
+          "name": "receiving-code-review",
+          "score": 20,
+          "path": ""
+        },
+        {
+          "name": "using-claude-code",
+          "score": 15,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.6666666666666666,
+        "recall_at_3": 1,
+        "precision_at_10": 0.6666666666666666,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Code review task"
+    },
+    {
+      "id": "task-create-skill",
+      "category": "task_based",
+      "query": "create a new skill",
+      "expected": [
+        "skill-creator",
+        "creating-skills",
+        "writing-skills"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "implementing-modules",
+          "score": 46,
+          "path": ""
+        },
+        {
+          "name": "skill-creator",
+          "score": 34,
+          "path": ""
+        },
+        {
+          "name": "react-hook-form-zod",
+          "score": 25,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "implementing-modules",
+          "score": 46,
+          "path": ""
+        },
+        {
+          "name": "skill-creator",
+          "score": 34,
+          "path": ""
+        },
+        {
+          "name": "react-hook-form-zod",
+          "score": 25,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 0.3333333333333333,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 0.3333333333333333,
+        "mrr": 0.5,
+        "first_relevant_rank": 2,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Skill creation task"
+    },
+    {
+      "id": "task-refactor",
+      "category": "task_based",
+      "query": "refactor this code",
+      "expected": [
+        "refactoring-safely"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "Refactoring Safely",
+          "score": 32,
+          "path": ""
+        },
+        {
+          "name": "cleaning-up-post-task",
+          "score": 28,
+          "path": ""
+        },
+        {
+          "name": "searching-code-structures",
+          "score": 19,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "Refactoring Safely",
+          "score": 32,
+          "path": ""
+        },
+        {
+          "name": "cleaning-up-post-task",
+          "score": 28,
+          "path": ""
+        },
+        {
+          "name": "searching-code-structures",
+          "score": 19,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 1,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Refactoring task"
+    },
+    {
+      "id": "typo-brainstorm",
+      "category": "typo_tolerance",
+      "query": "brianstorming",
+      "expected": [
+        "brainstorming"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "brainstorming",
+          "score": 17,
+          "path": ""
+        },
+        {
+          "name": "write-in-user-voice",
+          "score": 10,
+          "path": ""
+        },
+        {
+          "name": "cloudflare-full-stack-scaffold",
+          "score": 10,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "brainstorming",
+          "score": 17,
+          "path": ""
+        },
+        {
+          "name": "write-in-user-voice",
+          "score": 10,
+          "path": ""
+        },
+        {
+          "name": "cloudflare-full-stack-scaffold",
+          "score": 10,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 1,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Common typo - transposed letters"
+    },
+    {
+      "id": "typo-debugging",
+      "category": "typo_tolerance",
+      "query": "debigging",
+      "expected": [
+        "debugging-systematically",
+        "systematic-debugging"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "systematic-debugging",
+          "score": 17,
+          "path": ""
+        },
+        {
+          "name": "debugging-systematically",
+          "score": 14,
+          "path": ""
+        },
+        {
+          "name": "Designing Before Coding",
+          "score": 12,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "systematic-debugging",
+          "score": 17,
+          "path": ""
+        },
+        {
+          "name": "debugging-systematically",
+          "score": 14,
+          "path": ""
+        },
+        {
+          "name": "Designing Before Coding",
+          "score": 12,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.6666666666666666,
+        "recall_at_3": 1,
+        "precision_at_10": 0.6666666666666666,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Typo in debugging"
+    },
+    {
+      "id": "typo-cloudflare",
+      "category": "typo_tolerance",
+      "query": "cloudflair workers",
+      "expected": [],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "claude-api",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "openai-responses",
+          "score": 12,
+          "path": ""
+        },
+        {
+          "name": "clerk-auth",
+          "score": 12,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "claude-api",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "openai-responses",
+          "score": 12,
+          "path": ""
+        },
+        {
+          "name": "clerk-auth",
+          "score": 12,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 1,
+        "precision_at_10": 0,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "No cloudflare skill exists - test acknowledges gap"
+    },
+    {
+      "id": "natural-how-do-i",
+      "category": "natural_language",
+      "query": "how do I implement dark mode",
+      "expected": [
+        "tailwind-v4-shadcn",
+        "frontend-dev-guidelines-tailwind"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "implementing-modules",
+          "score": 44,
+          "path": ""
+        },
+        {
+          "name": "react-hook-form-zod",
+          "score": 29,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 28,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "implementing-modules",
+          "score": 44,
+          "path": ""
+        },
+        {
+          "name": "react-hook-form-zod",
+          "score": 29,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 28,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 0,
+        "precision_at_10": 0,
+        "recall_at_10": 0,
+        "mrr": 0,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": false,
+      "notes": "Natural language question - tailwind has dark mode docs"
+    },
+    {
+      "id": "natural-whats-best",
+      "category": "natural_language",
+      "query": "what's the best way to handle errors",
+      "expected": [
+        "debugging-systematically"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "debugging-systematically",
+          "score": 30,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 25,
+          "path": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "debugging-systematically",
+          "score": 30,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 25,
+          "path": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 1,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Natural language - error handling"
+    },
+    {
+      "id": "natural-can-you-help",
+      "category": "natural_language",
+      "query": "can you help me with git workflow",
+      "expected": [
+        "git-expert",
+        "using-git-worktrees"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "git-expert",
+          "score": 23,
+          "path": ""
+        },
+        {
+          "name": "claude-action-workflows",
+          "score": 17,
+          "path": ""
+        },
+        {
+          "name": "using-claude-code",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "git-expert",
+          "score": 23,
+          "path": ""
+        },
+        {
+          "name": "claude-action-workflows",
+          "score": 17,
+          "path": ""
+        },
+        {
+          "name": "using-claude-code",
+          "score": 13,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 0.5,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 0.5,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Natural language with git"
+    },
+    {
+      "id": "negative-pai-unrelated",
+      "category": "negative",
+      "query": "fix this bug",
+      "expected": [],
+      "not_expected": [
+        "PAI"
+      ],
+      "actual_top3": [
+        {
+          "name": "debugging-systematically",
+          "score": 38,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 31,
+          "path": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 29,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "debugging-systematically",
+          "score": 38,
+          "path": ""
+        },
+        {
+          "name": "Tailwind v4 + shadcn/ui Stack",
+          "score": 31,
+          "path": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 29,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 1,
+        "precision_at_10": 0,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "PAI should NOT appear for unrelated queries"
+    },
+    {
+      "id": "negative-pai-tests",
+      "category": "negative",
+      "query": "write tests",
+      "expected": [],
+      "not_expected": [
+        "PAI"
+      ],
+      "actual_top3": [
+        {
+          "name": "test-driven-development",
+          "score": 36,
+          "path": ""
+        },
+        {
+          "name": "testing-anti-patterns",
+          "score": 25,
+          "path": ""
+        },
+        {
+          "name": "testing-skills-with-subagents",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "test-driven-development",
+          "score": 36,
+          "path": ""
+        },
+        {
+          "name": "testing-anti-patterns",
+          "score": 25,
+          "path": ""
+        },
+        {
+          "name": "testing-skills-with-subagents",
+          "score": 23,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 1,
+        "precision_at_10": 0,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "PAI should NOT appear for testing queries"
+    },
+    {
+      "id": "negative-random-match",
+      "category": "negative",
+      "query": "database design",
+      "expected": [],
+      "not_expected": [
+        "react-hook-form-zod",
+        "tailwind-v4-shadcn"
+      ],
+      "actual_top3": [
+        {
+          "name": "specification-architect",
+          "score": 32,
+          "path": ""
+        },
+        {
+          "name": "architecting-solutions",
+          "score": 22,
+          "path": ""
+        },
+        {
+          "name": "aws-solution-architect",
+          "score": 22,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "specification-architect",
+          "score": 32,
+          "path": ""
+        },
+        {
+          "name": "architecting-solutions",
+          "score": 22,
+          "path": ""
+        },
+        {
+          "name": "aws-solution-architect",
+          "score": 22,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 1,
+        "precision_at_10": 0,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Frontend skills should NOT match database queries"
+    },
+    {
+      "id": "compound-react-testing",
+      "category": "compound",
+      "query": "test react components",
+      "expected": [
+        "test-driven-development",
+        "frontend-dev-guidelines-tailwind"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "frontend-dev-guidelines-tailwind",
+          "score": 36,
+          "path": ""
+        },
+        {
+          "name": "react-hook-form-zod",
+          "score": 26,
+          "path": ""
+        },
+        {
+          "name": "test-driven-development",
+          "score": 26,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "frontend-dev-guidelines-tailwind",
+          "score": 36,
+          "path": ""
+        },
+        {
+          "name": "react-hook-form-zod",
+          "score": 26,
+          "path": ""
+        },
+        {
+          "name": "test-driven-development",
+          "score": 26,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.6666666666666666,
+        "recall_at_3": 1,
+        "precision_at_10": 0.6666666666666666,
+        "recall_at_10": 1,
+        "mrr": 1,
+        "first_relevant_rank": 1,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Compound query - testing + react"
+    },
+    {
+      "id": "compound-api-cloudflare",
+      "category": "compound",
+      "query": "build api on cloudflare",
+      "expected": [
+        "backend-dev-guidelines-universal"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "wp-rest-api",
+          "score": 55,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 51,
+          "path": ""
+        },
+        {
+          "name": "implementing-modules",
+          "score": 46,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "wp-rest-api",
+          "score": 55,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 51,
+          "path": ""
+        },
+        {
+          "name": "implementing-modules",
+          "score": 46,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 0,
+        "precision_at_10": 0,
+        "recall_at_10": 0,
+        "mrr": 0,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": false,
+      "notes": "Compound query - api focus since no cloudflare skill"
+    },
+    {
+      "id": "short-ai",
+      "category": "short_query",
+      "query": "ai api",
+      "expected": [
+        "claude-api",
+        "openai-responses",
+        "google-gemini-api"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "wp-rest-api",
+          "score": 40,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 28,
+          "path": ""
+        },
+        {
+          "name": "Maintaining Consistent Abstractions",
+          "score": 21,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "wp-rest-api",
+          "score": 40,
+          "path": ""
+        },
+        {
+          "name": "Google Gemini API",
+          "score": 28,
+          "path": ""
+        },
+        {
+          "name": "Maintaining Consistent Abstractions",
+          "score": 21,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0.3333333333333333,
+        "recall_at_3": 0.3333333333333333,
+        "precision_at_10": 0.3333333333333333,
+        "recall_at_10": 0.3333333333333333,
+        "mrr": 0.5,
+        "first_relevant_rank": 2,
+        "has_negative_match": false
+      },
+      "pass": true,
+      "notes": "Short query with context - should match AI/LLM API skills"
+    },
+    {
+      "id": "short-db",
+      "category": "short_query",
+      "query": "database",
+      "expected": [
+        "architecting-solutions"
+      ],
+      "not_expected": [],
+      "actual_top3": [
+        {
+          "name": "optimizing-performance",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "managing-hetzner-coolify",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "agent-observability",
+          "score": 11,
+          "path": ""
+        }
+      ],
+      "actual_top10": [
+        {
+          "name": "optimizing-performance",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "managing-hetzner-coolify",
+          "score": 13,
+          "path": ""
+        },
+        {
+          "name": "agent-observability",
+          "score": 11,
+          "path": ""
+        }
+      ],
+      "metrics": {
+        "precision_at_3": 0,
+        "recall_at_3": 0,
+        "precision_at_10": 0,
+        "recall_at_10": 0,
+        "mrr": 0,
+        "first_relevant_rank": null,
+        "has_negative_match": false
+      },
+      "pass": false,
+      "notes": "Single word query - general architecture covers DB design"
+    }
+  ]
+}
