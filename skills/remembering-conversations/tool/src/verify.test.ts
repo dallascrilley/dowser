@@ -6,7 +6,9 @@ import os from 'os';
 import { initDatabase, insertExchange } from './db.js';
 import { ConversationExchange } from './types.js';
 
-describe('verifyIndex', () => {
+const describeWithBetterSqlite3 = process.versions.bun ? describe.skip : describe;
+
+describeWithBetterSqlite3('verifyIndex', () => {
   const testDir = path.join(os.tmpdir(), 'conversation-search-test-' + Date.now());
   const projectsDir = path.join(testDir, '.claude', 'projects');
   const archiveDir = path.join(testDir, '.clank', 'conversation-archive');
@@ -143,7 +145,7 @@ describe('verifyIndex', () => {
   // primary use case for verification.
 });
 
-describe('repairIndex', () => {
+describeWithBetterSqlite3('repairIndex', () => {
   const testDir = path.join(os.tmpdir(), 'conversation-repair-test-' + Date.now());
   const projectsDir = path.join(testDir, '.claude', 'projects');
   const archiveDir = path.join(testDir, '.clank', 'conversation-archive');
