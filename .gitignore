@@ -32,3 +32,7 @@ npm-debug.log*
 # Metrics (generated at runtime)
 lib/skill-metrics.json
 lib/skill-gaps.jsonl
+
+# Semantic search artifacts (generated at runtime)
+lib/models/
+lib/skill-embeddings.json

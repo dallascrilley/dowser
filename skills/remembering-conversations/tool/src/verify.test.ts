@@ -1,12 +1,21 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, test, expect, beforeEach, afterEach } from 'bun:test';
 import { verifyIndex, repairIndex, VerificationResult } from './verify.js';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { initDatabase, insertExchange } from './db.js';
 import { ConversationExchange } from './types.js';
+import { createRequire } from 'module';
 
-const describeWithBetterSqlite3 = process.versions.bun ? describe.skip : describe;
+const require = createRequire(import.meta.url);
+let hasBetterSqlite3 = true;
+try {
+  require('better-sqlite3');
+} catch {
+  hasBetterSqlite3 = false;
+}
+
+const describeWithBetterSqlite3 = hasBetterSqlite3 ? describe : describe.skip;
 
 describeWithBetterSqlite3('verifyIndex', () => {
   const testDir = path.join(os.tmpdir(), 'conversation-search-test-' + Date.now());
@@ -34,7 +43,7 @@ describeWithBetterSqlite3('verifyIndex', () => {
     delete process.env.TEST_DB_PATH;
   });
 
-  it('detects missing summaries', async () => {
+  test('detects missing summaries', async () => {
     // Create a test conversation file without a summary
     const projectArchive = path.join(archiveDir, 'test-project');
     fs.mkdirSync(projectArchive, { recursive: true });
@@ -55,7 +64,7 @@ describeWithBetterSqlite3('verifyIndex', () => {
     expect(result.missing[0].reason).toBe('No summary file');
   });
 
-  it('detects orphaned database entries', async () => {
+  test('detects orphaned database entries', async () => {
     // Initialize database
     const db = initDatabase();
 
@@ -83,7 +92,7 @@ describeWithBetterSqlite3('verifyIndex', () => {
     expect(result.orphaned[0].path).toBe(exchange.archivePath);
   });
 
-  it('detects outdated files (file modified after last_indexed)', async () => {
+  test('detects outdated files (file modified after last_indexed)', async () => {
     // Create conversation file with summary
     const projectArchive = path.join(archiveDir, 'test-project');
     fs.mkdirSync(projectArchive, { recursive: true });
@@ -171,7 +180,7 @@ describeWithBetterSqlite3('repairIndex', () => {
     delete process.env.TEST_DB_PATH;
   });
 
-  it('deletes orphaned database entries during repair', async () => {
+  test('deletes orphaned database entries during repair', async () => {
     // Initialize database with orphaned entry
     const db = initDatabase();
 
@@ -208,7 +217,7 @@ describeWithBetterSqlite3('repairIndex', () => {
     dbAfter.close();
   });
 
-  it('re-indexes outdated files during repair', { timeout: 30000 }, async () => {
+  test('re-indexes outdated files during repair', { timeout: 30000 }, async () => {
     // Create conversation file with summary
     const projectArchive = path.join(archiveDir, 'test-project');
     fs.mkdirSync(projectArchive, { recursive: true });
