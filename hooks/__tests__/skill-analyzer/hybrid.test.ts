@@ -13,7 +13,7 @@ describe('hybrid scoring', () => {
       folderName: 'some-skill',
       sourceType: 'plugin',
     };
-    const out = scoreSkillRelevanceHybrid(skill, 'zzz', null, new Map(), new Map());
+    const out = scoreSkillRelevanceHybrid(skill, 'zzz', null, new Map(), new Map(), new Map());
     expect(out.score).toBe(0);
   });
 });
