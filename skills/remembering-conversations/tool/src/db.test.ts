@@ -6,7 +6,9 @@ import path from 'path';
 import os from 'os';
 import Database from 'better-sqlite3';
 
-describe('database migration', () => {
+const describeWithBetterSqlite3 = process.versions.bun ? describe.skip : describe;
+
+describeWithBetterSqlite3('database migration', () => {
   const testDir = path.join(os.tmpdir(), 'db-migration-test-' + Date.now());
   const dbPath = path.join(testDir, 'test.db');
 
@@ -66,7 +68,7 @@ describe('database migration', () => {
   });
 });
 
-describe('insertExchange with last_indexed', () => {
+describeWithBetterSqlite3('insertExchange with last_indexed', () => {
   const testDir = path.join(os.tmpdir(), 'insert-test-' + Date.now());
   const dbPath = path.join(testDir, 'test.db');
 
