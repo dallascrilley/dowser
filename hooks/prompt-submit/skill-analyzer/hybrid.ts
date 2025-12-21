@@ -1,9 +1,28 @@
 import type Fuse from 'fuse.js';
+import path from 'path';
 import { CONFIG } from '../../../lib/config';
 import type { Skill } from './types';
 import type { SkillRules } from './rules';
 import { scoreSkillFromRules } from './rules';
 import { scoreSkillRelevanceFuzzy } from './tokenize';
+
+const PREFER_PAI_SKILLS = process.env.SKILL_ANALYZER_PREFER_PAI_SKILLS !== '0';
+const PAI_SKILLS_PRIORITY_BOOST = Number.parseInt(process.env.SKILL_ANALYZER_PAI_BOOST || '25', 10);
+const MIN_SCORE_FOR_PAI_BOOST = Number.parseInt(
+  process.env.SKILL_ANALYZER_PAI_BOOST_MIN_SCORE || String(CONFIG.GAP_THRESHOLD),
+  10
+);
+
+function isPaiSkillsSkill(skill: Skill): boolean {
+  return skill.path.includes(`${path.sep}pai-skills${path.sep}`);
+}
+
+function getPaiSkillBoost(skill: Skill, baseScore: number): number {
+  if (!PREFER_PAI_SKILLS || PAI_SKILLS_PRIORITY_BOOST <= 0) return 0;
+  if (!isPaiSkillsSkill(skill)) return 0;
+  if (baseScore < MIN_SCORE_FOR_PAI_BOOST) return 0;
+  return PAI_SKILLS_PRIORITY_BOOST;
+}
 
 export function scoreSkillRelevanceHybrid(
   skill: Skill,
@@ -27,8 +46,9 @@ export function scoreSkillRelevanceHybrid(
       Math.floor(fuseData.fuseScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.fuse) +
       Math.floor(tfidfScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.tfidf) +
       Math.floor(semanticScore * 0.3);
+    const paiBoost = getPaiSkillBoost(skill, hybridScore);
     return {
-      score: hybridScore,
+      score: hybridScore + paiBoost,
       source: (fuzzyScore > 0 || fuseData.fuseScore > 0 || tfidfScore > 0 || semanticScore > 0) ? 'hybrid' : 'rules'
     };
   }
@@ -65,5 +85,6 @@ export function scoreSkillRelevanceHybrid(
     source = primary.name;
   }
 
-  return { score: combinedScore, source };
+  const paiBoost = getPaiSkillBoost(skill, combinedScore);
+  return { score: combinedScore + paiBoost, source };
 }
