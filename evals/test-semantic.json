@@ -1,55 +1,309 @@
 {
-  "version": "1.0",
-  "description": "Semantic search evaluation test cases",
+  "version": "1.1",
+  "description": "Semantic search evaluation cases (vague intent, paraphrases, and disambiguation)",
   "test_cases": [
     {
-      "id": "semantic-performance",
-      "category": "semantic",
+      "id": "semantic-perf-01",
+      "category": "performance",
       "query": "make things go faster",
       "expected": ["optimizing-performance"],
-      "notes": "Conceptual match: fast -> performance"
+      "not_expected": ["implementing-modules"],
+      "notes": "Vague performance intent"
     },
     {
-      "id": "semantic-root-cause",
-      "category": "semantic",
+      "id": "semantic-perf-02",
+      "category": "performance",
+      "query": "speed this up",
+      "expected": ["optimizing-performance"],
+      "not_expected": ["implementing-modules"],
+      "notes": "Short paraphrase"
+    },
+    {
+      "id": "semantic-perf-03",
+      "category": "performance",
+      "query": "reduce latency",
+      "expected": ["optimizing-performance"],
+      "notes": "Performance metric phrasing"
+    },
+    {
+      "id": "semantic-perf-04",
+      "category": "performance",
+      "query": "profile bottlenecks",
+      "expected": ["optimizing-performance"],
+      "notes": "Performance workflow phrasing"
+    },
+    {
+      "id": "semantic-perf-05",
+      "category": "performance",
+      "query": "optimize a slow database query",
+      "expected": ["optimizing-performance"],
+      "notes": "Domain + performance"
+    },
+    {
+      "id": "semantic-debug-01",
+      "category": "debugging",
       "query": "find the root cause",
-      "expected": ["systematic-debugging", "root-cause-tracing"],
-      "notes": "Conceptual match: root cause -> debugging"
+      "expected": ["systematic-debugging", "debugging-systematically", "root-cause-tracing"],
+      "notes": "Root-cause phrasing"
     },
     {
-      "id": "semantic-quality",
-      "category": "semantic",
+      "id": "semantic-debug-02",
+      "category": "debugging",
+      "query": "debug this error systematically",
+      "expected": ["debugging-systematically", "systematic-debugging"],
+      "notes": "Direct intent phrasing"
+    },
+    {
+      "id": "semantic-debug-03",
+      "category": "debugging",
+      "query": "trace why this is failing",
+      "expected": ["systematic-debugging", "root-cause-tracing"],
+      "notes": "Failure investigation paraphrase"
+    },
+    {
+      "id": "semantic-quality-01",
+      "category": "quality",
       "query": "ensure code quality",
       "expected": ["refactoring-safely", "test-driven-development", "testing-anti-patterns"],
-      "notes": "Conceptual match: quality -> refactoring/testing"
+      "notes": "Quality umbrella intent"
     },
     {
-      "id": "semantic-clean-up",
-      "category": "semantic",
+      "id": "semantic-quality-02",
+      "category": "quality",
       "query": "clean up the codebase",
       "expected": ["refactoring-safely", "cleaning-up-post-task"],
-      "notes": "Conceptual match: clean up -> refactoring"
+      "notes": "Cleanup/refactor intent"
     },
     {
-      "id": "semantic-user-input",
-      "category": "semantic",
+      "id": "semantic-quality-03",
+      "category": "quality",
+      "query": "reduce complexity",
+      "expected": ["reducing-complexity", "simplifying-control-flow"],
+      "notes": "Complexity reduction intent"
+    },
+    {
+      "id": "semantic-quality-04",
+      "category": "quality",
+      "query": "simplify control flow",
+      "expected": ["simplifying-control-flow", "reducing-complexity"],
+      "notes": "Specific technique phrasing"
+    },
+    {
+      "id": "semantic-quality-05",
+      "category": "quality",
+      "query": "refactor without breaking things",
+      "expected": ["refactoring-safely", "test-driven-development"],
+      "notes": "Risk-aware refactor phrasing"
+    },
+    {
+      "id": "semantic-security-01",
+      "category": "security",
       "query": "handle user input safely",
       "expected": ["validating-inputs", "react-hook-form-zod"],
-      "notes": "Conceptual match: input safety -> validation"
+      "notes": "Input validation intent"
     },
     {
-      "id": "semantic-cli",
-      "category": "semantic",
+      "id": "semantic-security-02",
+      "category": "security",
+      "query": "validate external inputs",
+      "expected": ["validating-inputs"],
+      "notes": "Boundary validation phrasing"
+    },
+    {
+      "id": "semantic-security-03",
+      "category": "security",
+      "query": "prevent sql injection",
+      "expected": ["validating-inputs", "defense-in-depth"],
+      "notes": "Security-specific phrasing"
+    },
+    {
+      "id": "semantic-security-04",
+      "category": "security",
+      "query": "defense in depth strategy",
+      "expected": ["defense-in-depth"],
+      "notes": "Exact concept phrasing"
+    },
+    {
+      "id": "semantic-ui-01",
+      "category": "ui",
+      "query": "make it look good",
+      "expected": ["frontend-dev-guidelines-tailwind", "tailwind-v4-shadcn", "web-asset-generator"],
+      "notes": "Aesthetic UI intent"
+    },
+    {
+      "id": "semantic-ui-02",
+      "category": "ui",
+      "query": "tailwind v4 setup",
+      "expected": ["tailwind-v4-shadcn"],
+      "notes": "Setup phrasing"
+    },
+    {
+      "id": "semantic-ui-03",
+      "category": "ui",
+      "query": "dark mode theme switching",
+      "expected": ["tailwind-v4-shadcn", "frontend-dev-guidelines-tailwind"],
+      "notes": "Natural language UI issue"
+    },
+    {
+      "id": "semantic-cli-01",
+      "category": "cli",
       "query": "command line tool building",
       "expected": ["cli-tool-developer", "developing-cli-tools"],
-      "notes": "Conceptual match: command line -> CLI"
+      "notes": "CLI intent"
     },
     {
-      "id": "semantic-styles",
-      "category": "semantic",
-      "query": "make it look good",
-      "expected": ["frontend-dev-guidelines-tailwind", "tailwind-v4-shadcn"],
-      "notes": "Conceptual match: look good -> styling/frontend"
+      "id": "semantic-cli-02",
+      "category": "cli",
+      "query": "argument parsing flags and subcommands",
+      "expected": ["developing-cli-tools", "cli-tool-developer"],
+      "notes": "CLI specifics"
+    },
+    {
+      "id": "semantic-git-01",
+      "category": "git",
+      "query": "split this into atomic commits",
+      "expected": ["create-atomic-commits"],
+      "notes": "Atomic commit intent"
+    },
+    {
+      "id": "semantic-git-02",
+      "category": "git",
+      "query": "use git worktrees",
+      "expected": ["using-git-worktrees"],
+      "notes": "Worktree intent"
+    },
+    {
+      "id": "semantic-git-03",
+      "category": "git",
+      "query": "git rebase help",
+      "expected": ["git-expert"],
+      "notes": "Git expert intent"
+    },
+    {
+      "id": "semantic-research-01",
+      "category": "research",
+      "query": "research this topic deeply",
+      "expected": ["researching-web", "researching-technical-implementations"],
+      "notes": "Deep research intent"
+    },
+    {
+      "id": "semantic-research-02",
+      "category": "research",
+      "query": "scrape a website with javascript-heavy pages",
+      "expected": ["using-crawl4ai-cli", "web-browser"],
+      "notes": "Scraping intent"
+    },
+    {
+      "id": "semantic-research-03",
+      "category": "research",
+      "query": "extract structured data from a webpage",
+      "expected": ["using-crawl4ai-cli", "extracting-knowledge-concepts"],
+      "notes": "Extraction phrasing"
+    },
+    {
+      "id": "semantic-planning-01",
+      "category": "planning",
+      "query": "break down this project into steps",
+      "expected": ["decomposing-complex-tasks", "project-planning", "writing-plans"],
+      "notes": "Decomposition intent"
+    },
+    {
+      "id": "semantic-planning-02",
+      "category": "planning",
+      "query": "write a plan",
+      "expected": ["writing-plans", "project-planning"],
+      "notes": "Plan request phrasing"
+    },
+    {
+      "id": "semantic-planning-03",
+      "category": "planning",
+      "query": "design before coding",
+      "expected": ["designing-before-coding"],
+      "notes": "Process intent"
+    },
+    {
+      "id": "semantic-planning-04",
+      "category": "planning",
+      "query": "architect a solution",
+      "expected": ["architecting-solutions"],
+      "notes": "Architecture intent"
+    },
+    {
+      "id": "semantic-meta-01",
+      "category": "meta",
+      "query": "create a new skill",
+      "expected": ["skill-creator", "creating-skills", "writing-skills"],
+      "notes": "Skill authoring intent"
+    },
+    {
+      "id": "semantic-meta-02",
+      "category": "meta",
+      "query": "convert docs to a skill",
+      "expected": ["convert-docs-to-skill"],
+      "notes": "Docs → skill intent"
+    },
+    {
+      "id": "semantic-meta-03",
+      "category": "meta",
+      "query": "run garden checks on the skills wiki",
+      "expected": ["gardening-skills-wiki"],
+      "notes": "Repo maintenance intent"
+    },
+    {
+      "id": "semantic-agents-01",
+      "category": "agents",
+      "query": "spawn parallel subagents",
+      "expected": ["dispatching-parallel-agents", "subagent-driven-development"],
+      "notes": "Parallelization intent"
+    },
+    {
+      "id": "semantic-agents-02",
+      "category": "agents",
+      "query": "manage context between sessions",
+      "expected": ["managing-context"],
+      "notes": "Context hygiene intent"
+    },
+    {
+      "id": "semantic-apis-01",
+      "category": "apis",
+      "query": "openai responses api file search",
+      "expected": ["openai-responses"],
+      "notes": "Product intent"
+    },
+    {
+      "id": "semantic-apis-02",
+      "category": "apis",
+      "query": "gemini embeddings for semantic search",
+      "expected": ["google-gemini-embeddings"],
+      "notes": "Embedding intent"
+    },
+    {
+      "id": "semantic-state-01",
+      "category": "state",
+      "query": "tanstack query caching and invalidation",
+      "expected": ["tanstack-query"],
+      "notes": "Library intent"
+    },
+    {
+      "id": "semantic-state-02",
+      "category": "state",
+      "query": "zustand store setup",
+      "expected": ["zustand-state-management"],
+      "notes": "Library intent"
+    },
+    {
+      "id": "semantic-regex-01",
+      "category": "regex",
+      "query": "regex pattern to extract emails",
+      "expected": ["regex-patterns"],
+      "notes": "Regex intent"
+    },
+    {
+      "id": "semantic-process-01",
+      "category": "process",
+      "query": "verify before claiming done",
+      "expected": ["verification-before-completion"],
+      "notes": "Process safety intent"
     }
   ]
 }

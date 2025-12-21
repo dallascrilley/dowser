@@ -33,7 +33,10 @@ import { CONFIG } from '../../lib/config';
 
 // Configure cache for models
 const PLUGIN_LIB_DIR = path.join(__dirname, '..', '..', 'lib');
-env.cacheDir = path.join(PLUGIN_LIB_DIR, 'models');
+const SEMANTIC_CACHE_DIR = path.resolve(
+  process.env.SKILL_ANALYZER_SEMANTIC_CACHE_DIR || PLUGIN_LIB_DIR
+);
+env.cacheDir = path.join(SEMANTIC_CACHE_DIR, 'models');
 env.allowLocalModels = false;
 
 interface HookInput {
@@ -128,7 +131,7 @@ const DEBUG_TFIDF_ENABLED = process.env.SKILL_ANALYZER_DEBUG_TFIDF === '1';
 // Semantic Search Configuration
 const SEMANTIC_ENABLED = process.env.SKILL_ANALYZER_SEMANTIC !== '0';
 const EMBEDDING_MODEL = 'Xenova/all-MiniLM-L6-v2';
-const EMBEDDINGS_FILE = path.join(PLUGIN_LIB_DIR, 'skill-embeddings.json');
+const EMBEDDINGS_FILE = path.join(SEMANTIC_CACHE_DIR, 'skill-embeddings.json');
 
 interface EmbeddingCache {
   version: string;
@@ -139,8 +142,18 @@ interface EmbeddingCache {
 
 let extractor: any = null;
 
+function ensureSemanticCacheDir(): void {
+  try {
+    fs.mkdirSync(SEMANTIC_CACHE_DIR, { recursive: true });
+    fs.mkdirSync(env.cacheDir, { recursive: true });
+  } catch {
+    // Best-effort; semantic search should degrade gracefully if cache is unwritable.
+  }
+}
+
 async function getExtractor() {
   if (!extractor) {
+    ensureSemanticCacheDir();
     extractor = await pipeline('feature-extraction', EMBEDDING_MODEL, {
       quantized: false, // Use full precision for better quality
     });
@@ -193,6 +206,7 @@ function buildSkillEmbeddingText(skill: Skill): string {
 }
 
 function loadEmbeddingCache(): EmbeddingCache {
+  ensureSemanticCacheDir();
   if (!fs.existsSync(EMBEDDINGS_FILE)) {
     return {
       version: '2.0',
@@ -223,6 +237,7 @@ function loadEmbeddingCache(): EmbeddingCache {
 }
 
 function saveEmbeddingCache(cache: EmbeddingCache) {
+  ensureSemanticCacheDir();
   cache.lastUpdated = new Date().toISOString();
   fs.writeFileSync(EMBEDDINGS_FILE, JSON.stringify(cache, null, 2));
 }
@@ -1903,7 +1918,9 @@ async function main() {
     }
 
     // Analyze prompt for relevant skills
-    const { skills: relevantSkills, scoredSkills } = await findRelevantSkills(userPrompt, 3);
+    const rawLimit = Number.parseInt(process.env.SKILL_ANALYZER_LIMIT || '3', 10);
+    const limit = Number.isFinite(rawLimit) ? Math.min(20, Math.max(1, rawLimit)) : 3;
+    const { skills: relevantSkills, scoredSkills } = await findRelevantSkills(userPrompt, limit);
 
     // Check if top match is below threshold (skill gap)
     const topScore = scoredSkills.length > 0 ? scoredSkills[0].score : 0;
