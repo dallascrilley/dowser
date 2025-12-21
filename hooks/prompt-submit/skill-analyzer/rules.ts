@@ -67,6 +67,7 @@ function compileIntentPatterns(patterns?: string[]): RegExp[] {
  */
 export function loadSkillRules(skillsRoot: string, isPluginContext: boolean): SkillRules | null {
   const rulesPath = path.join(skillsRoot, 'skill-rules.json');
+  const cacheKey = `${rulesPath}:${isPluginContext ? 'plugin' : 'nonplugin'}`;
 
   if (!fs.existsSync(rulesPath)) {
     return null;
@@ -74,7 +75,7 @@ export function loadSkillRules(skillsRoot: string, isPluginContext: boolean): Sk
 
   try {
     const stat = fs.statSync(rulesPath);
-    const cached = rulesCache.get(rulesPath);
+    const cached = rulesCache.get(cacheKey);
 
     // Return cached if unchanged
     if (cached && cached.mtime === stat.mtimeMs) {
@@ -104,7 +105,7 @@ export function loadSkillRules(skillsRoot: string, isPluginContext: boolean): Sk
     }
 
     // Cache it
-    rulesCache.set(rulesPath, {
+    rulesCache.set(cacheKey, {
       rules,
       mtime: stat.mtimeMs
     });

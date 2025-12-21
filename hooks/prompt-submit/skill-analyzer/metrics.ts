@@ -72,7 +72,9 @@ export function loadMetrics(): SkillMetrics {
 
 function saveMetrics(metrics: SkillMetrics): void {
   metrics.lastUpdated = new Date().toISOString();
-  fs.writeFileSync(METRICS_FILE, JSON.stringify(metrics, null, 2));
+  const tmpPath = `${METRICS_FILE}.tmp`;
+  fs.writeFileSync(tmpPath, JSON.stringify(metrics, null, 2));
+  fs.renameSync(tmpPath, METRICS_FILE);
 }
 
 /**

@@ -372,6 +372,9 @@ export function scoreSkillRelevanceFuzzy(skill: Skill, prompt: string): number {
     }
   }
 
+  const descriptionLower = skill.description ? skill.description.toLowerCase() : '';
+  const whenToUseLower = skill.whenToUse ? skill.whenToUse.toLowerCase() : '';
+
   // Check for keyword matches (expanded list)
   const keywords = [
     'test', 'testing', 'debug', 'debugging', 'deploy', 'deployment',
@@ -387,8 +390,8 @@ export function scoreSkillRelevanceFuzzy(skill: Skill, prompt: string): number {
   for (const keyword of keywords) {
     if (promptLower.includes(keyword) &&
         (nameLower.includes(keyword) ||
-         skill.description.toLowerCase().includes(keyword) ||
-         skill.whenToUse.toLowerCase().includes(keyword))) {
+         descriptionLower.includes(keyword) ||
+         whenToUseLower.includes(keyword))) {
       score += 3;
     }
   }

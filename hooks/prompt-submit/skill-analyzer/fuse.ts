@@ -47,13 +47,12 @@ function getFuseInstance(skills: Skill[]): Fuse<Skill> {
 
 /**
  * Score skills using Fuse.js fuzzy search
- * Returns scores normalized to our 0-100 scale
+ * Returns scores normalized to a 0-20 contribution scale
  */
 export function scoreSkillsWithFuse(
   skills: Skill[],
   query: string
 ): Map<string, { fuseScore: number; fuseMatch: Fuse.FuseResult<Skill> | null }> {
-  const debug = process.env.SKILL_ANALYZER_DEBUG === '1';
   const debugFuzzy = process.env.SKILL_ANALYZER_DEBUG_FUZZY === '1';
   const results = new Map<string, { fuseScore: number; fuseMatch: Fuse.FuseResult<Skill> | null }>();
   

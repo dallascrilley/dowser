@@ -5,7 +5,11 @@ import type { Skill } from './types';
  */
 export function formatSkillSuggestions(
   skills: Skill[],
-  scoredSkills?: Array<{ skill: Skill; score: number; source?: string }>
+  scoredSkills?: Array<{
+    skill: Skill;
+    score: number;
+    source?: 'rules' | 'fuzzy' | 'fuse' | 'tfidf' | 'hybrid';
+  }>
 ): string {
   if (skills.length === 0) return '';
 

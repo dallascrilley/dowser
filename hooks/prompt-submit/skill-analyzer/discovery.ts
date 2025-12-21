@@ -40,7 +40,7 @@ async function discoverSkills(root: string, sourceType: SkillSourceType): Promis
 
   for (const file of files) {
     const folderName = path.basename(path.dirname(file));
-    const content = fs.readFileSync(file, 'utf-8');
+    const content = await fs.promises.readFile(file, 'utf-8');
     const { name, description, whenToUse } = parseFrontMatter(content, folderName);
     skills.push({
       name,

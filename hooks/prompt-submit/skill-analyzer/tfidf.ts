@@ -1,8 +1,12 @@
 import { TfIdf } from 'natural';
 import type { Skill } from './types';
 
-let tfidfInstance: TfIdf | null = null;
-let tfidfSkillsHash: string | null = null;
+type TfIdfCache = {
+  tfidf: TfIdf;
+  corpusKey: string;
+};
+
+let tfidfCache: TfIdfCache | null = null;
 
 /** TF-IDF scoring is ON by default. Disable via SKILL_ANALYZER_TFIDF=0 */
 const TFIDF_ENABLED = process.env.SKILL_ANALYZER_TFIDF !== '0';
@@ -15,18 +19,24 @@ const DEBUG_TFIDF_ENABLED = process.env.SKILL_ANALYZER_DEBUG_TFIDF === '1';
  * rare terms like "tailwind" get high weight
  */
 function getTfIdfInstance(skills: Skill[]): TfIdf {
-  // Create simple hash of skill names to detect cache invalidation
-  const currentHash = skills.map(s => s.name).sort().join('|');
+  const currentHash = skills
+    .map((skill) => [
+      skill.name,
+      skill.folderName,
+      skill.description || '',
+      skill.whenToUse || '',
+    ].join('\u0000'))
+    .join('\u0001');
 
-  if (tfidfInstance && tfidfSkillsHash === currentHash) {
-    return tfidfInstance;
+  if (tfidfCache && tfidfCache.corpusKey === currentHash) {
+    return tfidfCache.tfidf;
   }
 
   if (DEBUG_TFIDF_ENABLED) {
     console.error(`\n🔬 Building TF-IDF corpus from ${skills.length} skills`);
   }
 
-  tfidfInstance = new TfIdf();
+  const tfidfInstance = new TfIdf();
 
   // Add each skill as a document with combined searchable text
   for (const skill of skills) {
@@ -40,7 +50,7 @@ function getTfIdfInstance(skills: Skill[]): TfIdf {
     tfidfInstance.addDocument(doc);
   }
 
-  tfidfSkillsHash = currentHash;
+  tfidfCache = { tfidf: tfidfInstance, corpusKey: currentHash };
 
   if (DEBUG_TFIDF_ENABLED) {
     console.error(`✓ TF-IDF corpus built with ${skills.length} documents`);
@@ -87,7 +97,8 @@ export function scoreSkillsWithTfIdf(skills: Skill[], query: string): Map<string
     const skill = skills[i];
     const rawScore = rawScores[i] || 0;
     const normalizedScore = maxScore > 0 ? Math.round((rawScore / maxScore) * 25) : 0;
-    results.set(skill.name, normalizedScore);
+    const previousScore = results.get(skill.name) || 0;
+    results.set(skill.name, Math.max(previousScore, normalizedScore));
 
     if (DEBUG_TFIDF_ENABLED && normalizedScore > 0) {
       console.error(`  ${skill.name}: raw=${rawScore.toFixed(3)}, normalized=${normalizedScore}`);
