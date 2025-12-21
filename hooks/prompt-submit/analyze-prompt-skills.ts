@@ -30,6 +30,7 @@ import Fuse from 'fuse.js';
 import { pipeline, env } from '@xenova/transformers';
 import { CONFIG } from '../../lib/config';
 import { scoreSkillsWithTfIdf } from './skill-analyzer/tfidf';
+import { scoreSkillRelevanceHybrid } from './skill-analyzer/hybrid';
 import { scoreSkillRelevanceFuzzy } from './skill-analyzer/tokenize';
 import { scoreSkillsWithFuse } from './skill-analyzer/fuse';
 
@@ -353,26 +354,6 @@ function getPaiSkillBoost(skill: Skill, baseScore: number): number {
   return PAI_SKILLS_PRIORITY_BOOST;
 }
 
-/**
- * Build or get cached TF-IDF instance from skills corpus
- * TF-IDF weights terms by uniqueness: common terms like "implement" get low weight,
- * rare terms like "tailwind" get high weight
- */
-
-/**
- * Get TF-IDF weighted scores for query against all skills
- * Returns map of skill name -> TF-IDF score
- */
-/**
- * Build or get cached TF-IDF instance from skills corpus
- * TF-IDF weights terms by uniqueness: common terms like "implement" get low weight,
- * rare terms like "tailwind" get high weight
- */
-
-/**
- * Get TF-IDF weighted scores for query against all skills
- * Returns map of skill name -> TF-IDF score
- */
 const PLUGIN_CACHE_FRAGMENT = `${path.sep}.claude${path.sep}plugins${path.sep}cache`;
 const IS_PLUGIN_CONTEXT =
   PROJECT_DIR.includes(PLUGIN_CACHE_FRAGMENT) ||
@@ -1103,74 +1084,11 @@ function getSkillRoots(): Array<{ path: string; sourceType: 'project' | 'user' |
   return roots;
 }
 
-
-
 /**
  * Hybrid scoring: Combines rules-based, token-based, Fuse.js fuzzy matching, TF-IDF, and Semantic Search
  * TF-IDF adds term weighting: common terms get low weight, unique terms get high weight
  * Semantic Search: Captures intent and conceptual similarity
  */
-function scoreSkillRelevanceHybrid(
-  skill: Skill,
-  prompt: string,
-  rules: SkillRules | null,
-  fuseScores: Map<string, { fuseScore: number; fuseMatch: Fuse.FuseResult<Skill> | null }>,
-  tfidfScores: Map<string, number>,
-  semanticScores: Map<string, number>
-): { score: number; source: 'rules' | 'fuzzy' | 'fuse' | 'tfidf' | 'semantic' | 'hybrid' } {
-  const rulesScore = scoreSkillFromRules(skill, prompt, rules);
-  const fuzzyScore = scoreSkillRelevanceFuzzy(skill, prompt);
-  const fuseData = fuseScores.get(skill.name) || { fuseScore: 0, fuseMatch: null };
-  const tfidfScore = tfidfScores.get(skill.name) || 0;
-  const semanticScore = semanticScores.get(skill.name) || 0;
-
-  // If skill has rules and matched, prioritize rules-based score
-  if (rulesScore > 0) {
-    // Add bonuses from fuzzy, fuse, TF-IDF, and semantic matching
-    const hybridScore = rulesScore +
-      Math.floor(fuzzyScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.fuzzy) +
-      Math.floor(fuseData.fuseScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.fuse) +
-      Math.floor(tfidfScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.tfidf) +
-      Math.floor(semanticScore * 0.3); // Semantic bonus
-    const paiBoost = getPaiSkillBoost(skill, hybridScore);
-    return {
-      score: hybridScore + paiBoost,
-      source: (fuzzyScore > 0 || fuseData.fuseScore > 0 || tfidfScore > 0 || semanticScore > 0) ? 'hybrid' : 'rules'
-    };
-  }
-
-  // Combine scores from different engines
-  let combinedScore: number;
-  let source: 'fuzzy' | 'fuse' | 'tfidf' | 'semantic' | 'hybrid';
-
-  // Find the maximum base score
-  const scores = [
-    { value: fuzzyScore, name: 'fuzzy' as const },
-    { value: fuseData.fuseScore, name: 'fuse' as const },
-    { value: tfidfScore, name: 'tfidf' as const },
-    { value: semanticScore, name: 'semantic' as const }
-  ].sort((a, b) => b.value - a.value);
-
-  const primary = scores[0];
-  const secondary = scores[1];
-  const tertiary = scores[2];
-
-  if (primary.value === 0) {
-    return { score: 0, source: 'fuzzy' };
-  }
-
-  // Primary score + smaller bonuses from others
-  combinedScore = primary.value +
-    Math.floor(secondary.value * CONFIG.WEIGHTS.hybridBonuses.whenNoRules.secondary) +
-    Math.floor(tertiary.value * CONFIG.WEIGHTS.hybridBonuses.whenNoRules.tertiary);
-
-  // Determine source based on which methods contributed
-  const hasMultiple = secondary.value > 0;
-  source = hasMultiple ? 'hybrid' : primary.name;
-
-  const paiBoost = getPaiSkillBoost(skill, combinedScore);
-  return { score: combinedScore + paiBoost, source };
-}
 
 /**
  * Find relevant skills for a prompt
@@ -1339,7 +1257,6 @@ async function readStdinWithTimeout(timeout: number = 5000): Promise<string> {
     });
   });
 }
-
 
 /**
  * Main hook function
