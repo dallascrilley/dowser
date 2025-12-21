@@ -8,7 +8,8 @@ import { ConversationExchange } from './types.js';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
-let hasBetterSqlite3 = true;
+const isBun = typeof process.versions.bun === 'string';
+let hasBetterSqlite3 = !isBun;
 try {
   require('better-sqlite3');
 } catch {
