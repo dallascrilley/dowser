@@ -161,22 +161,20 @@ async function runAnalyzer(
   semanticEnabled: boolean,
   baseEnv: NodeJS.ProcessEnv,
   limit: number
-): Promise<SearchResult[]> {
-  return new Promise((resolve, reject) => {
-    const proc = spawn('bun', ['run', ANALYZER_SCRIPT], {
+	): Promise<SearchResult[]> {
+	  return new Promise((resolve, reject) => {
+	    const proc = spawn('bun', ['run', ANALYZER_SCRIPT], {
       env: { 
         ...baseEnv,
         SKILL_ANALYZER_SHOW_SCORES: '1',
         SKILL_ANALYZER_SEMANTIC: semanticEnabled ? '1' : '0',
         SKILL_ANALYZER_LIMIT: String(limit),
       },
-    });
+	    });
 
-    let stdout = '';
-    let stderr = '';
+	    let stderr = '';
 
-    proc.stdout.on('data', (data) => { stdout += data.toString(); });
-    proc.stderr.on('data', (data) => { stderr += data.toString(); });
+	    proc.stderr.on('data', (data) => { stderr += data.toString(); });
 
     proc.stdin.write(JSON.stringify({ userMessage: query }));
     proc.stdin.end();
