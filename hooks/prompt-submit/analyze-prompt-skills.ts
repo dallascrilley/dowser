@@ -32,6 +32,7 @@ import { CONFIG } from '../../lib/config';
 import { scoreSkillsWithTfIdf } from './skill-analyzer/tfidf';
 import { scoreSkillRelevanceHybrid } from './skill-analyzer/hybrid';
 import { scoreSkillsWithFuse } from './skill-analyzer/fuse';
+import { GAP_THRESHOLD, recordGap, recordRichGap, formatGapWarning, recordSkillSuggestions, checkGapNotification, recordSkillActivation, recordSearch, loadMetrics, clearGaps } from './skill-analyzer/metrics';
 import { loadSkillRules, scoreSkillFromRules, type SkillRules } from './skill-analyzer/rules';
 
 // Configure cache for models
@@ -315,18 +316,6 @@ const isPluginContext =
   PROJECT_DIR.includes(PLUGIN_CACHE_FRAGMENT) ||
   PROJECT_DIR.includes('/.claude/plugins/cache/');
 
-/**
- * Get metrics file path - uses plugin's lib directory
- * Metrics track how often each skill is suggested by the hook
- */
-function getMetricsPath(): string {
-  // Use plugin's lib directory for metrics (alongside skill-rules.json)
-  const pluginLibDir = path.join(__dirname, '..', '..', 'lib');
-  return path.join(pluginLibDir, 'skill-metrics.json');
-}
-
-const METRICS_FILE = getMetricsPath();
-const METRICS_DIR = path.dirname(METRICS_FILE);
 
 
 /** Maximum edit distance for fuzzy matching */
@@ -1178,11 +1167,14 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
     console.error(`Searching skill roots: ${roots.map(r => `${r.path} (${r.sourceType})`).join(', ')}`);
   }
 
-  // Load skill rules - check PAI plugin lib first, then first skills root
+  // Load skill rules - prefer project rules, then PAI plugin lib, then first skills root
   const paiDir = process.env.PAI_DIR || path.join(process.env.HOME || '', 'PAI');
   const paiPluginRulesDir = path.join(paiDir, '.claude', 'plugins', 'pai-skills', 'lib');
+  const projectRulesRoot = roots.find((root) => root.sourceType === 'project')?.path;
   let rules: SkillRules | null = null;
-  if (fs.existsSync(path.join(paiPluginRulesDir, 'skill-rules.json'))) {
+  if (projectRulesRoot && fs.existsSync(path.join(projectRulesRoot, 'skill-rules.json'))) {
+    rules = loadSkillRules(projectRulesRoot, isPluginContext);
+  } else if (fs.existsSync(path.join(paiPluginRulesDir, 'skill-rules.json'))) {
     rules = loadSkillRules(paiPluginRulesDir, isPluginContext);
   } else if (roots.length > 0) {
     rules = loadSkillRules(roots[0].path, isPluginContext);
