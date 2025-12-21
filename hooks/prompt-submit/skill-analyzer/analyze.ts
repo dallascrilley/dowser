@@ -471,12 +471,12 @@ export async function analyzeUserPrompt(data: HookInput): Promise<Record<string,
     ? formatGapWarning(userPrompt, topScore, scoredSkills)
     : '';
 
+  // Check if we should notify about accumulated gaps
+  const gapNotification = checkGapNotification();
+
   if (relevantSkills.length > 0) {
     recordSkillSuggestions(relevantSkills.map(skill => skill.name));
     const skillSummary = formatSkillSuggestions(relevantSkills, scoredSkills);
-
-    // Check if we should notify about accumulated gaps
-    const gapNotification = checkGapNotification();
 
     // Output to stderr for console display
     console.error(skillSummary);
@@ -502,6 +502,13 @@ export async function analyzeUserPrompt(data: HookInput): Promise<Record<string,
         additionalContext,
       },
     };
+  }
+
+  if (gapWarning) {
+    console.error(gapWarning);
+  }
+  if (gapNotification) {
+    console.error(gapNotification);
   }
 
   // No skills found - return empty response
