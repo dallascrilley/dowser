@@ -24,6 +24,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import Fuse from 'fuse.js';
 import { TfIdf } from 'natural';
+import { CONFIG } from '../../lib/config';
 
 interface HookInput {
   session_id?: string;
@@ -358,7 +359,7 @@ interface SkillMetrics {
 }
 
 /** Minimum score for a skill to be considered a "good match" */
-const GAP_THRESHOLD = 15;
+const GAP_THRESHOLD = CONFIG.GAP_THRESHOLD;
 
 /** How many gap queries before we notify */
 const GAP_NOTIFICATION_THRESHOLD = 10;
@@ -1410,9 +1411,9 @@ function scoreSkillRelevanceHybrid(
   if (rulesScore > 0) {
     // Add bonuses from fuzzy, fuse, and TF-IDF matching
     const hybridScore = rulesScore +
-      Math.floor(fuzzyScore * 0.3) +
-      Math.floor(fuseData.fuseScore * 0.3) +
-      Math.floor(tfidfScore * 0.2);
+      Math.floor(fuzzyScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.fuzzy) +
+      Math.floor(fuseData.fuseScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.fuse) +
+      Math.floor(tfidfScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.tfidf);
     return {
       score: hybridScore,
       source: (fuzzyScore > 0 || fuseData.fuseScore > 0 || tfidfScore > 0) ? 'hybrid' : 'rules'
@@ -1441,8 +1442,8 @@ function scoreSkillRelevanceHybrid(
 
   // Primary score + smaller bonuses from others
   combinedScore = primary.value +
-    Math.floor(secondary.value * 0.3) +
-    Math.floor(tertiary.value * 0.2);
+    Math.floor(secondary.value * CONFIG.WEIGHTS.hybridBonuses.whenNoRules.secondary) +
+    Math.floor(tertiary.value * CONFIG.WEIGHTS.hybridBonuses.whenNoRules.tertiary);
 
   // Determine source based on which methods contributed
   const hasMultiple = secondary.value > 0;
@@ -1620,18 +1621,18 @@ async function readStdinWithTimeout(timeout: number = 5000): Promise<string> {
 
 /**
  * Fuse.js configuration for fuzzy search
- * - threshold: 0.4 allows reasonable typos (lower = stricter matching)
+ * - threshold: CONFIG.FUZZY_THRESHOLD allows reasonable typos (lower = stricter matching)
  * - distance: 100 allows matches anywhere in the string
  * - minMatchCharLength: 2 for short queries like "ai", "db"
  */
 const FUSE_OPTIONS: Fuse.IFuseOptions<Skill> = {
   keys: [
-    { name: 'name', weight: 0.4 },
-    { name: 'folderName', weight: 0.35 },
-    { name: 'description', weight: 0.15 },
-    { name: 'whenToUse', weight: 0.1 },
+    { name: 'name', weight: CONFIG.WEIGHTS.fuseKeys.name },
+    { name: 'folderName', weight: CONFIG.WEIGHTS.fuseKeys.folderName },
+    { name: 'description', weight: CONFIG.WEIGHTS.fuseKeys.description },
+    { name: 'whenToUse', weight: CONFIG.WEIGHTS.fuseKeys.whenToUse },
   ],
-  threshold: 0.4,          // 0 = perfect match, 1 = match anything
+  threshold: CONFIG.FUZZY_THRESHOLD, // 0 = perfect match, 1 = match anything
   distance: 100,           // How far apart characters can be
   minMatchCharLength: 2,   // Enable short queries
   includeScore: true,      // Get match scores
