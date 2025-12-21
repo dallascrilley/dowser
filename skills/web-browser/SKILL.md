@@ -52,7 +52,7 @@ bun install
 # or: npm install
 ```
 
----
+----
 
 ## Quick Start
 
@@ -83,7 +83,7 @@ bun install
 
 **Note:** You can also use `./tools/web.js` directly if preferred.
 
----
+----
 
 ## Commands Reference
 
@@ -186,7 +186,7 @@ Kill Chrome instance and clean up. Run when finished to free resources.
 
 Display usage information and command reference.
 
----
+----
 
 ## Critical Rules
 
@@ -202,7 +202,7 @@ Display usage information and command reference.
 - Assume tab exists (`nav` creates one if needed)
 - Leave Chrome running indefinitely (uses system resources)
 
----
+----
 
 ## Common Patterns
 
@@ -249,7 +249,7 @@ Display usage information and command reference.
 ./web stop
 ```
 
----
+----
 
 ## Troubleshooting
 
@@ -278,7 +278,7 @@ Display usage information and command reference.
 - Ensure page loaded: Wait after `nav` command
 - Check temp directory writable: `ls -la /tmp` or `$TMPDIR`
 
----
+----
 
 ## Technical Details
 
@@ -296,7 +296,7 @@ Display usage information and command reference.
 **Dependencies:**
 - `puppeteer-core` ^24.27.0 (lightweight, no bundled browser)
 
----
+----
 
 ## Examples
 

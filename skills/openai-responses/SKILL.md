@@ -26,10 +26,9 @@ description: >
   openai, reasoning preservation, agentic workflows, conversation state,
   background mode, chat completions migration, gpt-5, polymorphic outputs
 when_to_use: >
-  Building AI agents with reasoning preservation, integrating MCP servers, using
-  OpenAI built-in tools (Code Interpreter, File Search, Web Search, Image
-  Generation), managing stateful conversations, background processing, migrating
-  from Chat Completions API. Agentic workflows, conversational AI.
+  Use when building agentic apps that need stateful conversations, preserved
+  reasoning, built-in tools, or MCP integration, or when migrating from Chat
+  Completions. Covers Node.js SDK and Workers.
 version: 1.0.0
 license: MIT
 category: agents-and-skills

@@ -14,13 +14,9 @@ description: >-
   custom skills, MCP servers, slash commands, file operations, git integration,
   debugging, skill creation, workflow optimization.
 when_to_use: >
-  Use when user asks about Claude Code capabilities, features, or commands;
-  creating custom skills or MCP integration; workflow
-
-  optimization; troubleshooting CLI issues; creating slash commands or hooks;
-  file operations and git integration; or extending
-
-  functionality with tools and servers.
+  Use when user asks about Claude Code features/commands, skills, MCP
+  integration, hooks/slash commands, workflow optimization, file operations, or
+  troubleshooting CLI behavior.
 version: 1.0.0
 category: agents-and-skills
 ---

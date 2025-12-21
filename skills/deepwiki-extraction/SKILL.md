@@ -42,7 +42,7 @@ Activate when user:
 
 **Key Benefit:** Extract once, answer multiple questions without re-navigating.
 
----
+----
 
 ## Quick Start
 
@@ -63,7 +63,7 @@ What would you like to know about this repository?
 
 **Follow-up:** Answer from cached content, no re-navigation needed.
 
----
+----
 
 ## Workflow
 
@@ -77,7 +77,7 @@ What would you like to know about this repository?
 - [ ] Verify completeness
 - [ ] Present results
 
----
+----
 
 ### Step 1: Parse Repository
 
@@ -92,7 +92,7 @@ python scripts/parse_github_url.py "https://github.com/owner/repo"
 **Errors:** Invalid → Report to user, stop workflow
 **Details:** [reference/url-patterns.md](reference/url-patterns.md)
 
----
+----
 
 ### Step 2: Navigate to DeepWiki
 
@@ -104,7 +104,7 @@ mcp__chrome-devtools__navigate_page(
 
 **Error:** 404 → Repository not found, stop
 
----
+----
 
 ### Step 3: Wait for Load
 
@@ -117,7 +117,7 @@ mcp__chrome-devtools__wait_for(
 
 **Fail:** Check for "not found", report to user
 
----
+----
 
 ### Step 4: Extract Content
 
@@ -176,7 +176,7 @@ result = mcp__chrome-devtools__evaluate_script(function=extraction_script)
 
 **Details:** [reference/extraction-selectors.md](reference/extraction-selectors.md)
 
----
+----
 
 ### Step 5: Format Markdown
 
@@ -190,7 +190,7 @@ python scripts/format_markdown.py --add-toc /tmp/extracted.json
 
 **Output:** Markdown with TOC, clean headings, code blocks
 
----
+----
 
 ### Step 6: Verify
 
@@ -202,7 +202,7 @@ python scripts/format_markdown.py --add-toc /tmp/extracted.json
 
 **Fail:** Report warnings, present partial results
 
----
+----
 
 ### Step 7: Present
 
@@ -219,7 +219,7 @@ What would you like to know?
 
 **Follow-ups:** Answer from cache, don't re-navigate
 
----
+----
 
 ## Error Handling
 
@@ -243,7 +243,7 @@ What would you like to know?
 - **Symptom:** Broken markdown
 - **Action:** `format_markdown.py` auto-fixes, report warnings
 
----
+----
 
 ## Examples
 
@@ -273,7 +273,7 @@ User: Extract docs for fake/repo-123
 ✓ Report error with alternatives
 ```
 
----
+----
 
 ## Best Practices
 
@@ -295,7 +295,7 @@ Partial: "Extracted content with warnings: {warnings}..."
 Failure: "Error: {specific issue}. Alternatives: {suggestions}"
 ```
 
----
+----
 
 ## Reference
 
@@ -328,7 +328,7 @@ python scripts/format_markdown.py input.json
 - `mcp__chrome-devtools__take_snapshot` - Get page structure
 - `mcp__chrome-devtools__evaluate_script` - Extract with JavaScript
 
----
+----
 
 ## Troubleshooting
 
@@ -349,7 +349,7 @@ python scripts/format_markdown.py input.json
 2. Cache for follow-ups
 3. Avoid incremental extraction
 
----
+----
 
 ## Limitations
 
@@ -367,7 +367,7 @@ python scripts/format_markdown.py input.json
 - Updates: Re-extract when needed
 - Interactive: Manual browser visit
 
----
+----
 
 ## Success Criteria
 
@@ -385,7 +385,7 @@ python scripts/format_markdown.py input.json
 - ✗ Page load timeout
 - ✗ No content (<100 chars)
 
----
+----
 
 ## Summary
 

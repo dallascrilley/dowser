@@ -4,10 +4,8 @@ description: >-
   Refactor with tests first, one change at a time, never mix refactoring with
   bug fixes or new features
 when_to_use: >-
-  Before refactoring any code. When improving structure/naming, extracting
-  methods/classes, code review requests changes, discovering bugs during
-  refactoring, tempted to "fix while I'm here", making multiple changes,
-  refactoring without tests, mixing behavior/structure changes, or scope creep.
+  Use before any refactor (rename, extract, restructure). If tempted to fix bugs
+  or add features while refactoring, stop and separate the work.
 version: 1.0.0
 languages: all
 category: coding

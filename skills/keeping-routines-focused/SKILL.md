@@ -4,10 +4,9 @@ description: >-
   Each routine does one thing and does it well - extract when routines have
   multiple responsibilities
 when_to_use: >-
-  When writing any function or method. When routine does multiple things,
-  description has "and" in it, routine is hard to name, longer than 200 lines,
-  parameter list exceeds 7, refactoring complex code, god function exists,
-  function does too much, tests are hard to write, mixed abstraction levels...
+  Use when writing or refactoring routines that do multiple things, are hard to
+  name/test, or mix abstraction levels. If the description includes "and",
+  extract.
 version: 1.0.0
 languages: all
 category: coding

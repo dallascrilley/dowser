@@ -10,10 +10,8 @@ description: >-
   logos or text slogans. Handles image resizing, text-to-image generation, and
   provides proper HTML meta tags.
 when_to_use: >-
-  Use when generating favicons and app icons for websites, creating social media
-  meta images (Open Graph), generating Facebook/Twitter/LinkedIn sharing images,
-  creating PWA icons, converting logos to web icons, generating emoji-based
-  favicons, creating text-based social images with branding...
+  Use when generating favicons, app/PWA icon sets, or social/Open Graph images
+  from logos or text, including sharing assets for major platforms.
 version: 1.0.0
 category: integrations-and-saas
 ---

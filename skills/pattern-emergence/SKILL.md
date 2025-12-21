@@ -13,10 +13,8 @@ description: >-
   emergence detection, diversity orchestration, tension-driven insights, and
   discovering unexpected patterns from agent collaboration.
 when_to_use: >-
-  Use when orchestrating diverse perspectives to detect emergent patterns,
-  synthesizing multi-agent insights from multiple agents, coordinating knowledge
-  synthesis from conflicting viewpoints, identifying meta-patterns across
-  diverse sources, managing productive tensions between perspectives...
+  Use when coordinating multiple perspectives or agents to synthesize insights,
+  manage productive tension, or detect meta-patterns across diverse sources.
 version: 1.0.0
 license: MIT
 category: meta

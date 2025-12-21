@@ -4,10 +4,9 @@ description: >-
   Hide implementation details behind interfaces - work at domain level (what),
   not implementation level (how)
 when_to_use: >-
-  Designing classes/interfaces, implementation details leak into public API,
-  storage format (JSON/SQL/files) exposed, working with raw data structures
-  instead of domain objects, client code must know HOW things work, changing
-  implementation breaks clients, database queries mixed with business logic.
+  Use when designing classes/APIs or refactoring where implementation details
+  leak into interfaces (storage formats, raw data, SQL/JSON). If changing
+  implementation breaks callers, apply this.
 version: 1.0.0
 languages: all
 category: architecture

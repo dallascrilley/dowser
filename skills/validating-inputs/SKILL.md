@@ -4,10 +4,8 @@ description: >-
   Check all external inputs for validity - garbage in, nothing out, never
   garbage out
 when_to_use: >-
-  Before implementing functions receiving external data. When writing functions
-  taking parameters from users, APIs, databases, files, or untrusted sources.
-  When seeing missing validation, no error handling, silent failures,
-  TypeError/ValueError/KeyError, crashes, security issues, or unexpected input.
+  Use when functions accept external or untrusted data (users, APIs, files, DB,
+  config). Apply if validation is missing or input-related errors appear.
 version: 1.0.0
 languages: all
 category: coding

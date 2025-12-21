@@ -1,5 +1,8 @@
 ---
 name: wordpress-management
+short_description: >-
+  Manage WordPress pages built with Visual Composer (WPBakery) using wp-cli plus
+  browser verification.
 description: >-
   Manage WordPress sites using Visual Composer (WPBakery) page builder. Use when
   updating WordPress pages, replacing images in team grids, editing Visual

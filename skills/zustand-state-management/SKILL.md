@@ -46,13 +46,8 @@ description: >
   sessionStorage, immer middleware, shallow equality, selector pattern, zustand
   v5
 when_to_use: >
-  Use when setting up global state in React, migrating from Redux/Context API,
-  implementing state persistence with localStorage,
-
-  configuring TypeScript with Zustand, using slices pattern, adding devtools
-  middleware, handling Next.js SSR hydration,
-
-  or encountering hydration/TypeScript issues.
+  Use when setting up or debugging Zustand in React/TypeScript: global state,
+  persistence, slices, devtools, or Next.js hydration issues.
 version: 1.0.0
 license: MIT
 category: coding

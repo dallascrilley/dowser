@@ -4,10 +4,9 @@ description: >-
   Interactive idea refinement using Socratic method to develop fully-formed
   designs
 when_to_use: >-
-  When your human partner says "I've got an idea", "Let's make/build/create", "I
-  want to implement/add", "What if we". When starting design for complex
-  feature, before writing implementation plans, or when idea needs refinement.
-  ACTIVATE AUTOMATICALLY when partner describes a feature/project idea.
+  Use when a user proposes a new idea or feature and needs refinement before
+  planning or coding. Start complex feature design by clarifying goals,
+  constraints, and options.
 version: 2.0.0
 category: collaboration
 ---
