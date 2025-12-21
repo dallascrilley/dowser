@@ -15,7 +15,14 @@ try {
   hasBetterSqlite3 = false;
 }
 
-const describeWithBetterSqlite3 = hasBetterSqlite3 ? describe : describe.skip;
+let hasSqliteVec = true;
+try {
+  require('sqlite-vec');
+} catch {
+  hasSqliteVec = false;
+}
+
+const describeWithBetterSqlite3 = (hasBetterSqlite3 && hasSqliteVec) ? describe : describe.skip;
 
 describeWithBetterSqlite3('database migration', () => {
   const testDir = path.join(os.tmpdir(), 'db-migration-test-' + Date.now());

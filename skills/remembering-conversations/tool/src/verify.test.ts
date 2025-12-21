@@ -16,7 +16,14 @@ try {
   hasBetterSqlite3 = false;
 }
 
-const describeWithBetterSqlite3 = hasBetterSqlite3 ? describe : describe.skip;
+let hasSqliteVec = true;
+try {
+  require('sqlite-vec');
+} catch {
+  hasSqliteVec = false;
+}
+
+const describeWithBetterSqlite3 = (hasBetterSqlite3 && hasSqliteVec) ? describe : describe.skip;
 
 describeWithBetterSqlite3('verifyIndex', () => {
   const testDir = path.join(os.tmpdir(), 'conversation-search-test-' + Date.now());

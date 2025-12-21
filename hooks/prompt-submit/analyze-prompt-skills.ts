@@ -320,15 +320,29 @@ async function scoreSkillsWithEmbeddings(skills: Skill[], query: string): Promis
 }
 
 function cosineSimilarity(a: number[], b: number[]): number {
+  if (!a?.length || !b?.length) return 0;
+
+  const len = Math.min(a.length, b.length);
+  if (len === 0) return 0;
+
   let dotProduct = 0;
   let normA = 0;
   let normB = 0;
-  for (let i = 0; i < a.length; i++) {
+  for (let i = 0; i < len; i++) {
     dotProduct += a[i] * b[i];
     normA += a[i] * a[i];
     normB += b[i] * b[i];
   }
-  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+
+  if (normA === 0 || normB === 0) return 0;
+
+  const denom = Math.sqrt(normA) * Math.sqrt(normB);
+  if (denom === 0) return 0;
+
+  const similarity = dotProduct / denom;
+  if (!Number.isFinite(similarity)) return 0;
+
+  return Math.max(-1, Math.min(1, similarity));
 }
 
 function isPaiSkillsSkill(skill: Skill): boolean {
@@ -824,8 +838,7 @@ function checkGapNotification(): string | null {
       .map(([query, count]) => `  • "${query}" (${count}x)`) 
       .join('\n');
 
-    return `\n⚠️ **Skill Gap Analysis** (${totalGaps} low-relevance queries detected)\n\nTop queries without good skill matches:\n${gapList}\n\nConsider creating skills for these topics. Run 
-bun run scripts/view-metrics.ts --gaps\` for full list.`;
+    return `\n⚠️ **Skill Gap Analysis** (${totalGaps} low-relevance queries detected)\n\nTop queries without good skill matches:\n${gapList}\n\nConsider creating skills for these topics. Run \`bun run scripts/view-metrics.ts --gaps\` for full list.`;
   } catch {
     return null;
   }
