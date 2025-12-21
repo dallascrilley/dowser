@@ -1329,25 +1329,53 @@
       "type": "domain",
       "enforcement": "suggest",
       "priority": "medium",
-      "description": "Facilitates creative ideation, divergence, and idea clustering sessions.",
+      "description": "Triggers for creative thinking, ideation workflows, and alternative generation activities.",
       "promptTriggers": {
         "keywords": [
           "brainstorm",
+          "brainstorming",
+          "ideation",
           "idea generation",
-          "ideation session"
+          "ideate",
+          "ideating",
+          "generate alternatives",
+          "explore options",
+          "what if",
+          "divergent thinking",
+          "blue sky thinking",
+          "possibilities",
+          "creative session",
+          "ideation workshop",
+          "mind mapping",
+          "think outside the box",
+          "conceptualize",
+          "novel ideas",
+          "creative exploration",
+          "lateral thinking",
+          "innovation session"
         ],
         "intentPatterns": [
-          "(brainstorm|ideate|generate).*?ideas",
-          "(explore|diverge).*?concepts"
+          "(brainstorm|ideate|conceptualize).*?(ideas|concepts|solutions|approaches)",
+          "(explore|diverge|generate).*?(alternatives|options|possibilities|scenarios)",
+          "(what\\s+if|imagine|envision|visualize).*?(scenario|solution|approach|future)",
+          "(blue\\s+sky|think.*?outside.*?box|divergent\\s+thinking|lateral\\s+thinking)",
+          "(creative\\s+session|ideation\\s+workshop|mind\\s+mapping|brainstorm\\s+session)",
+          "(generate|brainstorm).*?(multiple|various|different).*(alternatives|possibilities|approaches)",
+          "(problem.*?solving|creative\\s+thinking|innovative|novel\\s+approach)",
+          "(idea\\s+generation|innovation|creative\\s+exploration|possibilities\\s+space)"
         ]
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/brainstorming/**"
+          "**/brainstorm*.md",
+          "**/ideas.*",
+          "**/ideation*.md",
+          "**/creative*.md"
         ],
         "contentPatterns": [
           "divergent thinking",
-          "creative prompts"
+          "creative prompts",
+          "brainstorming session"
         ]
       }
     },
@@ -1600,24 +1628,54 @@
       "type": "domain",
       "enforcement": "suggest",
       "priority": "high",
-      "description": "Applies structured debugging loops, instrumentation, and hypothesis tracking.",
+      "description": "Structured, methodical approach to debugging that prioritizes root cause analysis over trial-and-error. Emphasizes reproducibility, hypothesis tracking, instrumentation, and systematic elimination of variables.",
       "promptTriggers": {
         "keywords": [
           "systematic debugging",
-          "debug checklist"
+          "debug checklist",
+          "methodical debugging",
+          "step by step debugging",
+          "trace execution",
+          "reproduce bug",
+          "isolate variable",
+          "binary search debugging",
+          "hypothesis tracking",
+          "instrumentation",
+          "root cause analysis",
+          "debug workflow",
+          "structured debugging",
+          "verify hypothesis",
+          "narrow down problem",
+          "wild guess",
+          "random changes",
+          "shotgun debugging"
         ],
         "intentPatterns": [
-          "(debug|diagnose).*?systematically",
-          "(apply).*?debug checklist"
+          "(debug|diagnose|troubleshoot).*?systematically",
+          "(apply|follow).*?(debug checklist|debug workflow)",
+          "(trace|instrument|log).*?(execution|code|flow)",
+          "(reproduce|isolate|narrow down).*?(bug|issue|problem|error)",
+          "(binary search|hypothesis|verify).*?(debug|troubleshoot|diagnose)",
+          "avoid.*(wild guess|random changes|shotgun debug|trial.?and.?error)",
+          "(step by step|methodical|structured).*?(debug|diagnose|troubleshoot)",
+          "root cause.*(analysis|investigation|debugging)"
         ]
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/systematic-debugging/**"
+          "**/*.test.ts",
+          "**/*.test.js",
+          "**/*.test.py",
+          "**/debug/**",
+          "**/*debug*.ts",
+          "**/*debug*.js",
+          "**/*debug*.py"
         ],
         "contentPatterns": [
           "debug loop",
-          "instrumentation plan"
+          "instrumentation plan",
+          "root cause",
+          "hypothesis"
         ]
       }
     },
@@ -3257,6 +3315,1218 @@
           "guard clause",
           "early return",
           "nested"
+        ]
+      }
+    },
+    "naming-variables": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Guidelines for choosing clear, descriptive variable names.",
+      "promptTriggers": {
+        "keywords": [
+          "variable naming",
+          "naming conventions",
+          "variable name",
+          "meaningful names",
+          "clear naming",
+          "descriptive names"
+        ],
+        "intentPatterns": [
+          "(name|rename).*?(variable|function|method)",
+          "(improve|clarify).*?(naming|name)",
+          "(choose|select).*?variable.*?name"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/naming-variables/**"
+        ],
+        "contentPatterns": [
+          "variable name",
+          "naming"
+        ]
+      }
+    },
+    "encapsulating-complexity": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Hiding implementation details behind clear interfaces.",
+      "promptTriggers": {
+        "keywords": [
+          "encapsulation",
+          "hide implementation",
+          "abstraction layer",
+          "interface design",
+          "private methods"
+        ],
+        "intentPatterns": [
+          "(encapsulate|hide).*?(implementation|details)",
+          "(create|design).*?(interface|abstraction)",
+          "(expose|provide).*?(minimal|clean).*?interface"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/encapsulating-complexity/**"
+        ],
+        "contentPatterns": [
+          "encapsulation",
+          "private"
+        ]
+      }
+    },
+    "maintaining-consistent-abstractions": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Keeping abstraction levels consistent throughout code.",
+      "promptTriggers": {
+        "keywords": [
+          "abstraction level",
+          "consistent abstraction",
+          "mixing levels",
+          "abstraction leakage"
+        ],
+        "intentPatterns": [
+          "(maintain|keep).*?(consistent|same).*?abstraction",
+          "(avoid|prevent).*?mixing.*?levels",
+          "(leak|expose).*?implementation.*?details"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/maintaining-consistent-abstractions/**"
+        ],
+        "contentPatterns": [
+          "abstraction"
+        ]
+      }
+    },
+    "commenting-intent": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Writing comments that explain intent rather than mechanics.",
+      "promptTriggers": {
+        "keywords": [
+          "comment",
+          "commenting",
+          "documentation",
+          "explain intent",
+          "why not what"
+        ],
+        "intentPatterns": [
+          "(write|add).*?comment",
+          "(explain|document).*?(intent|purpose|why)",
+          "(improve|add).*?documentation"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/commenting-intent/**"
+        ],
+        "contentPatterns": [
+          "comment",
+          "//"
+        ]
+      }
+    },
+    "writing-evergreen-comments": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Writing comments that remain valid as code evolves.",
+      "promptTriggers": {
+        "keywords": [
+          "evergreen comments",
+          "comment maintenance",
+          "outdated comments",
+          "stale documentation"
+        ],
+        "intentPatterns": [
+          "(write|maintain).*?evergreen.*?comment",
+          "(avoid|prevent).*?(outdated|stale).*?comment",
+          "(keep).*?comment.*?(current|up.to.date)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/writing-evergreen-comments/**"
+        ],
+        "contentPatterns": [
+          "evergreen"
+        ]
+      }
+    },
+    "domain-focused-naming": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Using domain-specific terminology in names for clarity.",
+      "promptTriggers": {
+        "keywords": [
+          "domain naming",
+          "domain-specific",
+          "ubiquitous language",
+          "business terms"
+        ],
+        "intentPatterns": [
+          "(use|apply).*?domain.*?(naming|language)",
+          "(reflect|express).*?business.*?(concept|term)",
+          "(align).*?(naming|terminology).*?domain"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/domain-focused-naming/**"
+        ],
+        "contentPatterns": [
+          "domain"
+        ]
+      }
+    },
+    "receiving-code-review": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Best practices for receiving and responding to code review feedback.",
+      "promptTriggers": {
+        "keywords": [
+          "code review feedback",
+          "receive feedback",
+          "review comments",
+          "responding to review"
+        ],
+        "intentPatterns": [
+          "(receive|get).*?code.*?review",
+          "(respond to|address).*?review.*?feedback",
+          "(handle|process).*?reviewer.*?comments"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/receiving-code-review/**"
+        ],
+        "contentPatterns": [
+          "code review"
+        ]
+      }
+    },
+    "requesting-code-review": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Strategies for requesting effective code reviews from peers.",
+      "promptTriggers": {
+        "keywords": [
+          "request code review",
+          "asking for review",
+          "code review request",
+          "peer review"
+        ],
+        "intentPatterns": [
+          "(request|ask for).*?code.*?review",
+          "(prepare).*?(for|to).*?code.*?review",
+          "(submit).*?(pr|pull request).*?review"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/requesting-code-review/**"
+        ],
+        "contentPatterns": [
+          "code review"
+        ]
+      }
+    },
+    "testing-anti-patterns": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Identifying and fixing flaky, slow, and fragile test patterns.",
+      "promptTriggers": {
+        "keywords": [
+          "testing anti-patterns",
+          "flaky tests",
+          "test smell",
+          "brittle tests",
+          "slow tests"
+        ],
+        "intentPatterns": [
+          "(identify|find).*?testing.*?anti.pattern",
+          "(fix|improve).*?(flaky|slow|brittle).*?test",
+          "(detect|recognize).*?test.*?smell"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/testing-anti-patterns/**"
+        ],
+        "contentPatterns": [
+          "anti-pattern",
+          "flaky"
+        ]
+      }
+    },
+    "executing-plans": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Systematically executing plans with proper tracking and completion verification.",
+      "promptTriggers": {
+        "keywords": [
+          "execute plan",
+          "executing plan",
+          "follow plan",
+          "plan execution",
+          "track progress"
+        ],
+        "intentPatterns": [
+          "(execute|follow).*?plan",
+          "(track|monitor).*?progress",
+          "(complete|finish).*?plan.*?(tasks|items)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/executing-plans/**"
+        ],
+        "contentPatterns": [
+          "execute",
+          "plan"
+        ]
+      }
+    },
+    "react-hook-form-zod": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Form state management and validation using React Hook Form with Zod schema validation. Detects form-related code patterns and provides guidance on best practices for building type-safe, validated forms with proper error handling.",
+      "promptTriggers": {
+        "keywords": [
+          "react-hook-form",
+          "rhf",
+          "zod",
+          "form validation",
+          "form errors",
+          "form state management",
+          "validation issues",
+          "input validation",
+          "uncontrolled inputs",
+          "no validation",
+          "manual validation",
+          "schema validation",
+          "controlled inputs",
+          "typescript forms",
+          "form submission"
+        ],
+        "intentPatterns": [
+          "(setup|initialize|create).*?(form|schema|validation)",
+          "(fix|handle|manage).*?(form errors|validation errors|input state)",
+          "(validate|implement).*?(form|input|submission)",
+          "(refactor|improve).*?(form|validation|error handling)",
+          "(build|implement).*?(form.*?validation|validated form|type-safe form)",
+          "(debug|troubleshoot).*?(form state|validation|form errors)",
+          "(prevent|avoid).*?(uncontrolled inputs|validation issues|form bugs)",
+          "(migrate|convert).*?(form.*?validation|unvalidated form)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/form*.ts*",
+          "**/schema*.ts*",
+          "**/*form*.tsx?",
+          "**/validation*.ts*",
+          "**/*.schema.ts",
+          "**/*hook*.ts*"
+        ],
+        "contentPatterns": [
+          "useForm",
+          "FormProvider",
+          "zodResolver",
+          "from.*?[\"']zod[\"']",
+          "useFormContext",
+          "<Controller",
+          "useWatch",
+          "useFieldArray"
+        ]
+      }
+    },
+    "dispatching-parallel-agents": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Orchestrate multiple specialized subagents for concurrent task execution to improve throughput, reduce latency, and parallelize independent work streams. Use when work can be decomposed into concurrent branches.",
+      "promptTriggers": {
+        "keywords": [
+          "parallel agents",
+          "concurrent tasks",
+          "task dispatch",
+          "subagent orchestration",
+          "parallel execution",
+          "async agents",
+          "batch operations",
+          "concurrent processing",
+          "agent pooling",
+          "workload distribution",
+          "task queueing",
+          "multi-agent execution",
+          "parallel workflows",
+          "task scheduling",
+          "concurrent dispatch"
+        ],
+        "intentPatterns": [
+          "(dispatch|launch|run).*?(multiple|several|parallel|concurrent).*?(agent|subagent)",
+          "(speed up|optimize|accelerate).*?(execution|processing|performance).*?(parallel|concurrent)",
+          "(multiple|batch).*?(agent|subagent).*?(simultaneously|in parallel|concurrently)",
+          "(parallel|concurrent).*?(processing|execution|work).*?(across|with).*?(agent|subagent)",
+          "execute.*?(task|work).*?parallel.*?(agent|subagent)",
+          "(improve|reduce).*?(latency|throughput).*?(parallel|concurrent).*?(agent|subagent)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/subagent*.ts",
+          "**/parallel*.ts",
+          "**/dispatch*.ts",
+          "**/concurrent*.ts",
+          "**/orchestrat*.ts",
+          "**/task-pool*.ts",
+          "**/agent-pool*.ts"
+        ],
+        "contentPatterns": [
+          "Promise.all",
+          "Promise.allSettled",
+          "Promise.race",
+          "subagent.*?spawn",
+          "spawn.*?subagent",
+          "concurrent.*?execution",
+          "parallel.*?execution",
+          "task.*?queue",
+          "work.*?queue"
+        ]
+      }
+    },
+    "subagent-driven-development": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Delegate specialized work to autonomous subagents with clear ownership, expertise boundaries, and milestone-based handoffs. Use when a task is too large for one context, requires specialized expertise, or benefits from isolated execution environments.",
+      "promptTriggers": {
+        "keywords": [
+          "subagent ownership",
+          "task delegation",
+          "milestone handoff",
+          "distributed work",
+          "agent coordination",
+          "task decomposition",
+          "ownership transfer",
+          "subagent specialization",
+          "work assignment",
+          "parallel development",
+          "agent collaboration",
+          "milestone tracking",
+          "task ownership",
+          "decentralized work",
+          "agent autonomy"
+        ],
+        "intentPatterns": [
+          "(delegate|assign|hand off).*?(to|with).*?(subagent|agent|specialist)",
+          "(break down|decompose|split).*?(task|work|project).*?(for|across).*?(subagent|agent)",
+          "(milestone|ownership|responsibility).*?(to|for).*?(subagent|agent)",
+          "(specialize|expert|specialization).*?(subagent|agent).*?(for|in)",
+          "(autonomous|independent).*?(subagent|agent).*?(for|to|handle)",
+          "(divide|distribute).*?(work|task).*?(among|across).*?(subagent|agent)",
+          "(spin up|create|launch).*?(subagent|agent).*?(for|to)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/handoff*.md",
+          "**/delegation*.ts",
+          "**/subagent*.ts",
+          "**/specialist*.ts",
+          "**/ownership*.ts",
+          "**/milestone*.ts",
+          "**/.claude/handoffs/*"
+        ],
+        "contentPatterns": [
+          "subagent",
+          "sub-agent",
+          "delegate",
+          "delegation",
+          "handoff",
+          "hand-off",
+          "ownership",
+          "milestone",
+          "specialized.*?agent",
+          "agent.*?specialist",
+          "autonomous.*?agent"
+        ]
+      }
+    },
+    "testing-skills-with-subagents": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Validates skills by deploying test subagents under pressure scenarios, edge cases, and regression conditions before production use. Ensures skill reliability, baseline behavior correctness, and resilience under load.",
+      "promptTriggers": {
+        "keywords": [
+          "skill testing",
+          "subagent testing",
+          "pressure testing",
+          "skill validation",
+          "untested skill",
+          "skill not working",
+          "skill fails in production",
+          "skill errors",
+          "deploy without testing",
+          "skip validation",
+          "assume it works",
+          "baseline behavior",
+          "stress test",
+          "edge cases",
+          "regression testing"
+        ],
+        "intentPatterns": [
+          "(test|validate|verify).*?(skill).*?(subagent|agent)",
+          "(pressure|stress).*?(test).*?(skill)",
+          "(before|prior).*?(deploy|ship|production).*?(skill)",
+          "(skill).*?(work|function|execute).*?(correctly|properly|reliably)",
+          "(test).*?(skill).*?(before|prior).*?(production|deploy)",
+          "(validate|verify).*?(skill).*?(edge case|regression|boundary)",
+          "(subagent).*?(test|validate).*?(skill)",
+          "(skill).*?(broken|fail|error).*?(subagent|deployment)"
+        ]
+      }
+    },
+    "writing-plans": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Create structured implementation plans with clear tasks, acceptance criteria, and verification steps. Transforms vague requirements into executable specifications with measurable success criteria and scoped deliverables.",
+      "promptTriggers": {
+        "keywords": [
+          "writing plans",
+          "implementation plan",
+          "project plan",
+          "task planning",
+          "no clear direction",
+          "unstructured work",
+          "need roadmap",
+          "overwhelmed by scope",
+          "winging it",
+          "ad-hoc",
+          "no plan",
+          "jumping in",
+          "acceptance criteria",
+          "verification steps",
+          "task breakdown",
+          "milestones",
+          "scope management"
+        ],
+        "intentPatterns": [
+          "(write|create|draft).*?(plan|roadmap|specification)",
+          "(break down|decompose|structure).*?(task|work|project)",
+          "(need|want).*?(plan|direction|roadmap)",
+          "(how to|what).*?(approach|tackle|start).*?(project|feature)",
+          "(organize|plan|structure).*?(work|tasks|implementation)",
+          "(create|write).*?(acceptance criteria|verification|requirements)",
+          "(scope|estimate|break down).*?(feature|work)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/plans/**",
+          "**/*plan*.md",
+          "**/PLAN.md",
+          "**/.claude/plans/**",
+          "**/docs/plans/**"
+        ],
+        "contentPatterns": [
+          "## Tasks",
+          "## Objective",
+          "Acceptance Criteria",
+          "Verification",
+          "Success Criteria",
+          "Task breakdown",
+          "Proving command"
+        ]
+      }
+    },
+    "security-assessment": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Conduct security audits, identify vulnerabilities, assess risks, and recommend mitigations. Triggers when security assessment, vulnerability detection, or threat modeling is needed.",
+      "promptTriggers": {
+        "keywords": [
+          "security assessment",
+          "security audit",
+          "vulnerability assessment",
+          "penetration testing",
+          "security concerns",
+          "potential vulnerability",
+          "need security review",
+          "data exposure risk",
+          "insecure code",
+          "no security checks",
+          "skip security review",
+          "OWASP",
+          "threat model",
+          "CVE",
+          "attack surface"
+        ],
+        "intentPatterns": [
+          "(assess|audit|review|check).*?(security|vulnerability|risk)",
+          "(find|identify|detect).*?(vulnerability|security.*?issue|weakness)",
+          "(secure|harden|protect).*?(application|system|code)",
+          "(OWASP|threat|attack).*?(model|surface|vector)",
+          "(penetration|pen).*?(test|testing)",
+          "(security|threat).*?(posture|assessment|audit)",
+          "(vulnerability|risk).*?(assessment|analysis)",
+          "(insecure|unsafe).*?(code|pattern|practice)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/security/**",
+          "**/*auth*.ts",
+          "**/*auth*.py",
+          "**/*auth*.go",
+          "**/*auth*.rs",
+          "**/*security*.md",
+          "**/*security*.ts",
+          "**/security-*.ts"
+        ],
+        "contentPatterns": [
+          "OWASP",
+          "vulnerability",
+          "CVE-",
+          "security audit",
+          "penetration test",
+          "threat model",
+          "attack surface",
+          "insecure",
+          "security posture",
+          "vulnerability scan"
+        ]
+      }
+    },
+    "linear-github-sync": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Skill for setting up and managing bidirectional synchronization between Linear and GitHub issues. Handles webhook configuration, issue tracking integration, and cross-platform project management.",
+      "promptTriggers": {
+        "keywords": [
+          "linear",
+          "github",
+          "sync",
+          "issue sync",
+          "bidirectional sync",
+          "issue tracking",
+          "project management",
+          "webhook",
+          "integration",
+          "linear-github"
+        ],
+        "intentPatterns": [
+          "(setup|configure|create|install).*?(sync|integration|webhook)",
+          "(sync|synchronize|integrate).*?(linear|github|issues)",
+          "(configure|manage|update).*?(webhook|integration|synchronization)",
+          "(bidirectional|two-way).*?(sync|synchronization)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/linear/**",
+          "**/.linear/**",
+          "**/github-sync/**",
+          "**/integrations/**",
+          "**/sync-config/**"
+        ],
+        "contentPatterns": [
+          "linear.*api",
+          "github.*api",
+          "webhook",
+          "synchronization",
+          "issue.*sync"
+        ]
+      }
+    },
+    "linear-cli-linctl": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Skill for using linctl, the Linear CLI tool for managing issues, projects, and tasks from the command line. Provides guidance for running linctl commands, configuring the Linear CLI, and automating issue management workflows.",
+      "promptTriggers": {
+        "keywords": [
+          "linctl",
+          "linear cli",
+          "linear command line",
+          "issue management",
+          "command line linear",
+          "cli tool",
+          "linear api",
+          "issue commands",
+          "project commands",
+          "task automation"
+        ],
+        "intentPatterns": [
+          "(run|execute|use).*?(linctl|linear command)",
+          "(manage|create|update|delete).*?(issues|tasks|projects)",
+          "(configure|setup|install).*?(linctl|linear cli)",
+          "(query|list|search).*?(issues|projects|tasks)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/.linctl/**",
+          "**/linctl.config.*",
+          "**/linctl-config.*"
+        ],
+        "contentPatterns": [
+          "linctl issue",
+          "linctl project",
+          "linctl team",
+          "linctl workflow"
+        ]
+      }
+    },
+    "airtable-manager": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Manages Airtable bases, tables, records, and schemas. Provides guidance for working with the Airtable API, automating table workflows, and integrating Airtable as a database solution in applications.",
+      "promptTriggers": {
+        "keywords": [
+          "airtable",
+          "airtable api",
+          "airtable base",
+          "database management",
+          "spreadsheet database",
+          "no-code database",
+          "airtable sdk",
+          "record management",
+          "base schema",
+          "table automation"
+        ],
+        "intentPatterns": [
+          "(create|add|update|modify|delete).*?(record|table|base|field)",
+          "(connect|integrate|configure|setup).*?(airtable|base)",
+          "(automate|workflow|sync).*?(airtable|record|table)",
+          "(query|fetch|retrieve|read).*?(record|table|base)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/airtable/**",
+          "**/*airtable*.js",
+          "**/*airtable*.ts",
+          "**/config/*airtable*",
+          "**/.env*"
+        ],
+        "contentPatterns": [
+          "AIRTABLE_API_KEY",
+          "AIRTABLE_BASE_ID",
+          "airtable",
+          "new Airtable",
+          "from 'airtable'"
+        ]
+      }
+    },
+    "vmix-production-manager": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Handles vMix live production workflows including video switching, input management, streaming outputs, and broadcast production. Provides guidance for controlling vMix via HTTP API, managing overlays, and configuring streaming sources.",
+      "promptTriggers": {
+        "keywords": [
+          "vmix",
+          "vmix api",
+          "live production",
+          "video switching",
+          "live streaming",
+          "broadcast production",
+          "vmix http api",
+          "input management",
+          "overlay",
+          "streaming output"
+        ],
+        "intentPatterns": [
+          "(control|manage|configure|set).*?(vmix|video|stream|output)",
+          "(switch|transition|mix).*?(input|video|source|camera)",
+          "(start|stop|enable|disable).*?(streaming|output|broadcast)",
+          "(create|add|manage).*?(overlay|input|layer)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/vmix/**",
+          "**/*.vmix"
+        ],
+        "contentPatterns": [
+          "vmix.*api",
+          "vmix.*http",
+          "vmix.*control"
+        ]
+      }
+    },
+    "pandadoc-sales-manager": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Manages PandaDoc API integration for sales document workflows including proposal generation, contract management, and e-signature automation. Handles document templates, quote generation, and automated sales document creation.",
+      "promptTriggers": {
+        "keywords": [
+          "pandadoc",
+          "pandadoc api",
+          "document automation",
+          "proposal generation",
+          "contract management",
+          "e-signature",
+          "document templates",
+          "pandadoc sdk",
+          "sales documents",
+          "quote generation"
+        ],
+        "intentPatterns": [
+          "(setup|configure|integrate|use).*?(pandadoc|api)",
+          "(create|generate|send|manage).*?(proposal|document|contract|quote)",
+          "(implement|set|enable|configure).*?(e-signature|signing|esign)",
+          "(build|create|template).*?(pandadoc|document)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/pandadoc/**",
+          "**/*pandadoc*.ts",
+          "**/*pandadoc*.js"
+        ],
+        "contentPatterns": [
+          "PandaDoc API",
+          "pandadoc",
+          "document template",
+          "e-signature"
+        ]
+      }
+    },
+    "tailwind-v4-shadcn": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Tailwind CSS v4 and shadcn/ui component library integration. Handles component creation, theming, dark mode, CSS variables, and design system patterns.",
+      "promptTriggers": {
+        "keywords": [
+          "tailwind v4",
+          "tailwindcss 4",
+          "shadcn/ui",
+          "shadcn",
+          "component system",
+          "design system",
+          "styling",
+          "CSS variables",
+          "@theme",
+          "dark mode",
+          "component variants",
+          "class composition"
+        ],
+        "intentPatterns": [
+          "(create|build|add|generate).*?(component|widget|ui element)",
+          "(style|customize|theme|configure).*?(component|design system|colors)",
+          "(integrate|setup|implement).*?(tailwind|shadcn|dark mode)",
+          "(fix|debug|troubleshoot).*?(styling|component|variant|theme)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/components/ui/**",
+          "tailwind.config.*",
+          "**/styles/**",
+          "**/*.module.css",
+          "globals.css"
+        ],
+        "contentPatterns": [
+          "@theme",
+          "shadcn",
+          "cn(",
+          "CSS variable",
+          "dark:",
+          "group-dark:"
+        ]
+      }
+    },
+    "slack-gif-creator": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Helps with creating, managing, and sharing animated GIFs through Slack integrations. Covers Slack API integration, GIF creation, reaction GIFs, and automated messaging with animated images.",
+      "promptTriggers": {
+        "keywords": [
+          "slack",
+          "gif",
+          "slack gif",
+          "giphy",
+          "messaging",
+          "reaction gif",
+          "slack api",
+          "gif creation"
+        ],
+        "intentPatterns": [
+          "(create|generate|make).*?(slack gif|gif|animated image)",
+          "(send|post|share).*?(gif|reaction gif|animated|message)",
+          "(automate|build|integrate).*?(slack gif creation|slack api|gif automation)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/slack/**"
+        ],
+        "contentPatterns": [
+          "slack webhook",
+          "gif"
+        ]
+      }
+    },
+    "internal-comms": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Detects requests for internal communication, team updates, and organizational announcements.",
+      "promptTriggers": {
+        "keywords": [
+          "internal communication",
+          "team updates",
+          "announcements",
+          "company news",
+          "employee communication",
+          "org updates",
+          "newsletter",
+          "intranet"
+        ],
+        "intentPatterns": [
+          "(create|write|draft).*?(announcement|communication|message)",
+          "(send|distribute|post).*?(update|news|bulletin)",
+          "(prepare|organize|schedule).*?(all-hands|town hall|broadcast)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/communications/**",
+          "**/announcements/**"
+        ],
+        "contentPatterns": [
+          "announcement",
+          "team update"
+        ]
+      }
+    },
+    "brand-guidelines": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Assists with creating, maintaining, and documenting brand guidelines, style guides, and design systems to ensure visual and brand consistency across products.",
+      "promptTriggers": {
+        "keywords": [
+          "brand guidelines",
+          "style guide",
+          "brand identity",
+          "brand consistency",
+          "logo usage",
+          "color palette",
+          "typography",
+          "design tokens"
+        ],
+        "intentPatterns": [
+          "(create|design).*?(brand|style|design)",
+          "(define|establish).*?(color|typography|guidelines)",
+          "(document|maintain).*?(brand consistency|logo|asset)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/brand/**",
+          "**/style-guide/**",
+          "**/design-system/**",
+          "**/branding/**"
+        ],
+        "contentPatterns": [
+          "brand",
+          "logo",
+          "color palette",
+          "typography",
+          "design tokens"
+        ]
+      }
+    },
+    "canvas-design": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Handles canvas-based design work including wireframing, whiteboarding, sketching, and drawing. Supports visual design planning, diagram creation, and canvas API implementations.",
+      "promptTriggers": {
+        "keywords": [
+          "canvas",
+          "whiteboard",
+          "sketching",
+          "wireframe",
+          "visual design",
+          "canvas api",
+          "drawing",
+          "diagram"
+        ],
+        "intentPatterns": [
+          "(create|build|design).*?(canvas|whiteboard|sketch)",
+          "(draw|sketch|wireframe).*?(ui|layout|design)",
+          "(visualize|map|layout).*?(component|page|interface)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/canvas/**",
+          "**/wireframes/**",
+          "**/sketches/**",
+          "**/design/**"
+        ],
+        "contentPatterns": [
+          "canvas",
+          "sketch",
+          "wireframe",
+          "drawing",
+          "whiteboard",
+          "diagram"
+        ]
+      }
+    },
+    "user-research-methods": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Guidance for conducting user research, interviews, testing, and analysis to inform product decisions and understand user needs, behaviors, and pain points.",
+      "promptTriggers": {
+        "keywords": [
+          "user research",
+          "usability testing",
+          "user interviews",
+          "understand users",
+          "user feedback",
+          "user needs",
+          "personas",
+          "user journey",
+          "A/B testing",
+          "surveys"
+        ],
+        "intentPatterns": [
+          "(conduct|perform|run).*?(user research|usability testing|interviews)",
+          "(create|develop|build).*?(personas|user journeys|user flows)",
+          "(analyze|gather|collect).*?(user feedback|user needs|survey results)",
+          "(understand|identify|discover).*?(user behavior|user pain points|user requirements)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/research/**",
+          "**/user-research/**"
+        ],
+        "contentPatterns": [
+          "persona",
+          "user journey",
+          "interview"
+        ]
+      }
+    },
+    "wp-rest-api": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Guidance for WordPress REST API development, custom endpoints, API authentication, and headless WordPress patterns.",
+      "promptTriggers": {
+        "keywords": [
+          "WordPress REST API",
+          "wp-json",
+          "WP API",
+          "REST endpoints",
+          "headless WordPress",
+          "custom endpoints",
+          "API authentication",
+          "register_rest_route",
+          "WP_REST_Controller",
+          "JWT"
+        ],
+        "intentPatterns": [
+          "(create|build|implement).*?(rest|api).*?(endpoint|route)",
+          "(register|add).*?(api|rest).*?(authentication|security)",
+          "(extend|customize).*?wordpress.*?api",
+          "(develop|set up).*?(headless|decoupled).*?wordpress"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/wp-content/**",
+          "**/*rest*.php",
+          "**/*api*.php"
+        ],
+        "contentPatterns": [
+          "register_rest_route",
+          "WP_REST_Controller",
+          "rest_api_init"
+        ]
+      }
+    },
+    "wordpress-management": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Handles WordPress site management, plugin development, theme customization, and WordPress-specific development patterns including hooks, actions, filters, and wp-cli operations.",
+      "promptTriggers": {
+        "keywords": [
+          "WordPress",
+          "WP",
+          "CMS",
+          "WordPress admin",
+          "plugin management",
+          "theme customization",
+          "site management",
+          "wp-cli",
+          "WordPress hooks",
+          "filters"
+        ],
+        "intentPatterns": [
+          "(create|add|install).*?(plugin|theme|widget)",
+          "(configure|customize|modify).*?(theme|plugin|setting)",
+          "(manage|handle|implement).*?(hook|action|filter)",
+          "(debug|troubleshoot).*?(plugin|theme|compatibility)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/wp-content/**",
+          "**/themes/**",
+          "**/plugins/**"
+        ],
+        "contentPatterns": [
+          "add_action",
+          "add_filter",
+          "wp_"
+        ]
+      }
+    },
+    "using-git-worktrees": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Detects when users are working with git worktrees to manage multiple checked-out branches simultaneously without switching contexts, enabling parallel development workflows.",
+      "promptTriggers": {
+        "keywords": [
+          "git worktree",
+          "worktrees",
+          "git worktree add",
+          "parallel branches",
+          "multiple checkouts",
+          "simultaneous work",
+          "worktree management",
+          "worktree list",
+          "worktree remove",
+          "branch isolation"
+        ],
+        "intentPatterns": [
+          "(add|create).*?(worktree|checkout)",
+          "(list|view|show).*?(worktrees|trees)",
+          "(remove|delete|prune).*?(worktree|trees)",
+          "(switch|navigate).*?(multiple|parallel).*(branches|checkouts|worktrees)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/.git/worktrees/**"
+        ],
+        "contentPatterns": [
+          "git worktree",
+          "worktree add",
+          "worktree list",
+          "worktree remove"
+        ]
+      }
+    },
+    "finishing-a-development-branch": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Assists with finalizing development branches by providing guidance on merging, rebasing, squashing commits, cleaning up branches, and preparing code for integration.",
+      "promptTriggers": {
+        "keywords": [
+          "finish branch",
+          "merge branch",
+          "branch cleanup",
+          "landing code",
+          "PR ready",
+          "branch complete",
+          "git merge",
+          "rebase",
+          "squash commits",
+          "branch delete"
+        ],
+        "intentPatterns": [
+          "(finish|complete|wrap.*up).*?(branch|work|development)",
+          "(merge|rebase|squash).*?(code|commits|branch|changes)",
+          "(clean.*up|delete|remove).*?(branch|development|local)",
+          "(land|push|ready).*?(code|changes|pull.*request|merge)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/.git/**",
+          "**/.github/**"
+        ],
+        "contentPatterns": [
+          "merge",
+          "rebase",
+          "squash"
+        ]
+      }
+    },
+    "homeassistant-dev": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "description": "Home Assistant smart home configuration, automation, and custom component development. Assists with YAML configuration, entity setup, automation rules, and Lovelace dashboard design.",
+      "promptTriggers": {
+        "keywords": [
+          "Home Assistant",
+          "HASS",
+          "home automation",
+          "smart home",
+          "device integration",
+          "automation rules",
+          "YAML config",
+          "custom components",
+          "Lovelace",
+          "MQTT"
+        ],
+        "intentPatterns": [
+          "(configure|setup|add).*?(device|integration|entity)",
+          "(create|write|define).*?(automation|rule|script)",
+          "(debug|troubleshoot|test).*?(automation|component|integration)",
+          "(migrate|update|upgrade).*?(configuration|component)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/homeassistant/**",
+          "**/configuration.yaml",
+          "**/automations.yaml",
+          "**/scripts.yaml",
+          "**/lovelace.yaml"
+        ],
+        "contentPatterns": [
+          "homeassistant:",
+          "automation:",
+          "lovelace:",
+          "integration:",
+          "entity_id:"
         ]
       }
     }
