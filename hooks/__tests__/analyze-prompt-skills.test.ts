@@ -584,3 +584,19 @@ Instructions for testing.
     });
   });
 });
+
+
+describe('analyze-prompt-skills hook (refactor regression)', () => {
+  test('still outputs hookSpecificOutput.additionalContext string', () => {
+    const hookPath = join(import.meta.dir, '../prompt-submit/analyze-prompt-skills.ts');
+    const input = JSON.stringify({ userMessage: 'testing', session_id: 's' });
+    const result = Bun.spawnSync({
+      cmd: ['bun', 'run', hookPath],
+      stdin: Buffer.from(input),
+      env: { ...process.env, CLAUDE_PROJECT_DIR: process.cwd() },
+    });
+    expect(result.exitCode).toBe(0);
+    const payload = JSON.parse(result.stdout.toString() || '{}');
+    expect(typeof payload?.hookSpecificOutput?.additionalContext).toBe('string');
+  });
+});

@@ -36,3 +36,5 @@ lib/skill-gaps.jsonl
 # Semantic search artifacts (generated at runtime)
 lib/models/
 lib/skill-embeddings.json
+
+.reviewrover/
