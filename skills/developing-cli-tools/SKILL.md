@@ -7,8 +7,7 @@ when_to_use: >-
   When creating CLIs, adding subcommands, designing argument interfaces,
   implementing help systems, handling stdin/stdout/stderr, building interactive
   prompts, creating progress indicators, or when CLI output breaks in
-  pipes/scripts. When users report confusing arguments, missing help, broken
-  piping, or color codes in logs.
+  pipes/scripts.
 version: 1.0.0
 languages:
   - typescript

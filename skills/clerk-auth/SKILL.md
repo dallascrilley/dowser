@@ -8,8 +8,7 @@ when_to_use: >-
   Use when adding Clerk to React/Vite projects, Next.js App Router, Cloudflare
   Workers, clerk auth, clerkMiddleware, protected routes, JWT templates,
   verifying tokens, @clerk/backend, integrating with Hono, shadcn/ui auth
-  components, clerk webhook, or encountering authentication errors (missing
-  secret key, JWKS, authorizedParties, JSX component errors).
+  components, clerk webhook...
 version: 1.0.0
 license: MIT
 category: integrations-and-saas

@@ -10,14 +10,11 @@ description: >-
   check availability, or set up booking webhooks. Keywords - acuity, scheduling,
   appointments, booking, calendar, availability, webhooks, client management,
   CRM sync.
-when_to_use: >
+when_to_use: >-
   Use when integrating Acuity Scheduling API, creating/managing/canceling
   appointments programmatically, checking availability for time slots and dates,
   managing client data via API, syncing Acuity appointments with CRM systems,
-  setting up Acuity webhooks for real-time notifications, exporting appointment
-  data for reporting, handling appointment booking workflows with validation,
-  implementing multi-calendar scheduling, or troubleshooting Acuity API errors
-  and rate limits.
+  setting up Acuity webhooks for real-time notifications...
 version: 1.0.0
 category: integrations-and-saas
 ---

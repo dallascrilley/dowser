@@ -29,14 +29,13 @@ description: >
   similarity, vector normalization, retrieval query, retrieval document, task
   types, dimension mismatch, embeddings rate limit, text truncation,
   @google/genai
-when_to_use: >
+when_to_use: >-
   Use when implementing vector search with Google Gemini embeddings
   (gemini-embedding-001), building RAG systems, semantic search,
 
   document clustering, integrating with Cloudflare Vectorize, using
   @google/genai SDK, batch processing embeddings, optimizing dimensions
-  (128-3072), or preventing embedding-specific errors (dimension mismatches,
-  task types, rate limiting).
+  (128-3072)...
 version: 1.0.0
 license: MIT
 metadata:

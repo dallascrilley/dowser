@@ -7,9 +7,7 @@ when_to_use: >-
   Before implementing any non-trivial solution. When you have your first idea
   and are ready to code. When solution feels complex, choosing between
   approaches, stuck on a design, tempted to implement first idea immediately,
-  asking "is this the best approach?", wondering "should I use library or custom
-  code?", evaluating trade-offs, solution feels forced, or implementation is
-  fighting you.
+  asking "is this the best approach?"...
 version: 1.0.0
 languages: all
 category: coding

@@ -15,6 +15,11 @@ when_to_use: >
   coexisting truths, or analyzing competing theories.
 version: 1.0.0
 category: productivity
+short_description: >-
+  Use this skill when encountering fundamental disagreements between sources,
+  paradoxes or contradictions that resist resolution, situations where mapping
+  unknowns is as important as knowns, multiple valid interpretations without
+  clear superiority, complex systems where multiple truths coexist...
 ---
 
 # Navigating Ambiguity

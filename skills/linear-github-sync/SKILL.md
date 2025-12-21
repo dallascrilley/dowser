@@ -14,8 +14,7 @@ when_to_use: >-
   when working on repositories that track issues in Linear - includes project
   setup, issue management, branch naming, commit messages, and PR linking. When
   user wants to work on a Linear issue, create a branch for it, commit with
-  issue reference, and create a PR with issue reference. When user wants to sync
-  with Linear, update the issue status, add a comment, or close the issue.
+  issue reference, and create a PR with issue reference.
 version: 1.0.0
 languages: all
 dependencies: 'linctl (npm install -g linctl), Linear API key'

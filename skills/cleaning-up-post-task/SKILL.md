@@ -10,17 +10,14 @@ description: >-
   maintain codebase hygiene and ruthless simplicity. Triggers include "task
   completed", "todo list done", "cleanup needed", "ensure simplicity", "remove
   cruft", "check for temporary files", or after major implementation work.
-when_to_use: >
+when_to_use: >-
   Use when tasks or todo lists are completed to review git status, remove
   temporary artifacts (planning docs, test scripts, debug
 
   files), eliminate unnecessary complexity, ensure adherence to Implementation
   Philosophy and Modular Design Philosophy principles,
 
-  maintain codebase hygiene, enforce ruthless simplicity. Triggers include "task
-  completed", "todo list done", "cleanup needed",
-
-  "ensure simplicity", "remove cruft", or after major implementation work.
+  maintain codebase hygiene...
 version: 1.0.0
 category: productivity
 ---

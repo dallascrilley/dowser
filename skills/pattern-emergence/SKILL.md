@@ -12,15 +12,11 @@ description: >-
   diversity rather than despite it. Ideal for multi-perspective analysis,
   emergence detection, diversity orchestration, tension-driven insights, and
   discovering unexpected patterns from agent collaboration.
-when_to_use: >
+when_to_use: >-
   Use when orchestrating diverse perspectives to detect emergent patterns,
   synthesizing multi-agent insights from multiple agents, coordinating knowledge
   synthesis from conflicting viewpoints, identifying meta-patterns across
-  diverse sources, managing productive tensions between perspectives, maximizing
-  collective intelligence through diversity, conducting multi-perspective
-  analysis, detecting emergence from diversity, finding unexpected patterns from
-  agent collaboration, or implementing diversity orchestration for insight
-  generation.
+  diverse sources, managing productive tensions between perspectives...
 version: 1.0.0
 license: MIT
 category: meta

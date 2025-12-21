@@ -7,9 +7,7 @@ when_to_use: >-
   When writing any code with variables. When variables are declared at top of
   function but used later, related statements are scattered, variable scope is
   larger than necessary, long variable live times or large span between
-  references, can't find where variable is initialized, variable has stale
-  value, forgot to reset counter, initialization errors occur, or variables
-  declared far from first use.
+  references, can't find where variable is initialized...
 version: 1.0.0
 languages: all
 category: coding

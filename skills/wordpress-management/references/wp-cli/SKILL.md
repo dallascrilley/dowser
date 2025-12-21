@@ -1,8 +1,12 @@
 ---
 name: wp-cli
 description: WP-CLI handbook guides and troubleshooting content from make.wordpress.org.
-when_to_use: |
-  Use when managing WordPress installations via command line, installing/activating/updating plugins and themes, performing database operations (migrations, search-replace, imports), managing WordPress core updates and installations, regenerating media thumbnails or managing attachments, working with WordPress multisite networks, automating WordPress administrative tasks, executing WordPress commands on remote servers via SSH, troubleshooting WP-CLI connection or configuration issues, creating custom WP-CLI commands or packages, or managing WordPress menus/taxonomies/post types programmatically.
+when_to_use: >-
+  Use when managing WordPress installations via command line,
+  installing/activating/updating plugins and themes, performing database
+  operations (migrations, search-replace, imports), managing WordPress core
+  updates and installations, regenerating media thumbnails or managing
+  attachments...
 version: 1.0.0
 ---
 

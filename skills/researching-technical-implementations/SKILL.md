@@ -14,6 +14,11 @@ when_to_use: >
   comparing implementations, or researching GitHub projects.
 version: 1.0.0
 category: research-and-learning
+short_description: >-
+  Use this skill when analyzing code repositories, reviewing technical
+  documentation, evaluating open source projects, assessing code quality and
+  architecture, comparing technical implementations, researching GitHub
+  projects, examining API specifications, finding implementation examples...
 ---
 
 # Technical Research Expert

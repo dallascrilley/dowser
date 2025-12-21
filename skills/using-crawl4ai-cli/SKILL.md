@@ -14,6 +14,7 @@ when_to_use: >
   changes, handling JavaScript-heavy sites, or LLM Q&A on pages.
 version: 1.0.0
 category: research-and-learning
+short_description: Extract structured data from websites using crawl4ai CLI.
 ---
 
 # Crawl4AI CLI Guide

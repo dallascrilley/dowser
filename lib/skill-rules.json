@@ -1286,13 +1286,27 @@
           "CloudFormation",
           "Terraform",
           "cost optimization",
-          "multi-region"
+          "multi-region",
+          "kubernetes",
+          "k8s",
+          "eks",
+          "ecs",
+          "fargate",
+          "container",
+          "ci/cd",
+          "cicd",
+          "pipeline",
+          "devops",
+          "codepipeline",
+          "deployment"
         ],
         "intentPatterns": [
           "(design|architect|optimize).*?AWS",
           "(build|create).*?serverless.*?(api|backend)",
           "(generate|write).*?(CloudFormation|CDK|Terraform)",
-          "(reduce|lower).*?AWS.*?cost"
+          "(reduce|lower).*?AWS.*?cost",
+          "(deploy|setup).*?(kubernetes|k8s|eks|ecs)",
+          "(build|configure).*?(ci/cd|cicd|pipeline)"
         ]
       },
       "fileTriggers": {
@@ -1528,11 +1542,22 @@
         "keywords": [
           "root cause",
           "rca",
-          "root-cause tracing"
+          "root-cause tracing",
+          "trace",
+          "debug systematically",
+          "why happening",
+          "underlying issue",
+          "source of bug",
+          "guess what's wrong",
+          "random fix",
+          "symptom"
         ],
         "intentPatterns": [
           "(run|perform).*?root cause",
-          "(trace|isolate).*?issue.*?origin"
+          "(trace|isolate).*?issue.*?origin",
+          "(find|trace).*?root.*?cause",
+          "(guess|assume).*?(problem|issue|bug)",
+          "(symptom|surface).*?vs.*?(cause|source)"
         ]
       },
       "fileTriggers": {
@@ -1605,11 +1630,23 @@
         "keywords": [
           "tdd",
           "test driven development",
-          "red green refactor"
+          "red green refactor",
+          "test first",
+          "failing test",
+          "write test before",
+          "TDD cycle",
+          "test coverage",
+          "unit test",
+          "wrote code without tests",
+          "test after",
+          "no tests"
         ],
         "intentPatterns": [
           "(practice|follow).*?tdd",
-          "(write).*?test.*?before code"
+          "(write).*?test.*?before code",
+          "(write|create).*?test.*?(before|first)",
+          "(implement|code).*?(without|before).*?test",
+          "(follow|practice|use).*?TDD"
         ]
       },
       "fileTriggers": {
@@ -1709,11 +1746,25 @@
         "keywords": [
           "verification before completion",
           "verify work",
-          "pre-completion checks"
+          "pre-completion checks",
+          "verify",
+          "prove",
+          "evidence",
+          "confirm working",
+          "probably works",
+          "should work",
+          "seems to work",
+          "untested",
+          "run tests",
+          "check output",
+          "validate result"
         ],
         "intentPatterns": [
           "(verify|double-check).*?before completion",
-          "(run).*?final verification"
+          "(run).*?final verification",
+          "(probably|should|might).*?work",
+          "(verify|prove|confirm).*?(before|completion)",
+          "(claim|assume).*?without.*?(test|verify)"
         ]
       },
       "fileTriggers": {
@@ -2582,7 +2633,10 @@
           "cloudflare kv",
           "vite cloudflare",
           "react cloudflare",
-          "full stack cloudflare"
+          "full stack cloudflare",
+          "cloudflair",
+          "cf workers",
+          "cloudflare worker"
         ],
         "intentPatterns": [
           "(create|scaffold|build|setup).*?cloudflare.*?(app|application|project)",
@@ -3017,6 +3071,192 @@
           "inspect_repo.py",
           "generate_scripts.py",
           "Codex environment"
+        ]
+      }
+    },
+    "validating-inputs": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Input validation and security boundary checking for user data, form submissions, and external requests.",
+      "promptTriggers": {
+        "keywords": [
+          "input validation",
+          "validate input",
+          "sanitize",
+          "user input",
+          "form validation",
+          "request validation",
+          "TypeError",
+          "ValueError",
+          "KeyError",
+          "SQL injection",
+          "XSS",
+          "boundary validation",
+          "zod",
+          "valibot"
+        ],
+        "intentPatterns": [
+          "(validate|sanitize|check).*?(input|request|form)",
+          "(prevent|avoid).*?(injection|xss|attack)",
+          "(user|external).*?(input|data).*?(safe|valid)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/validating-inputs/**",
+          "**/validation/**",
+          "**/validators/**"
+        ],
+        "contentPatterns": [
+          "zod",
+          "valibot",
+          "validate",
+          "InputValidation"
+        ]
+      }
+    },
+    "reducing-complexity": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Simplifying complex code, reducing cognitive load, and improving maintainability.",
+      "promptTriggers": {
+        "keywords": [
+          "reduce complexity",
+          "simplify",
+          "hard to understand",
+          "cognitive load",
+          "too complex",
+          "nesting depth",
+          "cyclomatic complexity",
+          "refactor for clarity",
+          "maintainability"
+        ],
+        "intentPatterns": [
+          "(too|very).*?(complex|complicated|hard)",
+          "(simplify|reduce).*?(logic|code|function)",
+          "(can't|hard to).*?(understand|follow|maintain)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/reducing-complexity/**",
+          "**/simplifying/**"
+        ],
+        "contentPatterns": [
+          "complexity",
+          "refactor",
+          "simplify"
+        ]
+      }
+    },
+    "refactoring-safely": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Safe code refactoring techniques with test coverage to prevent regressions.",
+      "promptTriggers": {
+        "keywords": [
+          "refactor safely",
+          "safe refactoring",
+          "refactoring",
+          "restructure code",
+          "code transformation",
+          "extract method",
+          "inline",
+          "rename",
+          "move",
+          "change signature"
+        ],
+        "intentPatterns": [
+          "(refactor|restructure).*?(safe|careful)",
+          "(extract|inline|move).*?(method|function|class)",
+          "(change|modify).*?(structure|architecture).*?(safe)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/refactoring-safely/**",
+          "**/safe-refactor/**"
+        ],
+        "contentPatterns": [
+          "refactor",
+          "safe",
+          "test"
+        ]
+      }
+    },
+    "designing-before-coding": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Planning and designing systems before implementing code.",
+      "promptTriggers": {
+        "keywords": [
+          "design first",
+          "plan before coding",
+          "architecture design",
+          "system design",
+          "design document",
+          "technical design",
+          "RFC",
+          "design review",
+          "before implementing"
+        ],
+        "intentPatterns": [
+          "(design|plan|architect).*?(before|first)",
+          "(think|consider).*?(before|prior).*?(implement|code)",
+          "(create|write).*?(design|spec|rfc)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/designing-before-coding/**",
+          "**/design-docs/**",
+          "**/architecture/**"
+        ],
+        "contentPatterns": [
+          "RFC",
+          "design",
+          "architecture",
+          "specification"
+        ]
+      }
+    },
+    "simplifying-control-flow": {
+      "type": "guardrail",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Simplifying conditional logic and control flow patterns.",
+      "promptTriggers": {
+        "keywords": [
+          "control flow",
+          "nested if",
+          "deeply nested",
+          "guard clause",
+          "early return",
+          "flatten",
+          "reduce nesting",
+          "arrow anti-pattern",
+          "else if chain",
+          "switch statement"
+        ],
+        "intentPatterns": [
+          "(too many|deep).*?(nested|nesting|if)",
+          "(flatten|simplify).*?(control|logic|flow)",
+          "(use|add).*?(guard|early return)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "**/simplifying-control-flow/**",
+          "**/control-flow/**"
+        ],
+        "contentPatterns": [
+          "guard clause",
+          "early return",
+          "nested"
         ]
       }
     }

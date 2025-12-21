@@ -11,6 +11,7 @@ when_to_use: >-
   creating shortcuts with arguments, or configuring script command metadata.
 version: 1.0.0
 category: automation-and-scripting
+short_description: 'Create, edit, and manage Raycast script commands.'
 ---
 
 # Raycast Script Commands

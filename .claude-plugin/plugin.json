@@ -1,10 +1,5 @@
 {
   "name": "pai-skills",
   "version": "1.0.0",
-  "description": "Personal skills library with 120+ domain-specific skills",
-  "author": {
-    "name": "Dallas Crilley"
-  },
-  "keywords": ["skills", "context", "suggestion", "PAI", "personal-ai"],
-  "repository": "https://github.com/dallascrilley/PAI"
+  "description": "Personal skills library with 120+ domain-specific skills"
 }

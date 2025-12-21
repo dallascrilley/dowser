@@ -9,14 +9,11 @@ description: >-
   users need icons, favicons, social sharing images, or Open Graph images from
   logos or text slogans. Handles image resizing, text-to-image generation, and
   provides proper HTML meta tags.
-when_to_use: >
+when_to_use: >-
   Use when generating favicons and app icons for websites, creating social media
   meta images (Open Graph), generating Facebook/Twitter/LinkedIn sharing images,
   creating PWA icons, converting logos to web icons, generating emoji-based
-  favicons, creating text-based social images with branding, validating web
-  asset file sizes and dimensions, providing HTML meta tags for favicons and
-  social media, or integrating web assets into Next.js/Astro/SvelteKit/Vue
-  projects.
+  favicons, creating text-based social images with branding...
 version: 1.0.0
 category: integrations-and-saas
 ---

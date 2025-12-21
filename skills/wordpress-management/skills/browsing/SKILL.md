@@ -1,8 +1,14 @@
 ---
 name: browsing
-description: Use when you need direct browser control - teaches Chrome DevTools Protocol for controlling existing browser sessions, multi-tab management, form automation, and content extraction via use_browser MCP tool
-when_to_use: |
-  Use when you need direct browser control via Chrome DevTools Protocol, controlling existing authenticated browser sessions, managing multiple tabs in running browser, automating form filling and submission, extracting page content with selectors, navigating and interacting with web pages programmatically, waiting for dynamic content to load, taking screenshots or capturing element attributes, or when Playwright MCP is unavailable or excessive for the task.
+description: >-
+  Use when you need direct browser control - teaches Chrome DevTools Protocol
+  for controlling existing browser sessions, multi-tab management, form
+  automation, and content extraction via use_browser MCP tool
+when_to_use: >-
+  Use when you need direct browser control via Chrome DevTools Protocol,
+  controlling existing authenticated browser sessions, managing multiple tabs in
+  running browser, automating form filling and submission, extracting page
+  content with selectors...
 allowed-tools: mcp__chrome__use_browser
 version: 1.0.0
 ---

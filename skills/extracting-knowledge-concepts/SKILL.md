@@ -13,6 +13,10 @@ when_to_use: >
   bases, analyzing research papers, or synthesizing ideas from multiple sources.
 version: 1.0.0
 category: research-and-learning
+short_description: >-
+  Use this skill when processing articles, papers, or documents to extract
+  structured knowledge components including atomic concepts, relationships,
+  tensions, and uncertainties.
 ---
 
 # Knowledge Concept Extraction Expert

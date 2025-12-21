@@ -14,6 +14,11 @@ when_to_use: >
   meta-patterns across domains, or discovering simplification cascades.
 version: 1.0.0
 category: research-and-learning
+short_description: >-
+  Use this skill when discovering revolutionary connections between disparate
+  concepts, finding breakthrough insights through collision-zone thinking,
+  identifying meta-patterns across domains, or discovering simplification
+  cascades that dramatically reduce complexity.
 ---
 
 # Insight Synthesis Expert

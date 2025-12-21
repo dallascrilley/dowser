@@ -8,7 +8,7 @@ when_to_use: >-
   Use when working with ConnectWise Manage API, cw, connectwise-cli, searching
   for agreements/companies/invoices/catalog items/contacts, debugging connection
   errors (401, 403, 404, 429, timeout), building filter queries, friendly search
-  syntax, agreement additions, write operations, or ConnectWise CLI commands.
+  syntax, agreement additions, write operations...
 version: 1.0.0
 license: MIT
 category: integrations-and-saas

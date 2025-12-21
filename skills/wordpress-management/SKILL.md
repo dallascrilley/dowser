@@ -5,13 +5,11 @@ description: >-
   updating WordPress pages, replacing images in team grids, editing Visual
   Composer shortcodes, or working with WPEngine-hosted sites. Teaches hybrid
   workflow using wp-cli for operations and browser for verification.
-when_to_use: >
+when_to_use: >-
   Use when managing WordPress sites with Visual Composer (WPBakery) page
   builder, updating WordPress page content programmatically, replacing images in
   team member grids or galleries, editing Visual Composer shortcodes via wp-cli,
-  working with WPEngine-hosted sites (with SSH/wp-cli access), uploading media
-  files with chunked transfer for WPEngine, backing up and restoring page
-  content, or verifying WordPress page changes via browser automation.
+  working with WPEngine-hosted sites (with SSH/wp-cli access)...
 version: 1.0.0
 category: integrations-and-saas
 ---

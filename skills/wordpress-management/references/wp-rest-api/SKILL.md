@@ -1,8 +1,13 @@
 ---
 name: wp-rest-api
-description: WordPress REST API handbook pages covering key concepts, usage, extending, and reference endpoints.
-when_to_use: |
-  Use when working with WordPress REST API, asking about WordPress REST API features or APIs, implementing WordPress REST API solutions, debugging WordPress REST API code, learning WordPress REST API best practices, building headless WordPress applications, consuming WordPress data programmatically, or extending WordPress with custom REST endpoints.
+description: >-
+  WordPress REST API handbook pages covering key concepts, usage, extending, and
+  reference endpoints.
+when_to_use: >-
+  Use when working with WordPress REST API, asking about WordPress REST API
+  features or APIs, implementing WordPress REST API solutions, debugging
+  WordPress REST API code, learning WordPress REST API best practices, building
+  headless WordPress applications...
 version: 1.0.0
 ---
 

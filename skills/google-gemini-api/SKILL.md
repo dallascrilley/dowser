@@ -45,13 +45,12 @@ description: >
   gemini 1m tokens,
 
   gemini tool use, parallel function calling, compositional function calling
-when_to_use: >
+when_to_use: >-
   Use when integrating Gemini API with @google/genai SDK, implementing
   multimodal AI (text/images/video/audio/PDFs), using thinking mode,
 
   function calling with parallel execution, streaming responses, deploying to
-  Cloudflare Workers, building chat applications, or encountering SDK
-  deprecation warnings, context window errors, or model not found errors.
+  Cloudflare Workers, building chat applications...
 version: 1.0.0
 license: MIT
 category: coding

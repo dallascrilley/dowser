@@ -10,15 +10,11 @@ description: >-
   getting started guides, documenting code, creating ADRs (Architecture Decision
   Records), establishing writing standards, organizing documentation structure,
   or restructuring complex technical content for better understanding.
-when_to_use: >
+when_to_use: >-
   Use when creating or improving technical documentation, writing user guides,
   tutorials, READMEs, API docs, architecture
 
-  documentation, ADRs, code comments, or enhancing content clarity. Applies to
-  getting started guides, writing standards,
-
-  information architecture, or restructuring technical content for better
-  understanding.
+  documentation, ADRs, code comments, or enhancing content clarity.
 version: 1.0.0
 category: collaboration
 ---

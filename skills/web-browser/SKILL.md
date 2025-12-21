@@ -29,6 +29,9 @@ when_to_use: >
 version: 1.0.0
 license: MIT
 category: research-and-learning
+short_description: >-
+  This skill provides tools for browser automation and web page interaction
+  through Chrome DevTools Protocol (CDP).
 ---
 
 # Web Browser Skill

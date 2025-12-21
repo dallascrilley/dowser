@@ -12,6 +12,9 @@ when_to_use: >
   across sources, or investigating complex topics.
 version: 1.0.0
 category: research-and-learning
+short_description: >-
+  Conducts deep web research using advanced search techniques and multi-source
+  synthesis.
 ---
 
 # Web Research Specialist

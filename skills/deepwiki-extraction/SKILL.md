@@ -13,6 +13,10 @@ when_to_use: >
   from cached content.
 version: 1.0.0
 category: research-and-learning
+short_description: >-
+  Extracts comprehensive repository documentation from DeepWiki by navigating
+  with Chrome DevTools MCP, capturing all sections as markdown, and enabling Q&A
+  about the codebase.
 ---
 
 # DeepWiki Documentation Extraction

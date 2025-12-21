@@ -25,16 +25,11 @@ description: >
   filterByFormula, airtable upsert, airtable sync, pyairtable, airtable.js,
   personal access token, airtable rate limit, airtable pagination, linked
   records, airtable attachments, airtable enterprise
-when_to_use: >
+when_to_use: >-
   Use when integrating Airtable API with JavaScript/Python, performing CRUD
   operations on Airtable bases/tables/records, filtering Airtable records with
   filterByFormula queries, implementing upsert (create-or-update) operations,
-  creating/managing Airtable webhooks for real-time updates, handling pagination
-  for large datasets, syncing data between Airtable and other systems, managing
-  30+ Airtable field types (attachments, linked records, formulas, rollups),
-  handling Airtable rate limits (5 req/sec per base), uploading attachments to
-  Airtable, or implementing enterprise Airtable features (base management, user
-  provisioning).
+  creating/managing Airtable webhooks for real-time updates...
 version: 1.0.0
 category: integrations-and-saas
 ---
