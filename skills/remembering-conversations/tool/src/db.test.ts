@@ -1,12 +1,20 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, test, expect, beforeEach, afterEach } from 'bun:test';
 import { initDatabase, migrateSchema, insertExchange } from './db.js';
 import { ConversationExchange } from './types.js';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import Database from 'better-sqlite3';
+import { createRequire } from 'module';
 
-const describeWithBetterSqlite3 = process.versions.bun ? describe.skip : describe;
+const require = createRequire(import.meta.url);
+let hasBetterSqlite3 = true;
+try {
+  require('better-sqlite3');
+} catch {
+  hasBetterSqlite3 = false;
+}
+
+const describeWithBetterSqlite3 = hasBetterSqlite3 ? describe : describe.skip;
 
 describeWithBetterSqlite3('database migration', () => {
   const testDir = path.join(os.tmpdir(), 'db-migration-test-' + Date.now());
@@ -22,9 +30,10 @@ describeWithBetterSqlite3('database migration', () => {
     fs.rmSync(testDir, { recursive: true, force: true });
   });
 
-  it('adds last_indexed column to existing database', () => {
+  test('adds last_indexed column to existing database', () => {
     // Create a database with old schema (no last_indexed)
-    const db = new Database(dbPath);
+    const DatabaseCtor = require('better-sqlite3');
+    const db = new DatabaseCtor(dbPath);
     db.exec(`
       CREATE TABLE exchanges (
         id TEXT PRIMARY KEY,
@@ -57,7 +66,7 @@ describeWithBetterSqlite3('database migration', () => {
     migratedDb.close();
   });
 
-  it('handles existing last_indexed column gracefully', () => {
+  test('handles existing last_indexed column gracefully', () => {
     // Create database with migration already applied
     const db = initDatabase();
 
@@ -82,7 +91,7 @@ describeWithBetterSqlite3('insertExchange with last_indexed', () => {
     fs.rmSync(testDir, { recursive: true, force: true });
   });
 
-  it('sets last_indexed timestamp when inserting exchange', () => {
+  test('sets last_indexed timestamp when inserting exchange', () => {
     const db = initDatabase();
 
     const exchange: ConversationExchange = {

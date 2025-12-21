@@ -1,15 +1,47 @@
-import Database from 'better-sqlite3';
 import { ConversationExchange } from './types.js';
+import { createRequire } from 'module';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
-import * as sqliteVec from 'sqlite-vec';
+
+type BetterSqliteDb = {
+  prepare: (sql: string) => any;
+  exec: (sql: string) => void;
+  pragma: (sql: string) => any;
+  close: () => void;
+};
+
+type BetterSqliteCtor = new (filename: string) => BetterSqliteDb;
+
+const require = createRequire(import.meta.url);
+
+function getBetterSqlite3Ctor(): BetterSqliteCtor {
+  try {
+    return require('better-sqlite3') as BetterSqliteCtor;
+  } catch (error) {
+    throw new Error(
+      'Missing dependency: better-sqlite3. Install dependencies in skills/remembering-conversations/tool before using the indexing DB.',
+      { cause: error as Error }
+    );
+  }
+}
+
+function getSqliteVec(): { load: (db: BetterSqliteDb) => void } {
+  try {
+    return require('sqlite-vec') as { load: (db: BetterSqliteDb) => void };
+  } catch (error) {
+    throw new Error(
+      'Missing dependency: sqlite-vec. Install dependencies in skills/remembering-conversations/tool before using the indexing DB.',
+      { cause: error as Error }
+    );
+  }
+}
 
 function getDbPath(): string {
   return process.env.TEST_DB_PATH || path.join(os.homedir(), '.clank', 'conversation-index', 'db.sqlite');
 }
 
-export function migrateSchema(db: Database.Database): void {
+export function migrateSchema(db: BetterSqliteDb): void {
   const hasColumn = db.prepare(`
     SELECT COUNT(*) as count FROM pragma_table_info('exchanges')
     WHERE name='last_indexed'
@@ -22,7 +54,7 @@ export function migrateSchema(db: Database.Database): void {
   }
 }
 
-export function initDatabase(): Database.Database {
+export function initDatabase(): BetterSqliteDb {
   const dbPath = getDbPath();
 
   // Ensure directory exists
@@ -31,10 +63,11 @@ export function initDatabase(): Database.Database {
     fs.mkdirSync(dbDir, { recursive: true });
   }
 
-  const db = new Database(dbPath);
+  const DatabaseCtor = getBetterSqlite3Ctor();
+  const db = new DatabaseCtor(dbPath);
 
   // Load sqlite-vec extension
-  sqliteVec.load(db);
+  getSqliteVec().load(db);
 
   // Enable WAL mode for better concurrency
   db.pragma('journal_mode = WAL');
@@ -74,7 +107,7 @@ export function initDatabase(): Database.Database {
 }
 
 export function insertExchange(
-  db: Database.Database,
+  db: BetterSqliteDb,
   exchange: ConversationExchange,
   embedding: number[]
 ): void {
@@ -110,12 +143,12 @@ export function insertExchange(
   vecStmt.run(exchange.id, Buffer.from(new Float32Array(embedding).buffer));
 }
 
-export function getAllExchanges(db: Database.Database): Array<{ id: string; archivePath: string }> {
+export function getAllExchanges(db: BetterSqliteDb): Array<{ id: string; archivePath: string }> {
   const stmt = db.prepare(`SELECT id, archive_path as archivePath FROM exchanges`);
   return stmt.all() as Array<{ id: string; archivePath: string }>;
 }
 
-export function getFileLastIndexed(db: Database.Database, archivePath: string): number | null {
+export function getFileLastIndexed(db: BetterSqliteDb, archivePath: string): number | null {
   const stmt = db.prepare(`
     SELECT MAX(last_indexed) as lastIndexed
     FROM exchanges
@@ -125,7 +158,7 @@ export function getFileLastIndexed(db: Database.Database, archivePath: string): 
   return row.lastIndexed;
 }
 
-export function deleteExchange(db: Database.Database, id: string): void {
+export function deleteExchange(db: BetterSqliteDb, id: string): void {
   // Delete from vector table
   db.prepare(`DELETE FROM vec_exchanges WHERE id = ?`).run(id);
 

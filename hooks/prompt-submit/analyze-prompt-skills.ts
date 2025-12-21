@@ -1,10 +1,12 @@
 #!/usr/bin/env bun
 /**
  * Enhanced Skill Analyzer Hook for UserPromptSubmit
- * Hybrid System: Combines Fuse.js fuzzy matching with declarative skill-rules.json
+ * Hybrid System: Combines Fuse.js fuzzy matching, TF-IDF, and Semantic Search with declarative skill-rules.json
  *
  * Features:
  * - Fuse.js fuzzy search with configurable threshold (typo tolerance)
+ * - TF-IDF term weighting for uniqueness
+ * - Semantic Search (Embeddings) using @xenova/transformers
  * - Token-based exact matching for skill names and descriptions
  * - Keyword scoring for common technical terms
  * - Description relevance scoring with deduplication
@@ -16,15 +18,23 @@
  * - SKILL_ANALYZER_DEBUG_FUZZY=1    Show fuzzy match details
  * - SKILL_ANALYZER_SHOW_SCORES=1    Include scores in output
  * - SKILL_ANALYZER_DEBUG_RULES=1    Show rules.json matching details
+ * - SKILL_ANALYZER_SEMANTIC=0       Disable semantic search (enabled by default)
  */
 
 import { glob } from 'glob';
 import matter from 'gray-matter';
+import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import Fuse from 'fuse.js';
 import { TfIdf } from 'natural';
+import { pipeline, env } from '@xenova/transformers';
 import { CONFIG } from '../../lib/config';
+
+// Configure cache for models
+const PLUGIN_LIB_DIR = path.join(__dirname, '..', '..', 'lib');
+env.cacheDir = path.join(PLUGIN_LIB_DIR, 'models');
+env.allowLocalModels = false;
 
 interface HookInput {
   session_id?: string;
@@ -100,6 +110,13 @@ const skillCache = new Map<string, CacheEntry>();
 const rulesCache = new Map<string, SkillRulesCacheEntry>();
 const PROJECT_DIR = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 
+const PREFER_PAI_SKILLS = process.env.SKILL_ANALYZER_PREFER_PAI_SKILLS !== '0';
+const PAI_SKILLS_PRIORITY_BOOST = Number.parseInt(process.env.SKILL_ANALYZER_PAI_BOOST || '25', 10);
+const MIN_SCORE_FOR_PAI_BOOST = Number.parseInt(
+  process.env.SKILL_ANALYZER_PAI_BOOST_MIN_SCORE || String(CONFIG.GAP_THRESHOLD),
+  10
+);
+
 // TF-IDF cache for term weighting
 let tfidfInstance: TfIdf | null = null;
 let tfidfSkillsHash: string | null = null;
@@ -107,6 +124,211 @@ let tfidfSkillsHash: string | null = null;
 const TFIDF_ENABLED = process.env.SKILL_ANALYZER_TFIDF !== '0';
 /** Debug TF-IDF scoring via SKILL_ANALYZER_DEBUG_TFIDF=1 */
 const DEBUG_TFIDF_ENABLED = process.env.SKILL_ANALYZER_DEBUG_TFIDF === '1';
+
+// Semantic Search Configuration
+const SEMANTIC_ENABLED = process.env.SKILL_ANALYZER_SEMANTIC !== '0';
+const EMBEDDING_MODEL = 'Xenova/all-MiniLM-L6-v2';
+const EMBEDDINGS_FILE = path.join(PLUGIN_LIB_DIR, 'skill-embeddings.json');
+
+interface EmbeddingCache {
+  version: string;
+  model: string;
+  embeddings: Record<string, { embedding: number[]; hash: string }>; // cacheKey -> embedding + content hash
+  lastUpdated: string;
+}
+
+let extractor: any = null;
+
+async function getExtractor() {
+  if (!extractor) {
+    extractor = await pipeline('feature-extraction', EMBEDDING_MODEL, {
+      quantized: false, // Use full precision for better quality
+    });
+  }
+  return extractor;
+}
+
+const SEMANTIC_QUERY_HINTS: Array<{ pattern: RegExp; hints: string[] }> = [
+  // Performance intent often comes in vague phrasing ("go faster") with no shared keywords.
+  { pattern: /\b(go faster|faster|speed up|speedup|make .*fast|run faster)\b/i, hints: ['performance', 'optimize', 'optimization', 'speed', 'fast', 'latency', 'throughput'] },
+  // Aesthetics/UI intent
+  { pattern: /\b(look good|make .*look good|polish|styling|style|css|ui|ux|design)\b/i, hints: ['ui', 'ux', 'styling', 'css', 'design', 'tailwind', 'shadcn', 'components'] },
+  // Quality intent
+  { pattern: /\b(code quality|ensure quality|quality gates?|lint|format|typecheck)\b/i, hints: ['lint', 'format', 'typecheck', 'tests', 'refactor', 'quality'] },
+];
+
+function expandSemanticQuery(query: string): { expanded: string; addedHints: string[] } {
+  const added = new Set<string>();
+  for (const { pattern, hints } of SEMANTIC_QUERY_HINTS) {
+    if (!pattern.test(query)) continue;
+    for (const hint of hints) added.add(hint);
+  }
+
+  if (added.size === 0) {
+    return { expanded: query, addedHints: [] };
+  }
+
+  const hintText = [...added].join(' ');
+  return { expanded: `${query}\n\n${hintText}`, addedHints: [...added] };
+}
+
+async function generateEmbedding(text: string): Promise<number[]> {
+  const pipe = await getExtractor();
+  const output = await pipe(text, { pooling: 'mean', normalize: true });
+  return Array.from(output.data);
+}
+
+function sha256(text: string): string {
+  return createHash('sha256').update(text).digest('hex');
+}
+
+function getSkillEmbeddingCacheKey(skill: Skill): string {
+  // Skills can exist in multiple roots (project/user/plugin caches) with the same name.
+  // Using the full path avoids collisions that silently corrupt semantic scoring.
+  return skill.path;
+}
+
+function buildSkillEmbeddingText(skill: Skill): string {
+  return `${skill.name}. ${skill.description || ''} ${skill.whenToUse || ''}`.trim();
+}
+
+function loadEmbeddingCache(): EmbeddingCache {
+  if (!fs.existsSync(EMBEDDINGS_FILE)) {
+    return {
+      version: '2.0',
+      model: EMBEDDING_MODEL,
+      embeddings: {},
+      lastUpdated: new Date().toISOString()
+    };
+  }
+  try {
+    const parsed = JSON.parse(fs.readFileSync(EMBEDDINGS_FILE, 'utf-8')) as Partial<EmbeddingCache>;
+    if (!parsed || parsed.version !== '2.0' || parsed.model !== EMBEDDING_MODEL || !parsed.embeddings) {
+      return {
+        version: '2.0',
+        model: EMBEDDING_MODEL,
+        embeddings: {},
+        lastUpdated: new Date().toISOString()
+      };
+    }
+    return parsed as EmbeddingCache;
+  } catch {
+    return {
+      version: '2.0',
+      model: EMBEDDING_MODEL,
+      embeddings: {},
+      lastUpdated: new Date().toISOString()
+    };
+  }
+}
+
+function saveEmbeddingCache(cache: EmbeddingCache) {
+  cache.lastUpdated = new Date().toISOString();
+  fs.writeFileSync(EMBEDDINGS_FILE, JSON.stringify(cache, null, 2));
+}
+
+/**
+ * Get semantic similarity scores for skills
+ */
+async function scoreSkillsWithEmbeddings(skills: Skill[], query: string): Promise<Map<string, number>> {
+  const results = new Map<string, number>();
+  
+  if (!SEMANTIC_ENABLED || !query || query.length < 3) {
+    return results;
+  }
+
+  const debug = process.env.SKILL_ANALYZER_DEBUG === '1';
+  if (debug) console.error('🧠 Semantic Search: Generating query embedding...');
+
+  try {
+    // 1. Generate query embedding
+    const { expanded, addedHints } = expandSemanticQuery(query);
+    if (debug && addedHints.length > 0) {
+      console.error(`🧠 Semantic Search: Added intent hints: ${addedHints.join(', ')}`);
+    }
+    const queryEmbedding = await generateEmbedding(expanded);
+    
+    // 2. Load/Update skill embeddings
+    const cache = loadEmbeddingCache();
+    let cacheDirty = false;
+    const skillEmbeddings = new Map<string, number[]>();
+
+    for (const skill of skills) {
+      const cacheKey = getSkillEmbeddingCacheKey(skill);
+      const text = buildSkillEmbeddingText(skill);
+      const contentHash = sha256(text);
+      const cached = cache.embeddings[cacheKey];
+
+      if (cached?.embedding?.length && cached.hash === contentHash) {
+        skillEmbeddings.set(cacheKey, cached.embedding);
+        continue;
+      }
+
+      if (debug) {
+        const reason = cached ? 'changed' : 'new';
+        console.error(`   Generating embedding for ${reason} skill: ${skill.name}`);
+      }
+      const embedding = await generateEmbedding(text);
+      cache.embeddings[cacheKey] = { embedding, hash: contentHash };
+      skillEmbeddings.set(cacheKey, embedding);
+      cacheDirty = true;
+    }
+
+    if (cacheDirty) {
+      saveEmbeddingCache(cache);
+    }
+
+    // 3. Compute Cosine Similarity
+    for (const skill of skills) {
+      const skillEmbedding = skillEmbeddings.get(getSkillEmbeddingCacheKey(skill));
+      if (!skillEmbedding) continue;
+
+      const similarity = cosineSimilarity(queryEmbedding, skillEmbedding);
+      
+      // Normalize: Cosine is -1 to 1.
+      // Usually 0.3 is "somewhat relevant", 0.7+ is "very relevant"
+      // Map 0.2 -> 0, 0.8 -> 30 (high weight)
+      const normalizedScore = Math.max(0, Math.round((similarity - 0.12) * 150));
+      
+      results.set(skill.name, normalizedScore);
+      
+      if (debug && normalizedScore > 5) {
+        console.error(`   ${skill.name}: similarity=${similarity.toFixed(3)}, normalized=${normalizedScore}`);
+      }
+    }
+
+  } catch (error) {
+    console.error('⚠️  Semantic search failed:', error);
+  }
+
+  return results;
+}
+
+function cosineSimilarity(a: number[], b: number[]): number {
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dotProduct += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+function isPaiSkillsSkill(skill: Skill): boolean {
+  // Prefer the local PAI skills corpus over other installed plugin skills.
+  // This keeps suggestions aligned with the PAI skill system even when other plugins
+  // contain similarly relevant skills.
+  return skill.path.includes(`${path.sep}pai-skills${path.sep}`);
+}
+
+function getPaiSkillBoost(skill: Skill, baseScore: number): number {
+  if (!PREFER_PAI_SKILLS || PAI_SKILLS_PRIORITY_BOOST <= 0) return 0;
+  if (!isPaiSkillsSkill(skill)) return 0;
+  if (baseScore < MIN_SCORE_FOR_PAI_BOOST) return 0;
+  return PAI_SKILLS_PRIORITY_BOOST;
+}
 
 /**
  * Build or get cached TF-IDF instance from skills corpus
@@ -537,7 +759,7 @@ function formatGapWarning(
   scoredSkills: Array<{ skill: { name: string }; score: number }>
 ): string {
   const truncatedQuery = query.length > 60
-    ? query.slice(0, 57) + '...'
+    ? query.slice(0, 57) + '...' 
     : query;
   const matches = scoredSkills.slice(0, 3)
     .map(s => `${s.skill.name} (${Math.round(s.score)})`)
@@ -584,10 +806,11 @@ function checkGapNotification(): string | null {
     saveMetrics(metrics);
 
     const gapList = topGaps
-      .map(([query, count]) => `  • "${query}" (${count}x)`)
+      .map(([query, count]) => `  • "${query}" (${count}x)`) 
       .join('\n');
 
-    return `\n⚠️ **Skill Gap Analysis** (${totalGaps} low-relevance queries detected)\n\nTop queries without good skill matches:\n${gapList}\n\nConsider creating skills for these topics. Run \`bun run scripts/view-metrics.ts --gaps\` for full list.`;
+    return `\n⚠️ **Skill Gap Analysis** (${totalGaps} low-relevance queries detected)\n\nTop queries without good skill matches:\n${gapList}\n\nConsider creating skills for these topics. Run 
+bun run scripts/view-metrics.ts --gaps\` for full list.`;
   } catch {
     return null;
   }
@@ -844,7 +1067,7 @@ async function discoverSkillsCached(root: string, sourceType: 'project' | 'user'
 /**
  * Get all skill roots to search
  * Returns: { path: string, sourceType: 'project' | 'user' | 'plugin' }[]
- * Order: project skills last (so they win during deduplication)
+ * Order: project skills last (so they win during deduplication) - highest priority
  */
 function getSkillRoots(): Array<{ path: string; sourceType: 'project' | 'user' | 'plugin' }> {
   const roots: Array<{ path: string; sourceType: 'project' | 'user' | 'plugin' }> = [];
@@ -899,7 +1122,7 @@ function getSkillRoots(): Array<{ path: string; sourceType: 'project' | 'user' |
               'examples', 'test', 'tests', '__tests__', 'docs', 'references',
               'repos', 'marketplaces'  // repos contain source code, marketplaces are indexes
             ];
-            // Skip temp directories (temp_git_*, temp_*)
+            // Skip temp directories (temp_git_*, temp_*) 
             const isTempDir = entry.name.startsWith('temp_');
             if (!skipDirs.includes(entry.name) && !isTempDir) {
               findSkillsDirs(fullPath, depth + 1);
@@ -1080,6 +1303,12 @@ function expandTokens(tokens: string[]): string[] {
       }
     }
 
+    // Avoid exploding generic verbs into many near-synonyms (e.g. "make" -> "implement"),
+    // which creates noisy matches that overpower semantic scoring.
+    if (LOW_WEIGHT_TOKENS.has(token)) {
+      continue;
+    }
+
     // Add synonyms
     const synonyms = SYNONYM_MAP.get(token);
     if (synonyms) {
@@ -1102,7 +1331,7 @@ function tokenize(text: string, keepSkillTokens: boolean = false): string[] {
   const rawTokens = text
     .toLowerCase()
     .replace(/[^\w\s-]/g, ' ')  // Replace punctuation with spaces
-    .split(/\s+/)
+    .split(/\s+/)              // Split on whitespace
     .filter(t => t.length >= 2);  // Allow 2-char tokens initially
 
   // Filter tokens
@@ -1166,8 +1395,8 @@ function scoreFuzzyMatch(distance: number, maxDistance: number = MAX_FUZZY_DISTA
 function tokenizeSkillName(name: string): string[] {
   return name
     .toLowerCase()
-    .split(/[\s\-_]+/)  // Split on spaces, hyphens, underscores
-    .filter(token => token.length >= 3);  // Filter short tokens
+    .split(/[\s\-_]+/)
+    .filter(token => token.length >= 3);
 }
 
 /**
@@ -1310,9 +1539,11 @@ function scoreSkillRelevanceFuzzy(skill: Skill, prompt: string): number {
 
   for (const keyword of keywords) {
     if (promptLower.includes(keyword) &&
-        (nameLower.includes(keyword) ||
-         skill.description.toLowerCase().includes(keyword) ||
-         skill.whenToUse.toLowerCase().includes(keyword))) {
+        (
+          nameLower.includes(keyword) ||
+          skill.description.toLowerCase().includes(keyword) ||
+          skill.whenToUse.toLowerCase().includes(keyword)
+        )) {
       score += 3;
     }
   }
@@ -1392,44 +1623,49 @@ function scoreSkillsWithFuse(
 }
 
 /**
- * Hybrid scoring: Combines rules-based, token-based, Fuse.js fuzzy matching, and TF-IDF
+ * Hybrid scoring: Combines rules-based, token-based, Fuse.js fuzzy matching, TF-IDF, and Semantic Search
  * TF-IDF adds term weighting: common terms get low weight, unique terms get high weight
+ * Semantic Search: Captures intent and conceptual similarity
  */
 function scoreSkillRelevanceHybrid(
   skill: Skill,
   prompt: string,
   rules: SkillRules | null,
   fuseScores: Map<string, { fuseScore: number; fuseMatch: Fuse.FuseResult<Skill> | null }>,
-  tfidfScores: Map<string, number>
-): { score: number; source: 'rules' | 'fuzzy' | 'fuse' | 'tfidf' | 'hybrid' } {
+  tfidfScores: Map<string, number>,
+  semanticScores: Map<string, number>
+): { score: number; source: 'rules' | 'fuzzy' | 'fuse' | 'tfidf' | 'semantic' | 'hybrid' } {
   const rulesScore = scoreSkillFromRules(skill, prompt, rules);
   const fuzzyScore = scoreSkillRelevanceFuzzy(skill, prompt);
   const fuseData = fuseScores.get(skill.name) || { fuseScore: 0, fuseMatch: null };
   const tfidfScore = tfidfScores.get(skill.name) || 0;
+  const semanticScore = semanticScores.get(skill.name) || 0;
 
   // If skill has rules and matched, prioritize rules-based score
   if (rulesScore > 0) {
-    // Add bonuses from fuzzy, fuse, and TF-IDF matching
+    // Add bonuses from fuzzy, fuse, TF-IDF, and semantic matching
     const hybridScore = rulesScore +
       Math.floor(fuzzyScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.fuzzy) +
       Math.floor(fuseData.fuseScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.fuse) +
-      Math.floor(tfidfScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.tfidf);
+      Math.floor(tfidfScore * CONFIG.WEIGHTS.hybridBonuses.whenRulesMatch.tfidf) +
+      Math.floor(semanticScore * 0.3); // Semantic bonus
+    const paiBoost = getPaiSkillBoost(skill, hybridScore);
     return {
-      score: hybridScore,
-      source: (fuzzyScore > 0 || fuseData.fuseScore > 0 || tfidfScore > 0) ? 'hybrid' : 'rules'
+      score: hybridScore + paiBoost,
+      source: (fuzzyScore > 0 || fuseData.fuseScore > 0 || tfidfScore > 0 || semanticScore > 0) ? 'hybrid' : 'rules'
     };
   }
 
-  // Combine token-based, Fuse.js, and TF-IDF scores
-  // Use TF-IDF to re-weight: high TF-IDF means query has unique terms that match this skill
+  // Combine scores from different engines
   let combinedScore: number;
-  let source: 'fuzzy' | 'fuse' | 'tfidf' | 'hybrid';
+  let source: 'fuzzy' | 'fuse' | 'tfidf' | 'semantic' | 'hybrid';
 
   // Find the maximum base score
   const scores = [
     { value: fuzzyScore, name: 'fuzzy' as const },
     { value: fuseData.fuseScore, name: 'fuse' as const },
-    { value: tfidfScore, name: 'tfidf' as const }
+    { value: tfidfScore, name: 'tfidf' as const },
+    { value: semanticScore, name: 'semantic' as const }
   ].sort((a, b) => b.value - a.value);
 
   const primary = scores[0];
@@ -1449,7 +1685,8 @@ function scoreSkillRelevanceHybrid(
   const hasMultiple = secondary.value > 0;
   source = hasMultiple ? 'hybrid' : primary.name;
 
-  return { score: combinedScore, source };
+  const paiBoost = getPaiSkillBoost(skill, combinedScore);
+  return { score: combinedScore + paiBoost, source };
 }
 
 /**
@@ -1464,7 +1701,7 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
   const debug = process.env.SKILL_ANALYZER_DEBUG === '1';
 
   if (debug) {
-    console.error('\n🔍 HYBRID DEBUG MODE ENABLED (Token + Fuse.js + Rules)');
+    console.error('\n🔍 HYBRID DEBUG MODE ENABLED (Token + Fuse.js + Rules + Semantic)');
     console.error(`Searching skill roots: ${roots.map(r => `${r.path} (${r.sourceType})`).join(', ')}`);
   }
 
@@ -1490,22 +1727,15 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
     allSkills.push(...skills);
   }
 
-  // Deduplicate by folder name - later sources win (superpowers > pai-skills, project > all)
-  // Folder name is consistent across sources (e.g., "using-git-worktrees" folder)
-  // whereas display names may differ ("Using Git Worktrees" vs "using-git-worktrees")
-  // Order: user → pai-skills → cache/superpowers → project (last wins)
+  // Deduplicate by folder name
   const seenFolders = new Map<string, number>();
   for (let i = 0; i < allSkills.length; i++) {
     const folder = allSkills[i].folderName.toLowerCase();
-    // Last one wins (superpowers comes after pai-skills, project comes last)
     seenFolders.set(folder, i);
   }
   const uniqueIndices = new Set(seenFolders.values());
   const deduplicatedSkills = allSkills.filter((_, i) => uniqueIndices.has(i));
 
-  if (debug && deduplicatedSkills.length < allSkills.length) {
-    console.error(`Deduplicated: ${allSkills.length} → ${deduplicatedSkills.length} skills`);
-  }
   allSkills.length = 0;
   allSkills.push(...deduplicatedSkills);
 
@@ -1514,15 +1744,23 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
     return { skills: [], scoredSkills: [] };
   }
 
-  // Get Fuse.js scores for all skills
-  const fuseScores = scoreSkillsWithFuse(allSkills, prompt);
-
-  // Get TF-IDF scores for all skills (weights terms by uniqueness)
-  const tfidfScores = scoreSkillsWithTfIdf(allSkills, prompt);
+  // Calculate all scores in parallel where possible
+  const [fuseScores, tfidfScores, semanticScores] = await Promise.all([
+    Promise.resolve(scoreSkillsWithFuse(allSkills, prompt)),
+    Promise.resolve(scoreSkillsWithTfIdf(allSkills, prompt)),
+    scoreSkillsWithEmbeddings(allSkills, prompt)
+  ]);
 
   const scoredSkills = allSkills
     .map((skill) => {
-      const { score, source } = scoreSkillRelevanceHybrid(skill, prompt, rules, fuseScores, tfidfScores);
+      const { score, source } = scoreSkillRelevanceHybrid(
+        skill, 
+        prompt, 
+        rules, 
+        fuseScores, 
+        tfidfScores, 
+        semanticScores
+      );
       return { skill, score, source };
     })
     .filter(({ score }) => score > 0)
@@ -1538,11 +1776,11 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
     } else {
       scoredSkills.slice(0, 10).forEach(({ skill, score, source }, index) => {
         const marker = index < limit ? '✓' : ' ';
-        const sourceIcon = source === 'rules' ? '📋' : source === 'fuse' ? '🔎' : source === 'fuzzy' ? '🔍' : source === 'tfidf' ? '📊' : '🔀';
+        const sourceIcon = source === 'rules' ? '📋' : source === 'semantic' ? '🧠' : source === 'fuse' ? '🔎' : source === 'fuzzy' ? '🔍' : source === 'tfidf' ? '📊' : '🔀';
         console.error(`${marker} ${index + 1}. [Score: ${score}] ${sourceIcon} ${source.toUpperCase()} - ${skill.name}`);
         if (skill.description) {
           const desc = skill.description.length > 100
-            ? skill.description.slice(0, 100) + '...'
+            ? skill.description.slice(0, 100) + '...' 
             : skill.description;
           console.error(`      ${desc}`);
         }
@@ -1575,7 +1813,7 @@ function formatSkillSuggestions(
     if (showScores && scoredSkills) {
       const scored = scoredSkills.find(s => s.skill.name === skill.name);
       if (scored) {
-        const sourceIcon = scored.source === 'rules' ? '📋' : scored.source === 'fuzzy' ? '🔍' : '🔀';
+        const sourceIcon = scored.source === 'rules' ? '📋' : scored.source === 'semantic' ? '🧠' : scored.source === 'fuse' ? '🔎' : scored.source === 'fuzzy' ? '🔍' : scored.source === 'tfidf' ? '📊' : '🔀';
         scoreText = ` [score: ${scored.score}${scored.source ? `, ${sourceIcon} ${scored.source}` : ''}]`;
       }
     }
@@ -1737,7 +1975,8 @@ if (args[0] === '--record-activation' && args[1]) {
 } else if (args[0] === '--show-gaps') {
   const metrics = loadMetrics();
   const gaps = Object.entries(metrics.gaps).sort((a, b) => b[1] - a[1]);
-  console.log(`\n📊 Skill Gaps (queries with low relevance scores < ${GAP_THRESHOLD})`);
+  console.log(`\n📊 Skill Gaps (queries with low relevance scores < ${GAP_THRESHOLD})
+`);
   console.log('='.repeat(60));
   console.log(`Total gap queries: ${gaps.reduce((a, [_, c]) => a + c, 0)}`);
   console.log(`Unique queries: ${gaps.length}`);

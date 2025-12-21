@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "description": "Semantic search evaluation test cases",
+  "test_cases": [
+    {
+      "id": "semantic-performance",
+      "category": "semantic",
+      "query": "make things go faster",
+      "expected": ["optimizing-performance"],
+      "notes": "Conceptual match: fast -> performance"
+    },
+    {
+      "id": "semantic-root-cause",
+      "category": "semantic",
+      "query": "find the root cause",
+      "expected": ["systematic-debugging", "root-cause-tracing"],
+      "notes": "Conceptual match: root cause -> debugging"
+    },
+    {
+      "id": "semantic-quality",
+      "category": "semantic",
+      "query": "ensure code quality",
+      "expected": ["refactoring-safely", "test-driven-development", "testing-anti-patterns"],
+      "notes": "Conceptual match: quality -> refactoring/testing"
+    },
+    {
+      "id": "semantic-clean-up",
+      "category": "semantic",
+      "query": "clean up the codebase",
+      "expected": ["refactoring-safely", "cleaning-up-post-task"],
+      "notes": "Conceptual match: clean up -> refactoring"
+    },
+    {
+      "id": "semantic-user-input",
+      "category": "semantic",
+      "query": "handle user input safely",
+      "expected": ["validating-inputs", "react-hook-form-zod"],
+      "notes": "Conceptual match: input safety -> validation"
+    },
+    {
+      "id": "semantic-cli",
+      "category": "semantic",
+      "query": "command line tool building",
+      "expected": ["cli-tool-developer", "developing-cli-tools"],
+      "notes": "Conceptual match: command line -> CLI"
+    },
+    {
+      "id": "semantic-styles",
+      "category": "semantic",
+      "query": "make it look good",
+      "expected": ["frontend-dev-guidelines-tailwind", "tailwind-v4-shadcn"],
+      "notes": "Conceptual match: look good -> styling/frontend"
+    }
+  ]
+}
