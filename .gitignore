@@ -30,3 +30,4 @@ npm-debug.log*
 
 # Metrics (generated at runtime)
 lib/skill-metrics.json
+lib/skill-gaps.jsonl
