@@ -31,8 +31,8 @@ import { pipeline, env } from '@xenova/transformers';
 import { CONFIG } from '../../lib/config';
 import { scoreSkillsWithTfIdf } from './skill-analyzer/tfidf';
 import { scoreSkillRelevanceHybrid } from './skill-analyzer/hybrid';
-import { scoreSkillRelevanceFuzzy } from './skill-analyzer/tokenize';
 import { scoreSkillsWithFuse } from './skill-analyzer/fuse';
+import { loadSkillRules, scoreSkillFromRules, type SkillRules } from './skill-analyzer/rules';
 
 // Configure cache for models
 const PLUGIN_LIB_DIR = path.join(__dirname, '..', '..', 'lib');
@@ -69,51 +69,7 @@ interface CacheEntry {
   };
 }
 
-// skill-rules.json interfaces
-interface SkillRule {
-  type?: 'domain' | 'guardrail';
-  enforcement?: 'suggest' | 'block' | 'warn';
-  priority?: 'critical' | 'high' | 'medium' | 'low';
-  description?: string;
-  promptTriggers?: {
-    keywords?: string[];
-    intentPatterns?: string[];
-    compiledIntentRegexes?: RegExp[];
-  };
-  fileTriggers?: {
-    pathPatterns?: string[];
-    pathExclusions?: string[];
-    contentPatterns?: string[];
-  };
-  blockMessage?: string;
-  skipConditions?: {
-    sessionSkillUsed?: boolean;
-    fileMarkers?: string[];
-    envOverride?: string;
-  };
-  isPluginRule?: boolean;
-}
-
-interface SkillRules {
-  version?: string;
-  description?: string;
-  skills?: Record<string, SkillRule>;
-  globalConfig?: {
-    enableFileTriggersForAllProjects?: boolean;
-    cacheSkillRules?: boolean;
-    debugMode?: boolean;
-    respectSkillFinderDebugEnv?: boolean;
-  };
-  [key: string]: any; // Allow other properties
-}
-
-interface SkillRulesCacheEntry {
-  rules: SkillRules | null;
-  mtime: number;
-}
-
 const skillCache = new Map<string, CacheEntry>();
-const rulesCache = new Map<string, SkillRulesCacheEntry>();
 const PROJECT_DIR = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 
 const PREFER_PAI_SKILLS = process.env.SKILL_ANALYZER_PREFER_PAI_SKILLS !== '0';
@@ -355,7 +311,7 @@ function getPaiSkillBoost(skill: Skill, baseScore: number): number {
 }
 
 const PLUGIN_CACHE_FRAGMENT = `${path.sep}.claude${path.sep}plugins${path.sep}cache`;
-const IS_PLUGIN_CONTEXT =
+const isPluginContext =
   PROJECT_DIR.includes(PLUGIN_CACHE_FRAGMENT) ||
   PROJECT_DIR.includes('/.claude/plugins/cache/');
 
@@ -372,136 +328,24 @@ function getMetricsPath(): string {
 const METRICS_FILE = getMetricsPath();
 const METRICS_DIR = path.dirname(METRICS_FILE);
 
-function compileIntentPatterns(patterns?: string[]): RegExp[] {
-  if (!patterns?.length) return [];
-  const compiled: RegExp[] = [];
-  for (const pattern of patterns) {
-    try {
-      compiled.push(new RegExp(pattern, 'i'));
-    } catch (error) {
-      console.error(`⚠️  Invalid regex pattern in skill-rules.json: "${pattern}"`, error);
-    }
-  }
-  return compiled;
-}
 
 /** Maximum edit distance for fuzzy matching */
 
 /** Enable fuzzy matching debug output via SKILL_ANALYZER_DEBUG_FUZZY=1 */
 
 /** Enable rules debug output via SKILL_ANALYZER_DEBUG_RULES=1 */
-const DEBUG_RULES_ENABLED = process.env.SKILL_ANALYZER_DEBUG_RULES === '1';
 
 /**
  * Load skill-rules.json with caching
  */
-function loadSkillRules(skillsRoot: string): SkillRules | null {
-  const rulesPath = path.join(skillsRoot, 'skill-rules.json');
-
-  if (!fs.existsSync(rulesPath)) {
-    return null;
-  }
-
-  try {
-    const stat = fs.statSync(rulesPath);
-    const cached = rulesCache.get(rulesPath);
-
-    // Return cached if unchanged
-    if (cached && cached.mtime === stat.mtimeMs) {
-      return cached.rules;
-    }
-
-    // Load and parse
-    const content = fs.readFileSync(rulesPath, 'utf-8');
-    const rules = JSON.parse(content) as SkillRules;
-    if (rules.skills) {
-      for (const [name, rule] of Object.entries(rules.skills)) {
-        if (rule.promptTriggers?.intentPatterns) {
-          rule.promptTriggers.compiledIntentRegexes = compileIntentPatterns(rule.promptTriggers.intentPatterns);
-        }
-        const hasPluginPath = rule.fileTriggers?.pathPatterns?.some((pattern) =>
-          pattern.includes('/.claude/plugins/cache/')
-        );
-        rule.isPluginRule = Boolean(hasPluginPath);
-      }
-      if (!IS_PLUGIN_CONTEXT) {
-        for (const [name, rule] of Object.entries(rules.skills)) {
-          if (rule.isPluginRule) {
-            delete rules.skills[name];
-          }
-        }
-      }
-    }
-
-    // Cache it
-    rulesCache.set(rulesPath, {
-      rules,
-      mtime: stat.mtimeMs
-    });
-
-    if (DEBUG_RULES_ENABLED) {
-      console.error(`✓ Loaded skill-rules.json from ${rulesPath}`);
-      console.error(`  Found ${Object.keys(rules.skills || {}).length} skill rules`);
-    }
-
-    return rules;
-  } catch (error) {
-    console.error(`⚠️  Failed to load skill-rules.json from ${rulesPath}:`, error);
-    return null;
-  }
-}
 
 /**
  * Get priority score boost based on priority level
  */
-function getPriorityBoost(priority?: string): number {
-  switch (priority) {
-    case 'critical': return 15;
-    case 'high': return 10;
-    case 'medium': return 5;
-    case 'low': return 2;
-    default: return 0;
-  }
-}
 
 /**
  * Test if prompt matches any intent patterns
  */
-function matchesIntentPatterns(promptLower: string, rule: SkillRule): boolean {
-  const compiled = rule.promptTriggers?.compiledIntentRegexes;
-  if (compiled?.length) {
-    for (const regex of compiled) {
-      if (regex.test(promptLower)) {
-        if (DEBUG_RULES_ENABLED) {
-          console.error(`    ✓ Intent pattern match: "${regex.source}"`);
-        }
-        return true;
-      }
-    }
-    return false;
-  }
-
-  const rawPatterns = rule.promptTriggers?.intentPatterns;
-  if (!rawPatterns?.length) {
-    return false;
-  }
-
-  for (const pattern of rawPatterns) {
-    try {
-      const regex = new RegExp(pattern, 'i');
-      if (regex.test(promptLower)) {
-        if (DEBUG_RULES_ENABLED) {
-          console.error(`    ✓ Intent pattern match (fallback): "${pattern}"`);
-        }
-        return true;
-      }
-    } catch (error) {
-      console.error(`⚠️  Invalid regex pattern in skill-rules.json: "${pattern}"`, error);
-    }
-  }
-
-  return false;
-}
 
 /**
  * Metrics structure for tracking skill usage
@@ -767,60 +611,288 @@ function clearGaps(): void {
  * Score skill based on skill-rules.json configuration
  * Returns 0 if no rules exist for this skill
  */
-function scoreSkillFromRules(skill: Skill, prompt: string, rules: SkillRules | null): number {
-  if (!rules || !rules.skills) {
-    return 0;
-  }
+/** Maximum edit distance for fuzzy matching */
 
-  const skillRule = rules.skills[skill.name];
-  if (!skillRule) {
-    return 0; // No rules for this skill, fuzzy matching will handle it
-  }
+/** Enable fuzzy matching debug output via SKILL_ANALYZER_DEBUG_FUZZY=1 */
 
-  let score = 0;
-  const promptLower = prompt.toLowerCase();
+/** Enable rules debug output via SKILL_ANALYZER_DEBUG_RULES=1 */
 
-  if (DEBUG_RULES_ENABLED) {
-    console.error(`\n  📋 Checking rules for skill: ${skill.name}`);
-  }
+/**
+ * Load skill-rules.json with caching
+ */
 
-  // Check keyword matches
-  if (skillRule.promptTriggers?.keywords) {
-    for (const keyword of skillRule.promptTriggers.keywords) {
-      if (promptLower.includes(keyword.toLowerCase())) {
-        score += 8; // High weight for explicit keyword match
-        if (DEBUG_RULES_ENABLED) {
-          console.error(`    ✓ Keyword match: "${keyword}" (+8)`);
-        }
-      }
-    }
-  }
+/**
+ * Get priority score boost based on priority level
+ */
 
-  // Check intent pattern matches
-  if (skillRule.promptTriggers?.intentPatterns || skillRule.promptTriggers?.compiledIntentRegexes?.length) {
-    if (matchesIntentPatterns(promptLower, skillRule)) {
-      score += 6; // Medium weight for intent pattern match
-      if (DEBUG_RULES_ENABLED) {
-        console.error(`    ✓ Intent pattern matched (+6)`);
-      }
-    }
-  }
+/**
+ * Test if prompt matches any intent patterns
+ */
 
-  // Apply priority boost
-  const priorityBoost = getPriorityBoost(skillRule.priority);
-  if (priorityBoost > 0) {
-    score += priorityBoost;
-    if (DEBUG_RULES_ENABLED) {
-      console.error(`    ✓ Priority boost (${skillRule.priority}): +${priorityBoost}`);
-    }
-  }
-
-  if (DEBUG_RULES_ENABLED && score > 0) {
-    console.error(`    Final rules-based score: ${score}`);
-  }
-
-  return score;
+/**
+ * Metrics structure for tracking skill usage
+ */
+interface SkillMetrics {
+  suggestions: Record<string, number>;  // Hook suggested this skill
+  activations: Record<string, number>;  // Skill was actually loaded via Skill tool
+  searches: Record<string, number>;     // User searched for this (gap analysis)
+  gaps: Record<string, number>;         // Low-relevance queries (potential missing skills)
+  lastUpdated: string;
+  lastGapNotification?: string;         // When we last notified about gaps
 }
+
+/** Minimum score for a skill to be considered a "good match" */
+const GAP_THRESHOLD = CONFIG.GAP_THRESHOLD;
+
+/** How many gap queries before we notify */
+const GAP_NOTIFICATION_THRESHOLD = 10;
+
+/** Minimum hours between gap notifications */
+const GAP_NOTIFICATION_COOLDOWN_HOURS = 24;
+
+function getEmptyMetrics(): SkillMetrics {
+  return {
+    suggestions: {},
+    activations: {},
+    searches: {},
+    gaps: {},
+    lastUpdated: new Date().toISOString()
+  };
+}
+
+function loadMetrics(): SkillMetrics {
+  if (!fs.existsSync(METRICS_FILE)) {
+    return getEmptyMetrics();
+  }
+  try {
+    const data = JSON.parse(fs.readFileSync(METRICS_FILE, 'utf-8'));
+    // Handle legacy flat format (just skill: count)
+    if (!data.suggestions && !data.activations) {
+      // Migrate legacy data - assume all were suggestions
+      return {
+        suggestions: data,
+        activations: {},
+        searches: {},
+        gaps: {},
+        lastUpdated: new Date().toISOString()
+      };
+    }
+    // Ensure gaps exists (may be missing from older format)
+    if (!data.gaps) {
+      data.gaps = {};
+    }
+    return data;
+  } catch {
+    return getEmptyMetrics();
+  }
+}
+
+function saveMetrics(metrics: SkillMetrics): void {
+  metrics.lastUpdated = new Date().toISOString();
+  fs.writeFileSync(METRICS_FILE, JSON.stringify(metrics, null, 2));
+}
+
+/**
+ * Record skill suggestions (from hook)
+ */
+function recordSkillSuggestions(skillNames: string[]): void {
+  if (!skillNames.length) return;
+  try {
+    fs.mkdirSync(METRICS_DIR, { recursive: true });
+    const metrics = loadMetrics();
+    for (const name of skillNames) {
+      metrics.suggestions[name] = (metrics.suggestions[name] || 0) + 1;
+    }
+    saveMetrics(metrics);
+  } catch (error) {
+    console.error('⚠️  Failed to record skill metrics:', error);
+  }
+}
+
+/**
+ * Record skill activation (when skill is loaded via Skill tool)
+ * Called externally via: bun run hooks/prompt-submit/analyze-prompt-skills.ts --record-activation "skill-name"
+ */
+function recordSkillActivation(skillName: string): void {
+  if (!skillName) return;
+  try {
+    fs.mkdirSync(METRICS_DIR, { recursive: true });
+    const metrics = loadMetrics();
+    metrics.activations[skillName] = (metrics.activations[skillName] || 0) + 1;
+    saveMetrics(metrics);
+  } catch (error) {
+    console.error('⚠️  Failed to record skill activation:', error);
+  }
+}
+
+/**
+ * Record search query (for gap analysis - what skills are users looking for?)
+ * Called externally via: bun run hooks/prompt-submit/analyze-prompt-skills.ts --record-search "query"
+ */
+function recordSearch(query: string): void {
+  if (!query) return;
+  try {
+    fs.mkdirSync(METRICS_DIR, { recursive: true });
+    const metrics = loadMetrics();
+    metrics.searches[query] = (metrics.searches[query] || 0) + 1;
+    saveMetrics(metrics);
+  } catch (error) {
+    console.error('⚠️  Failed to record search:', error);
+  }
+}
+
+/**
+ * Record a gap - query where best match was below threshold
+ * These represent potential skills we should create
+ */
+function recordGap(query: string, bestScore: number): void {
+  if (!query || query.length < 5) return; // Skip very short queries
+  const debug = process.env.SKILL_ANALYZER_DEBUG === '1';
+  try {
+    fs.mkdirSync(METRICS_DIR, { recursive: true });
+    const metrics = loadMetrics();
+    // Normalize query for deduplication (truncate to first 100 chars to avoid excessively long keys)
+    const normalizedQuery = query.toLowerCase().trim().slice(0, 100);
+    metrics.gaps[normalizedQuery] = (metrics.gaps[normalizedQuery] || 0) + 1;
+    saveMetrics(metrics);
+    if (debug) {
+      console.error(`📉 Recorded gap: "${normalizedQuery}" (best score: ${bestScore})`);
+    }
+  } catch (error) {
+    if (debug) {
+      console.error('⚠️  Failed to record gap:', error);
+    }
+    // Non-critical - silently fail in normal operation
+  }
+}
+
+/**
+ * Rich gap entry with context for analysis
+ */
+interface RichGapEntry {
+  query: string;
+  bestScore: number;
+  topMatches: Array<{ skill: string; score: number }>;
+  timestamp: string;
+}
+
+const GAPS_LOG_PATH = path.join(METRICS_DIR, 'skill-gaps.jsonl');
+
+/**
+ * Record a rich gap entry to JSONL log for detailed analysis
+ * Includes top matches to help identify what skills came close
+ */
+function recordRichGap(
+  query: string,
+  bestScore: number,
+  scoredSkills: Array<{ skill: { name: string }; score: number }>
+): void {
+  if (!query || query.length < 5) return;
+  const debug = process.env.SKILL_ANALYZER_DEBUG === '1';
+  try {
+    fs.mkdirSync(METRICS_DIR, { recursive: true });
+    const entry: RichGapEntry = {
+      query: query.slice(0, 200),
+      bestScore: Math.round(bestScore),
+      topMatches: scoredSkills.slice(0, 3).map(s => ({
+        skill: s.skill.name,
+        score: Math.round(s.score)
+      })),
+      timestamp: new Date().toISOString(),
+    };
+    fs.appendFileSync(GAPS_LOG_PATH, JSON.stringify(entry) + '\n');
+    if (debug) {
+      console.error(`📊 Rich gap logged: ${entry.topMatches.length} close matches`);
+    }
+  } catch (error) {
+    if (debug) {
+      console.error('⚠️  Failed to record rich gap:', error);
+    }
+  }
+}
+
+/**
+ * Format a warning message for low skill coverage
+ */
+function formatGapWarning(
+  query: string,
+  bestScore: number,
+  scoredSkills: Array<{ skill: { name: string }; score: number }>
+): string {
+  const truncatedQuery = query.length > 60
+    ? query.slice(0, 57) + '...'
+    : query;
+  const matches = scoredSkills.slice(0, 3)
+    .map(s => `${s.skill.name} (${Math.round(s.score)})`)
+    .join(', ');
+
+  return `\n⚠️ **Low skill coverage** (score: ${Math.round(bestScore)}/100)
+   Query: "${truncatedQuery}"
+   Closest: ${matches || 'none'}`;
+}
+
+/**
+ * Check if we should notify about gaps and return notification message if so
+ */
+function checkGapNotification(): string | null {
+  try {
+    const metrics = loadMetrics();
+    const totalGaps = Object.values(metrics.gaps).reduce((a, b) => a + b, 0);
+
+    // Check if we have enough gaps to notify
+    if (totalGaps < GAP_NOTIFICATION_THRESHOLD) {
+      return null;
+    }
+
+    // Check cooldown
+    if (metrics.lastGapNotification) {
+      const lastNotification = new Date(metrics.lastGapNotification);
+      const hoursSince = (Date.now() - lastNotification.getTime()) / (1000 * 60 * 60);
+      if (hoursSince < GAP_NOTIFICATION_COOLDOWN_HOURS) {
+        return null;
+      }
+    }
+
+    // Generate notification
+    const topGaps = Object.entries(metrics.gaps)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    if (topGaps.length === 0) {
+      return null;
+    }
+
+    // Update last notification time
+    metrics.lastGapNotification = new Date().toISOString();
+    saveMetrics(metrics);
+
+    const gapList = topGaps
+      .map(([query, count]) => `  • "${query}" (${count}x)`)
+      .join('\n');
+
+    return `\n⚠️ **Skill Gap Analysis** (${totalGaps} low-relevance queries detected)\n\nTop queries without good skill matches:\n${gapList}\n\nConsider creating skills for these topics. Run \`bun run scripts/view-metrics.ts --gaps\` for full list.`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Clear gaps after notification (optional - call after user acknowledges)
+ */
+function clearGaps(): void {
+  try {
+    const metrics = loadMetrics();
+    metrics.gaps = {};
+    saveMetrics(metrics);
+  } catch {
+    // Silently fail
+  }
+}
+
+/**
+ * Score skill based on skill-rules.json configuration
+ * Returns 0 if no rules exist for this skill
+ */
 
 /**
  * Normalize multiline YAML strings (from | or > block scalars)
@@ -1111,9 +1183,9 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
   const paiPluginRulesDir = path.join(paiDir, '.claude', 'plugins', 'pai-skills', 'lib');
   let rules: SkillRules | null = null;
   if (fs.existsSync(path.join(paiPluginRulesDir, 'skill-rules.json'))) {
-    rules = loadSkillRules(paiPluginRulesDir);
+    rules = loadSkillRules(paiPluginRulesDir, isPluginContext);
   } else if (roots.length > 0) {
-    rules = loadSkillRules(roots[0].path);
+    rules = loadSkillRules(roots[0].path, isPluginContext);
   }
 
   if (debug && rules) {
