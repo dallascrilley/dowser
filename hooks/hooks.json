@@ -7,17 +7,20 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/prompt-submit/analyze-prompt-skills.ts\""
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/prompt-submit/analyze-prompt-skills.ts",
+            "timeout": 30000
           }
         ]
       }
     ],
     "SessionStart": [
       {
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/session-start/load-core-context.ts\""
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start/load-core-context.ts",
+            "timeout": 10000
           }
         ]
       }

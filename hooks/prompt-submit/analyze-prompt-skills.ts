@@ -483,6 +483,71 @@ function recordGap(query: string, bestScore: number): void {
 }
 
 /**
+ * Rich gap entry with context for analysis
+ */
+interface RichGapEntry {
+  query: string;
+  bestScore: number;
+  topMatches: Array<{ skill: string; score: number }>;
+  timestamp: string;
+}
+
+const GAPS_LOG_PATH = path.join(METRICS_DIR, 'skill-gaps.jsonl');
+
+/**
+ * Record a rich gap entry to JSONL log for detailed analysis
+ * Includes top matches to help identify what skills came close
+ */
+function recordRichGap(
+  query: string,
+  bestScore: number,
+  scoredSkills: Array<{ skill: { name: string }; score: number }>
+): void {
+  if (!query || query.length < 5) return;
+  const debug = process.env.SKILL_ANALYZER_DEBUG === '1';
+  try {
+    fs.mkdirSync(METRICS_DIR, { recursive: true });
+    const entry: RichGapEntry = {
+      query: query.slice(0, 200),
+      bestScore: Math.round(bestScore),
+      topMatches: scoredSkills.slice(0, 3).map(s => ({
+        skill: s.skill.name,
+        score: Math.round(s.score)
+      })),
+      timestamp: new Date().toISOString(),
+    };
+    fs.appendFileSync(GAPS_LOG_PATH, JSON.stringify(entry) + '\n');
+    if (debug) {
+      console.error(`📊 Rich gap logged: ${entry.topMatches.length} close matches`);
+    }
+  } catch (error) {
+    if (debug) {
+      console.error('⚠️  Failed to record rich gap:', error);
+    }
+  }
+}
+
+/**
+ * Format a warning message for low skill coverage
+ */
+function formatGapWarning(
+  query: string,
+  bestScore: number,
+  scoredSkills: Array<{ skill: { name: string }; score: number }>
+): string {
+  const truncatedQuery = query.length > 60
+    ? query.slice(0, 57) + '...'
+    : query;
+  const matches = scoredSkills.slice(0, 3)
+    .map(s => `${s.skill.name} (${Math.round(s.score)})`)
+    .join(', ');
+
+  return `\n⚠️ **Low skill coverage** (score: ${Math.round(bestScore)}/100)
+   Query: "${truncatedQuery}"
+   Closest: ${matches || 'none'}`;
+}
+
+/**
  * Check if we should notify about gaps and return notification message if so
  */
 function checkGapNotification(): string | null {
@@ -1603,25 +1668,38 @@ async function main() {
 
     // Check if top match is below threshold (skill gap)
     const topScore = scoredSkills.length > 0 ? scoredSkills[0].score : 0;
-    if (topScore < GAP_THRESHOLD) {
+    const isLowCoverage = topScore < GAP_THRESHOLD;
+    if (isLowCoverage) {
       recordGap(userPrompt, topScore);
+      recordRichGap(userPrompt, topScore, scoredSkills);
     }
+
+    // Generate inline warning for low coverage
+    const gapWarning = isLowCoverage
+      ? formatGapWarning(userPrompt, topScore, scoredSkills)
+      : '';
 
     if (relevantSkills.length > 0) {
       recordSkillSuggestions(relevantSkills.map(skill => skill.name));
       const skillSummary = formatSkillSuggestions(relevantSkills, scoredSkills);
 
-      // Check if we should notify about gaps
+      // Check if we should notify about accumulated gaps
       const gapNotification = checkGapNotification();
 
       // Output to stderr for console display
       console.error(skillSummary);
+      if (gapWarning) {
+        console.error(gapWarning);
+      }
       if (gapNotification) {
         console.error(gapNotification);
       }
 
       // Return the skills as additional context
       let additionalContext = `\n\n${skillSummary}\n\nConsider using the Skill tool to load these skills if they're relevant to the task.`;
+      if (gapWarning) {
+        additionalContext += gapWarning;
+      }
       if (gapNotification) {
         additionalContext += gapNotification;
       }

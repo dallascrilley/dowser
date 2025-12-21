@@ -8,7 +8,8 @@
  *   bun run scripts/view-metrics.ts --top 50           # Show top 50 suggestions
  *   bun run scripts/view-metrics.ts --activations      # Show activations
  *   bun run scripts/view-metrics.ts --searches         # Show searches
- *   bun run scripts/view-metrics.ts --gaps             # Show gaps (missing skills)
+ *   bun run scripts/view-metrics.ts --gaps             # Show gaps with recent details
+ *   bun run scripts/view-metrics.ts --gaps-detailed    # Show gaps with full rich history
  *   bun run scripts/view-metrics.ts --summary          # Show summary of all types
  */
 
@@ -16,6 +17,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const METRICS_FILE = path.join(__dirname, '..', 'lib', 'skill-metrics.json');
+const GAPS_LOG_FILE = path.join(__dirname, '..', 'lib', 'skill-gaps.jsonl');
+
+interface RichGapEntry {
+  query: string;
+  bestScore: number;
+  topMatches: Array<{ skill: string; score: number }>;
+  timestamp: string;
+}
 
 interface SkillMetrics {
   suggestions: Record<string, number>;
@@ -54,6 +63,53 @@ function loadMetrics(): SkillMetrics {
   } catch (error) {
     console.error(`Error parsing metrics file: ${error}`);
     return { suggestions: {}, activations: {}, searches: {}, gaps: {}, lastUpdated: '' };
+  }
+}
+
+function loadRichGaps(): RichGapEntry[] {
+  if (!fs.existsSync(GAPS_LOG_FILE)) {
+    return [];
+  }
+  try {
+    const content = fs.readFileSync(GAPS_LOG_FILE, 'utf-8').trim();
+    if (!content) return [];
+    return content.split('\n').filter(Boolean).map(line => JSON.parse(line));
+  } catch {
+    return [];
+  }
+}
+
+function printGapsEnhanced(metrics: SkillMetrics, limit: number, detailed: boolean) {
+  const richGaps = loadRichGaps();
+
+  // Print basic gap counts from metrics
+  printTable('Skill Gaps (queries with low relevance)', metrics.gaps, limit);
+
+  // Add rich gap details if available
+  if (richGaps.length > 0) {
+    console.log(`\n📋 Recent Gap Details (from skill-gaps.jsonl)`);
+    console.log(`${'─'.repeat(60)}`);
+
+    const recentGaps = richGaps.slice(-Math.min(detailed ? 20 : 5, richGaps.length)).reverse();
+
+    for (const gap of recentGaps) {
+      const date = new Date(gap.timestamp).toLocaleString();
+      const truncatedQuery = gap.query.length > 45 ? gap.query.slice(0, 42) + '...' : gap.query;
+
+      console.log(`\n  [${date}] Score: ${gap.bestScore}`);
+      console.log(`  Query: "${truncatedQuery}"`);
+
+      if (gap.topMatches.length > 0) {
+        const matches = gap.topMatches.map(m => `${m.skill} (${m.score})`).join(', ');
+        console.log(`  Closest: ${matches}`);
+      }
+    }
+
+    if (!detailed && richGaps.length > 5) {
+      console.log(`\n  ... and ${richGaps.length - 5} more entries`);
+      console.log(`  Run with --gaps-detailed for full history`);
+      console.log(`  Or use: bun run scripts/analyze-gaps.ts for analysis`);
+    }
   }
 }
 
@@ -149,11 +205,13 @@ function main() {
     limit = parseInt(args[topIndex + 1]) || 20;
   }
 
+  const gapsDetailed = args.includes('--gaps-detailed');
+
   if (args.includes('--activations')) {
     mode = 'activations';
   } else if (args.includes('--searches')) {
     mode = 'searches';
-  } else if (args.includes('--gaps')) {
+  } else if (args.includes('--gaps') || gapsDetailed) {
     mode = 'gaps';
   } else if (args.includes('--summary')) {
     mode = 'summary';
@@ -170,7 +228,7 @@ function main() {
       printTable('Search Queries', metrics.searches, limit);
       break;
     case 'gaps':
-      printTable('Skill Gaps (queries with low relevance - consider creating skills)', metrics.gaps, limit);
+      printGapsEnhanced(metrics, limit, gapsDetailed);
       break;
     default:
       printTable('Skill Suggestions (from hook)', metrics.suggestions, limit);
