@@ -2,7 +2,9 @@
   "name": "pai-skills",
   "version": "1.0.0",
   "description": "Personal skills library with 120+ domain-specific skills",
-  "author": "Dallas Crilley",
+  "author": {
+    "name": "Dallas Crilley"
+  },
   "license": "MIT",
   "keywords": ["skills", "discovery", "fuzzy-matching", "tfidf", "hybrid-search"]
 }
