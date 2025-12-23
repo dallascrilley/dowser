@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { createHash } from 'crypto';
-import { pipeline, env } from '@xenova/transformers';
 import { CONFIG } from '../../../lib/config';
 import type { HookInput, Skill, SkillSourceType } from './types';
 import { scoreSkillsWithTfIdf } from './tfidf';
@@ -18,13 +17,11 @@ const isPluginContext =
   PROJECT_DIR.includes(PLUGIN_CACHE_FRAGMENT) ||
   PROJECT_DIR.includes('/.claude/plugins/cache/');
 
-// Configure cache for semantic models
 const PLUGIN_LIB_DIR = path.join(__dirname, '..', '..', '..', 'lib');
 const SEMANTIC_CACHE_DIR = path.resolve(
   process.env.SKILL_ANALYZER_SEMANTIC_CACHE_DIR || PLUGIN_LIB_DIR
 );
-env.cacheDir = path.join(SEMANTIC_CACHE_DIR, 'models');
-env.allowLocalModels = false;
+const SEMANTIC_MODEL_DIR = path.join(SEMANTIC_CACHE_DIR, 'models');
 
 // Semantic Search Configuration
 const SEMANTIC_ENABLED = process.env.SKILL_ANALYZER_SEMANTIC !== '0';
@@ -39,20 +36,57 @@ interface EmbeddingCache {
 }
 
 let extractor: any = null;
+let transformersModule: null | { pipeline: any; env: any } = null;
+let transformersLoadAttempted = false;
+let transformersLoadError: unknown | null = null;
+let loggedTransformersLoadError = false;
 
 function ensureSemanticCacheDir(): void {
   try {
     fs.mkdirSync(SEMANTIC_CACHE_DIR, { recursive: true });
-    fs.mkdirSync(env.cacheDir, { recursive: true });
+    fs.mkdirSync(SEMANTIC_MODEL_DIR, { recursive: true });
   } catch {
     // Best-effort; semantic search should degrade gracefully if cache is unwritable.
+  }
+}
+
+async function loadTransformers(): Promise<{ pipeline: any; env: any } | null> {
+  if (transformersModule) return transformersModule;
+  if (transformersLoadAttempted) return null;
+
+  transformersLoadAttempted = true;
+
+  try {
+    const mod = await import('@xenova/transformers');
+
+    // Configure cache for semantic models (must happen after import so `env` exists).
+    mod.env.cacheDir = SEMANTIC_MODEL_DIR;
+    mod.env.allowLocalModels = false;
+
+    transformersModule = { pipeline: mod.pipeline, env: mod.env };
+    return transformersModule;
+  } catch (error) {
+    transformersLoadError = error;
+    return null;
   }
 }
 
 async function getExtractor() {
   if (!extractor) {
     ensureSemanticCacheDir();
-    extractor = await pipeline('feature-extraction', EMBEDDING_MODEL, {
+    const transformers = await loadTransformers();
+    if (!transformers) {
+      if (!loggedTransformersLoadError) {
+        loggedTransformersLoadError = true;
+        console.error('⚠️  Semantic search disabled: failed to load @xenova/transformers.');
+        if (process.env.SKILL_ANALYZER_DEBUG === '1' && transformersLoadError) {
+          console.error(transformersLoadError);
+        }
+      }
+      return null;
+    }
+
+    extractor = await transformers.pipeline('feature-extraction', EMBEDDING_MODEL, {
       quantized: false,
     });
   }
@@ -82,6 +116,9 @@ function expandSemanticQuery(query: string): { expanded: string; addedHints: str
 
 async function generateEmbedding(text: string): Promise<number[]> {
   const pipe = await getExtractor();
+  if (!pipe) {
+    throw new Error('Semantic search disabled (transformers unavailable)');
+  }
   const output = await pipe(text, { pooling: 'mean', normalize: true });
   return Array.from(output.data);
 }
