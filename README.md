@@ -52,7 +52,8 @@ Restart Claude Code or start a new session. On SessionStart, Dowser tries to loa
 
 ```bash
 bun install
-bun test
+bun run test
+# full suite (slower cold start): bun run test:all
 ```
 
 Exercise the analyzer without Claude Code:
