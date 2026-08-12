@@ -15,6 +15,10 @@ When a skill fits, the UserPromptSubmit hook injects a short suggestion into con
 
 This repository also ships the skill library under `skills/` (100+ domain and workflow skills).
 
+## Provenance
+
+Dowser is original plugin work (hooks, hybrid search, garden tooling, evals). The `skills/` tree is a **curated library**: many skills are first-party, and third-party content is redistributed under original licenses listed in [NOTICE](NOTICE) (including obra/superpowers-aligned workflows and Anthropic skill-creator materials). Treat skill count as library size, not LOC of novel engine code.
+
 ## Requirements
 
 - [Bun](https://bun.sh) 1.0+ (hooks and tests run on Bun)
@@ -46,7 +50,6 @@ ln -sfn "$(pwd)" ~/.claude/plugins/dowser
 
 Restart Claude Code or start a new session. On SessionStart, Dowser tries to load optional personal PAI context if you keep a `PAI/SKILL.md` (or `~/.claude/skills/PAI/SKILL.md`). Missing PAI context is a warning, not a failure: skill search still works.
 
-**Note:** The GitHub repository may still be named `dowser` until rename to Dowser completes. Clone URLs in this README track the current remote.
 
 ## Quickstart (local smoke)
 
