@@ -6,17 +6,16 @@ Thanks for helping improve skill discovery for Claude Code.
 
 Requirements:
 
-- [Bun](https://bun.sh) 1.0+
-- Node-compatible package manager (pnpm is pinned in `packageManager`; bun install also works)
+- [Bun](https://bun.sh) 1.0+ (hooks and tests run on Bun)
 
 ```bash
-git clone https://github.com/dallascrilley/pai-skills.git
-cd pai-skills
+git clone https://github.com/dallascrilley/dowser.git
+cd dowser
 bun install
-bun test
+bun run test
 ```
 
-After the repository is renamed to Dowser on GitHub, use the new clone URL.
+Bun is the supported runtime for hooks and tests. A `pnpm-lock.yaml` may be present for Node tooling compatibility; prefer `bun install` for local development.
 
 ## What to change
 

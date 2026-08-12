@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code plugin (`pai-skills`) that provides intelligent skill discovery and matching. It automatically suggests relevant skills based on user prompts using a hybrid search system (Fuse.js fuzzy matching + TF-IDF term weighting + declarative rules).
+This is a Claude Code plugin (`dowser`) that provides intelligent skill discovery and matching. It automatically suggests relevant skills based on user prompts using a hybrid search system (Fuse.js fuzzy matching + TF-IDF term weighting + declarative rules).
 
 ## Tech Stack
 
