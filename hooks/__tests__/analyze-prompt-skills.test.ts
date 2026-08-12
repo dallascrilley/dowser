@@ -131,13 +131,14 @@ describe('analyze-prompt-skills hook', () => {
         cmd: ['bun', 'run', hookPath],
         stdin: Buffer.from(input),
         env: {
-          ...process.env,
+          ...hermeticEnv(),
           CLAUDE_PROJECT_DIR: tempDir, // Empty dir with no .claude/skills
+          CLAUDE_PLUGIN_ROOT: tempDir,
         },
       });
 
       expect(result.exitCode).toBe(0);
-    });
+    }, 30_000);
   });
 
   describe('JSON output format', () => {

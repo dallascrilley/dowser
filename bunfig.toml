@@ -1,3 +1,2 @@
 [test]
-# Cold first-run loads transformers; keep timeout generous for CI/laptops
 timeout = 30000
