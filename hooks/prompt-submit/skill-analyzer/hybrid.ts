@@ -6,22 +6,36 @@ import type { SkillRules } from './rules';
 import { scoreSkillFromRules } from './rules';
 import { scoreSkillRelevanceFuzzy } from './tokenize';
 
-const PREFER_PAI_SKILLS = process.env.SKILL_ANALYZER_PREFER_PAI_SKILLS !== '0';
-const PAI_SKILLS_PRIORITY_BOOST = Number.parseInt(process.env.SKILL_ANALYZER_PAI_BOOST || '25', 10);
-const MIN_SCORE_FOR_PAI_BOOST = Number.parseInt(
-  process.env.SKILL_ANALYZER_PAI_BOOST_MIN_SCORE || String(CONFIG.GAP_THRESHOLD),
+// Prefer skills shipped with this plugin (dowser; legacy path name pai-skills)
+const PREFER_PLUGIN_SKILLS =
+  process.env.SKILL_ANALYZER_PREFER_PLUGIN_SKILLS !== '0' &&
+  process.env.SKILL_ANALYZER_PREFER_PAI_SKILLS !== '0';
+const PLUGIN_SKILLS_PRIORITY_BOOST = Number.parseInt(
+  process.env.SKILL_ANALYZER_PLUGIN_BOOST ||
+    process.env.SKILL_ANALYZER_PAI_BOOST ||
+    '25',
+  10
+);
+const MIN_SCORE_FOR_PLUGIN_BOOST = Number.parseInt(
+  process.env.SKILL_ANALYZER_PLUGIN_BOOST_MIN_SCORE ||
+    process.env.SKILL_ANALYZER_PAI_BOOST_MIN_SCORE ||
+    String(CONFIG.GAP_THRESHOLD),
   10
 );
 
-function isPaiSkillsSkill(skill: Skill): boolean {
-  return skill.path.includes(`${path.sep}pai-skills${path.sep}`);
+function isDowserSkill(skill: Skill): boolean {
+  const sep = path.sep;
+  return (
+    skill.path.includes(`${sep}dowser${sep}`) ||
+    skill.path.includes(`${sep}pai-skills${sep}`)
+  );
 }
 
 function getPaiSkillBoost(skill: Skill, baseScore: number): number {
-  if (!PREFER_PAI_SKILLS || PAI_SKILLS_PRIORITY_BOOST <= 0) return 0;
-  if (!isPaiSkillsSkill(skill)) return 0;
-  if (baseScore < MIN_SCORE_FOR_PAI_BOOST) return 0;
-  return PAI_SKILLS_PRIORITY_BOOST;
+  if (!PREFER_PLUGIN_SKILLS || PLUGIN_SKILLS_PRIORITY_BOOST <= 0) return 0;
+  if (!isDowserSkill(skill)) return 0;
+  if (baseScore < MIN_SCORE_FOR_PLUGIN_BOOST) return 0;
+  return PLUGIN_SKILLS_PRIORITY_BOOST;
 }
 
 export function scoreSkillRelevanceHybrid(

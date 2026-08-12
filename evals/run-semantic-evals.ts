@@ -115,7 +115,7 @@ function ndcgAtK(results: SearchResult[], expected: string[], k: number): number
 }
 
 function createHermeticEnv(): { env: NodeJS.ProcessEnv; cleanup: () => void } {
-  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pai-skills-evals-'));
+  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dowser-evals-'));
   const hermeticHome = path.join(tmpRoot, 'home');
   const hermeticPai = path.join(tmpRoot, 'PAI');
   const hermeticProject = path.join(tmpRoot, 'project');
@@ -124,7 +124,7 @@ function createHermeticEnv(): { env: NodeJS.ProcessEnv; cleanup: () => void } {
   fs.mkdirSync(hermeticPai, { recursive: true });
   fs.mkdirSync(hermeticProject, { recursive: true });
 
-  const paiPluginSkillsDir = path.join(hermeticPai, '.claude', 'plugins', 'pai-skills', 'skills');
+  const paiPluginSkillsDir = path.join(hermeticPai, '.claude', 'plugins', 'dowser', 'skills');
   fs.mkdirSync(path.dirname(paiPluginSkillsDir), { recursive: true });
 
   try {
@@ -137,7 +137,7 @@ function createHermeticEnv(): { env: NodeJS.ProcessEnv; cleanup: () => void } {
     fs.cpSync(REPO_SKILLS_DIR, paiPluginSkillsDir, { recursive: true });
   }
 
-  const semanticCacheDir = path.join(os.tmpdir(), 'pai-skills-semantic-cache');
+  const semanticCacheDir = path.join(os.tmpdir(), 'dowser-semantic-cache');
   fs.mkdirSync(semanticCacheDir, { recursive: true });
 
   const cleanup = () => {

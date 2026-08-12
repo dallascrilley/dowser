@@ -190,10 +190,21 @@ function getSkillRoots(): Array<{ path: string; sourceType: SkillSourceType }> {
     roots.push({ path: defaultSkillsDir, sourceType: 'user' });
   }
 
-  // PAI plugin skills directory (~/PAI/.claude/plugins/pai-skills/skills) - plugin level
-  const paiPluginSkillsDir = path.join(paiDir, '.claude', 'plugins', 'pai-skills', 'skills');
-  if (fs.existsSync(paiPluginSkillsDir)) {
-    roots.push({ path: paiPluginSkillsDir, sourceType: 'plugin' });
+  // This plugin's skills when installed via Claude Code (${CLAUDE_PLUGIN_ROOT}/skills)
+  const pluginRoot = process.env.CLAUDE_PLUGIN_ROOT || '';
+  const pluginSkillsDir = pluginRoot ? path.join(pluginRoot, 'skills') : '';
+  if (pluginSkillsDir && fs.existsSync(pluginSkillsDir)) {
+    roots.push({ path: pluginSkillsDir, sourceType: 'plugin' });
+  }
+
+  // Dowser (and legacy pai-skills) under PAI_DIR layout
+  const namedPluginSkillsDirs = ['dowser', 'pai-skills'].map((name) =>
+    path.join(paiDir, '.claude', 'plugins', name, 'skills')
+  );
+  for (const namedDir of namedPluginSkillsDirs) {
+    if (fs.existsSync(namedDir) && namedDir !== pluginSkillsDir) {
+      roots.push({ path: namedDir, sourceType: 'plugin' });
+    }
   }
 
   // Recursively find all skills directories under ~/.claude/plugins
@@ -215,8 +226,12 @@ function getSkillRoots(): Array<{ path: string; sourceType: SkillSourceType }> {
 
           // If this is a "skills" directory, add it
           if (entry.name === 'skills') {
-            // Avoid duplicates (e.g., pai-skills already added above)
-            if (!foundSkillDirs.has(fullPath) && fullPath !== paiPluginSkillsDir) {
+            // Avoid duplicates already added via CLAUDE_PLUGIN_ROOT or named plugin dirs
+            const already =
+              foundSkillDirs.has(fullPath) ||
+              fullPath === pluginSkillsDir ||
+              namedPluginSkillsDirs.includes(fullPath);
+            if (!already) {
               foundSkillDirs.add(fullPath);
               roots.push({ path: fullPath, sourceType: 'plugin' });
               if (debug) {
@@ -369,17 +384,27 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
     console.error(`Searching skill roots: ${roots.map(r => `${r.path} (${r.sourceType})`).join(', ')}`);
   }
 
-  // Load skill rules - prefer project rules, then PAI plugin lib, then first skills root
+  // Load skill rules - prefer project rules, then this plugin's lib, then first skills root
   const paiDir = process.env.PAI_DIR || path.join(process.env.HOME || '', 'PAI');
-  const paiPluginRulesDir = path.join(paiDir, '.claude', 'plugins', 'pai-skills', 'lib');
+  const pluginRootEnv = process.env.CLAUDE_PLUGIN_ROOT || '';
+  const candidateRulesDirs = [
+    pluginRootEnv ? path.join(pluginRootEnv, 'lib') : '',
+    path.join(paiDir, '.claude', 'plugins', 'dowser', 'lib'),
+    path.join(paiDir, '.claude', 'plugins', 'pai-skills', 'lib'),
+  ].filter(Boolean);
   const projectRulesRoot = roots.find((root) => root.sourceType === 'project')?.path;
   let rules: SkillRules | null = null;
   if (projectRulesRoot && fs.existsSync(path.join(projectRulesRoot, 'skill-rules.json'))) {
     rules = loadSkillRules(projectRulesRoot, isPluginContext);
-  } else if (fs.existsSync(path.join(paiPluginRulesDir, 'skill-rules.json'))) {
-    rules = loadSkillRules(paiPluginRulesDir, isPluginContext);
-  } else if (roots.length > 0) {
-    rules = loadSkillRules(roots[0].path, isPluginContext);
+  } else {
+    const pluginRulesDir = candidateRulesDirs.find((dir) =>
+      fs.existsSync(path.join(dir, 'skill-rules.json'))
+    );
+    if (pluginRulesDir) {
+      rules = loadSkillRules(pluginRulesDir, isPluginContext);
+    } else if (roots.length > 0) {
+      rules = loadSkillRules(roots[0].path, isPluginContext);
+    }
   }
 
   if (debug && rules) {
@@ -394,14 +419,14 @@ async function findRelevantSkills(prompt: string, limit = 3): Promise<{
     allSkills.push(...skills);
   }
 
-  // Deduplicate by folder name - later sources win (superpowers > pai-skills, project > all)
+  // Deduplicate by folder name - later sources win (superpowers > dowser, project > all)
   // Folder name is consistent across sources (e.g., "using-git-worktrees" folder)
   // whereas display names may differ ("Using Git Worktrees" vs "using-git-worktrees")
-  // Order: user → pai-skills → cache/superpowers → project (last wins)
+  // Order: user → dowser → cache/superpowers → project (last wins)
   const seenFolders = new Map<string, number>();
   for (let i = 0; i < allSkills.length; i++) {
     const folder = allSkills[i].folderName.toLowerCase();
-    // Last one wins (superpowers comes after pai-skills, project comes last)
+    // Last one wins (superpowers comes after dowser, project comes last)
     seenFolders.set(folder, i);
   }
   const uniqueIndices = new Set(seenFolders.values());

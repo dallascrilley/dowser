@@ -95,7 +95,7 @@ Delegate subtasks to specialized agents with minimal context
 ❌ Vague instructions ("might", "could", "should")
 
 ## Supplementary Resources
-For full standards: `read /Users/dallascrilley/PAI/.claude/skills/prompting/CLAUDE.md`
+For full standards: `read $HOME/.claude/skills/prompting/CLAUDE.md`
 
 ## Based On
 Anthropic's "Effective Context Engineering for AI Agents"

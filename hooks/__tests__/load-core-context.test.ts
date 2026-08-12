@@ -19,7 +19,7 @@ describe('load-core-context hook', () => {
 
   beforeEach(() => {
     // Create temp directory for test files
-    tempDir = mkdtempSync(join(tmpdir(), 'pai-skills-test-'));
+    tempDir = mkdtempSync(join(tmpdir(), 'dowser-test-'));
     // Save original environment
     originalEnv = { ...process.env };
   });

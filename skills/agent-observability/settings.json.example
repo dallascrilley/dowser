@@ -10,7 +10,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/dallascrilley/PAI/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type PreToolUse"
+            "command": "$HOME/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type PreToolUse"
           }
         ]
       }
@@ -21,7 +21,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/dallascrilley/PAI/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type PostToolUse"
+            "command": "$HOME/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type PostToolUse"
           }
         ]
       }
@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/dallascrilley/PAI/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type SessionStart"
+            "command": "$HOME/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type SessionStart"
           }
         ]
       }
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/dallascrilley/PAI/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type SessionEnd"
+            "command": "$HOME/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type SessionEnd"
           }
         ]
       }
@@ -51,7 +51,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/dallascrilley/PAI/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type Stop"
+            "command": "$HOME/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type Stop"
           }
         ]
       }
@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/dallascrilley/PAI/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type SubagentStop"
+            "command": "$HOME/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type SubagentStop"
           }
         ]
       }
@@ -71,7 +71,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/dallascrilley/PAI/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type UserPromptSubmit"
+            "command": "$HOME/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type UserPromptSubmit"
           }
         ]
       }

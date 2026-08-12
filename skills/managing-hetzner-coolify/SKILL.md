@@ -436,8 +436,8 @@ For detailed command references, see:
 - **Coolify Dashboard:** https://app.coolify.io
 - **Coolify API Tokens:** https://app.coolify.io/security/api-tokens
 - **Hetzner Console:** https://console.hetzner.cloud/
-- **Infrastructure Docs:** `/Users/dallascrilley/Code/ansible-dev-environment/docs/infrastructure-landscape.md`
-- **Full Cheatsheet:** `/Users/dallascrilley/Code/ansible-dev-environment/docs/hetzner-coolify-cheatsheet.md`
+- **Infrastructure Docs:** `./docs/infrastructure-landscape.md`
+- **Full Cheatsheet:** `./docs/hetzner-coolify-cheatsheet.md`
 
 ---
 

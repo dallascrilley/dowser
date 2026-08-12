@@ -233,7 +233,7 @@ Per infrastructure task:
 1. Edit SKILL.md inventory table
 2. Update server-specific sections (UUIDs, IPs)
 3. Update scripts with new server names/IPs
-4. Re-validate: `python3 /Users/dallascrilley/.claude/skills/skill-creator/scripts/validate_skill.py --full-check ~/.claude/skills/managing-hetzner-coolify`
+4. Re-validate: `python3 $HOME/.claude/skills/skill-creator/scripts/validate_skill.py --full-check ~/.claude/skills/managing-hetzner-coolify`
 5. Re-measure efficiency if major changes
 
 ---
@@ -258,8 +258,8 @@ managing-hetzner-coolify/
 ## Integration with Existing Docs
 
 This skill complements:
-- `/Users/dallascrilley/Code/ansible-dev-environment/docs/infrastructure-landscape.md`
-- `/Users/dallascrilley/Code/ansible-dev-environment/docs/hetzner-coolify-cheatsheet.md`
+- `./docs/infrastructure-landscape.md`
+- `./docs/hetzner-coolify-cheatsheet.md`
 
 **Relationship:**
 - Skill = Concise, actionable, context-aware

@@ -70,11 +70,11 @@ Example merged hook:
     "hooks": [
       {
         "type": "command",
-        "command": "/Users/dallascrilley/PAI/.claude/hooks/my-existing-hook.ts"
+        "command": "$HOME/.claude/hooks/my-existing-hook.ts"
       },
       {
         "type": "command",
-        "command": "/Users/dallascrilley/PAI/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type SessionStart"
+        "command": "$HOME/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type SessionStart"
       }
     ]
   }

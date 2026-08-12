@@ -54,7 +54,7 @@ This skill provides comprehensive tooling for Copper CRM API interactions:
 
 ```bash
 # Run setup script
-/Users/dallascrilley/.claude/skills/copper-crm/scripts/setup.sh
+$HOME/.claude/skills/copper-crm/scripts/setup.sh
 
 # This will:
 # - Check Python 3.11+

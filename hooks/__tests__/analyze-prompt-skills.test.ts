@@ -49,9 +49,24 @@ describe('analyze-prompt-skills hook', () => {
   }
 
   function writeRules(paiDir: string, rules: Record<string, unknown>) {
-    const rulesDir = join(paiDir, '.claude', 'plugins', 'pai-skills', 'lib');
+    const rulesDir = join(paiDir, '.claude', 'plugins', 'dowser', 'lib');
     mkdirSync(rulesDir, { recursive: true });
     writeFileSync(join(rulesDir, 'skill-rules.json'), JSON.stringify(rules, null, 2));
+  }
+
+
+  /** Isolate HOME/PAI so tests do not scan the real ~/.claude plugins tree. */
+  function hermeticEnv(extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
+    return {
+      ...process.env,
+      HOME: tempDir,
+      USERPROFILE: tempDir,
+      PAI_DIR: join(tempDir, 'PAI'),
+      CLAUDE_PROJECT_DIR: tempDir,
+      CLAUDE_PLUGIN_ROOT: '',
+      SKILL_ANALYZER_SEMANTIC: '0',
+      ...extra,
+    };
   }
 
   beforeEach(() => {
@@ -78,10 +93,7 @@ describe('analyze-prompt-skills hook', () => {
       const result = Bun.spawnSync({
         cmd: ['bun', 'run', hookPath],
         stdin: Buffer.from(input),
-        env: {
-          ...process.env,
-          CLAUDE_PROJECT_DIR: tempDir,
-        },
+        env: hermeticEnv(),
       });
 
       expect(result.exitCode).toBe(0);
@@ -91,10 +103,7 @@ describe('analyze-prompt-skills hook', () => {
       const result = Bun.spawnSync({
         cmd: ['bun', 'run', hookPath],
         stdin: Buffer.from(''),
-        env: {
-          ...process.env,
-          CLAUDE_PROJECT_DIR: tempDir,
-        },
+        env: hermeticEnv(),
       });
 
       // Should exit gracefully even with empty input
@@ -105,10 +114,7 @@ describe('analyze-prompt-skills hook', () => {
       const result = Bun.spawnSync({
         cmd: ['bun', 'run', hookPath],
         stdin: Buffer.from('this is not json'),
-        env: {
-          ...process.env,
-          CLAUDE_PROJECT_DIR: tempDir,
-        },
+        env: hermeticEnv(),
       });
 
       // Should exit gracefully even with invalid JSON
@@ -144,10 +150,7 @@ describe('analyze-prompt-skills hook', () => {
       const result = Bun.spawnSync({
         cmd: ['bun', 'run', hookPath],
         stdin: Buffer.from(input),
-        env: {
-          ...process.env,
-          CLAUDE_PROJECT_DIR: tempDir,
-        },
+        env: hermeticEnv(),
       });
 
       const stdout = result.stdout.toString().trim();
@@ -158,10 +161,7 @@ describe('analyze-prompt-skills hook', () => {
       const result = Bun.spawnSync({
         cmd: ['bun', 'run', hookPath],
         stdin: Buffer.from(''),
-        env: {
-          ...process.env,
-          CLAUDE_PROJECT_DIR: tempDir,
-        },
+        env: hermeticEnv(),
       });
 
       const stdout = result.stdout.toString().trim();
@@ -180,10 +180,7 @@ describe('analyze-prompt-skills hook', () => {
       const result = Bun.spawnSync({
         cmd: ['bun', 'run', hookPath],
         stdin: Buffer.from(input),
-        env: {
-          ...process.env,
-          CLAUDE_PROJECT_DIR: tempDir,
-        },
+        env: hermeticEnv(),
       });
 
       const stdout = result.stdout.toString().trim();
@@ -218,10 +215,7 @@ Instructions for testing.
       const result = Bun.spawnSync({
         cmd: ['bun', 'run', hookPath],
         stdin: Buffer.from(input),
-        env: {
-          ...process.env,
-          CLAUDE_PROJECT_DIR: tempDir,
-        },
+        env: hermeticEnv(),
       });
 
       expect(result.exitCode).toBe(0);
@@ -235,10 +229,7 @@ Instructions for testing.
     test('--show-metrics outputs valid JSON', async () => {
       const result = Bun.spawnSync({
         cmd: ['bun', 'run', hookPath, '--show-metrics'],
-        env: {
-          ...process.env,
-          CLAUDE_PROJECT_DIR: tempDir,
-        },
+        env: hermeticEnv(),
       });
 
       expect(result.exitCode).toBe(0);
@@ -249,10 +240,7 @@ Instructions for testing.
     test('--record-activation works', async () => {
       const result = Bun.spawnSync({
         cmd: ['bun', 'run', hookPath, '--record-activation', 'test-skill'],
-        env: {
-          ...process.env,
-          CLAUDE_PROJECT_DIR: tempDir,
-        },
+        env: hermeticEnv(),
       });
 
       expect(result.exitCode).toBe(0);
@@ -282,7 +270,7 @@ Instructions for testing.
             priority: 'high',
             promptTriggers: { keywords: ['aardvark'] },
             fileTriggers: {
-              pathPatterns: ['/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/plugin-only-skill/**'],
+              pathPatterns: ['**/.claude/plugins/cache/superpowers/skills/plugin-only-skill/**'],
             },
           },
         },
@@ -293,6 +281,7 @@ Instructions for testing.
         env: {
           ...process.env,
           HOME: homeDir,
+          SKILL_ANALYZER_SEMANTIC: '0',
           PAI_DIR: paiDir,
           CLAUDE_PROJECT_DIR: projectDir,
           SKILL_ANALYZER_TFIDF: '0',
@@ -324,7 +313,7 @@ Instructions for testing.
             priority: 'high',
             promptTriggers: { keywords: ['aardvark'] },
             fileTriggers: {
-              pathPatterns: ['/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/plugin-only-skill/**'],
+              pathPatterns: ['**/.claude/plugins/cache/superpowers/skills/plugin-only-skill/**'],
             },
           },
         },
@@ -335,6 +324,7 @@ Instructions for testing.
         env: {
           ...process.env,
           HOME: homeDir,
+          SKILL_ANALYZER_SEMANTIC: '0',
           PAI_DIR: paiDir,
           CLAUDE_PROJECT_DIR: projectDir,
           SKILL_ANALYZER_TFIDF: '0',
@@ -377,6 +367,7 @@ Instructions for testing.
         env: {
           ...process.env,
           HOME: homeDir,
+          SKILL_ANALYZER_SEMANTIC: '0',
           PAI_DIR: paiDir,
           CLAUDE_PROJECT_DIR: projectDir,
           SKILL_ANALYZER_TFIDF: '0',
@@ -420,6 +411,7 @@ Instructions for testing.
         env: {
           ...process.env,
           HOME: homeDir,
+          SKILL_ANALYZER_SEMANTIC: '0',
           PAI_DIR: paiDir,
           CLAUDE_PROJECT_DIR: projectDir,
           SKILL_ANALYZER_TFIDF: '0',
@@ -449,6 +441,7 @@ Instructions for testing.
         env: {
           ...process.env,
           HOME: homeDir,
+          SKILL_ANALYZER_SEMANTIC: '0',
           PAI_DIR: paiDir,
           CLAUDE_PROJECT_DIR: projectDir,
           SKILL_ANALYZER_TFIDF: '0',
@@ -474,6 +467,7 @@ Instructions for testing.
         env: {
           ...process.env,
           HOME: homeDir,
+          SKILL_ANALYZER_SEMANTIC: '0',
           PAI_DIR: paiDir,
           CLAUDE_PROJECT_DIR: projectDir,
           SKILL_ANALYZER_TFIDF: '0',
@@ -553,10 +547,7 @@ Instructions for testing.
       const result = Bun.spawnSync({
         cmd: ['bun', 'run', hookPath],
         stdin: Buffer.from(input),
-        env: {
-          ...process.env,
-          CLAUDE_PROJECT_DIR: tempDir,
-        },
+        env: hermeticEnv(),
       });
 
       // Should not crash
@@ -588,15 +579,46 @@ Instructions for testing.
 
 describe('analyze-prompt-skills hook (refactor regression)', () => {
   test('still outputs hookSpecificOutput.additionalContext string', () => {
-    const hookPath = join(import.meta.dir, '../prompt-submit/analyze-prompt-skills.ts');
-    const input = JSON.stringify({ userMessage: 'testing', session_id: 's' });
-    const result = Bun.spawnSync({
-      cmd: ['bun', 'run', hookPath],
-      stdin: Buffer.from(input),
-      env: { ...process.env, CLAUDE_PROJECT_DIR: process.cwd() },
-    });
-    expect(result.exitCode).toBe(0);
-    const payload = JSON.parse(result.stdout.toString() || '{}');
-    expect(typeof payload?.hookSpecificOutput?.additionalContext).toBe('string');
+    const home = mkdtempSync(join(tmpdir(), 'dowser-regression-'));
+    try {
+      const skillsRoot = join(home, '.claude', 'skills', 'unit-testing');
+      mkdirSync(skillsRoot, { recursive: true });
+      writeFileSync(
+        join(skillsRoot, 'SKILL.md'),
+        [
+          '---',
+          'name: Unit Testing',
+          'description: Write and run unit tests',
+          'when_to_use: when testing code or writing tests',
+          '---',
+          '',
+          '# Unit Testing',
+        ].join('\n')
+      );
+
+      const hookPath = join(import.meta.dir, '../prompt-submit/analyze-prompt-skills.ts');
+      const input = JSON.stringify({
+        userMessage: 'help me write unit tests for this module',
+        session_id: 's',
+      });
+      const result = Bun.spawnSync({
+        cmd: ['bun', 'run', hookPath],
+        stdin: Buffer.from(input),
+        env: {
+          ...process.env,
+          HOME: home,
+          USERPROFILE: home,
+          PAI_DIR: join(home, 'PAI'),
+          CLAUDE_PROJECT_DIR: home,
+          CLAUDE_PLUGIN_ROOT: '',
+          SKILL_ANALYZER_SEMANTIC: '0',
+        },
+      });
+      expect(result.exitCode).toBe(0);
+      const payload = JSON.parse(result.stdout.toString() || '{}');
+      expect(typeof payload?.hookSpecificOutput?.additionalContext).toBe('string');
+    } finally {
+      rmSync(home, { recursive: true, force: true });
+    }
   });
 });

@@ -12,8 +12,11 @@ import matter from 'gray-matter';
 import { mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync, copyFileSync, statSync } from 'fs';
 import { join, dirname, basename, relative } from 'path';
 
-const SOURCE_DIR = '/Users/dallascrilley/PAI/.claude/skills';
-const TARGET_DIR = '/Users/dallascrilley/PAI/.claude/plugins/pai-skills/skills';
+const home = process.env.HOME || process.env.USERPROFILE || '';
+const SOURCE_DIR = process.env.DOWSER_MIGRATE_SOURCE
+  || (home ? `${home}/.claude/skills` : './skills-source');
+const TARGET_DIR = process.env.DOWSER_MIGRATE_TARGET
+  || (home ? `${home}/.claude/plugins/dowser/skills` : './skills');
 
 // Skills to skip (already handled elsewhere or special cases)
 const SKIP_SKILLS = new Set([

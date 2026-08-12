@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "description": "Global skill activation rules for PAI. Enhances analyze-prompt-skills.ts with enforcement, priority, and file-based triggers.",
+  "description": "Global skill activation rules for Dowser. Enhances analyze-prompt-skills.ts with enforcement, priority, and file-based triggers.",
   "notes": {
     "usage": "This file is read by enhanced analyze-prompt-skills.ts hook",
     "fallback": "Skills without rules here still work via fuzzy matching",
@@ -1397,7 +1397,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/condition-based-waiting/**"
+          "**/.claude/plugins/cache/superpowers/skills/condition-based-waiting/**"
         ],
         "contentPatterns": [
           "wait-until",
@@ -1423,7 +1423,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/defense-in-depth/**"
+          "**/.claude/plugins/cache/superpowers/skills/defense-in-depth/**"
         ],
         "contentPatterns": [
           "security layer",
@@ -1449,7 +1449,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/dispatching-parallel-agents/**"
+          "**/.claude/plugins/cache/superpowers/skills/dispatching-parallel-agents/**"
         ],
         "contentPatterns": [
           "parallel execution",
@@ -1475,7 +1475,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/executing-plans/**"
+          "**/.claude/plugins/cache/superpowers/skills/executing-plans/**"
         ],
         "contentPatterns": [
           "plan checkpoint",
@@ -1501,7 +1501,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/finishing-a-development-branch/**"
+          "**/.claude/plugins/cache/superpowers/skills/finishing-a-development-branch/**"
         ],
         "contentPatterns": [
           "finish branch checklist",
@@ -1527,7 +1527,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/receiving-code-review/**"
+          "**/.claude/plugins/cache/superpowers/skills/receiving-code-review/**"
         ],
         "contentPatterns": [
           "review feedback",
@@ -1553,7 +1553,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/requesting-code-review/**"
+          "**/.claude/plugins/cache/superpowers/skills/requesting-code-review/**"
         ],
         "contentPatterns": [
           "review request template",
@@ -1590,7 +1590,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/root-cause-tracing/**"
+          "**/.claude/plugins/cache/superpowers/skills/root-cause-tracing/**"
         ],
         "contentPatterns": [
           "cause hypothesis",
@@ -1616,7 +1616,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/subagent-driven-development/**"
+          "**/.claude/plugins/cache/superpowers/skills/subagent-driven-development/**"
         ],
         "contentPatterns": [
           "subagent lane",
@@ -1709,7 +1709,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/test-driven-development/**"
+          "**/.claude/plugins/cache/superpowers/skills/test-driven-development/**"
         ],
         "contentPatterns": [
           "red/green/refactor",
@@ -1735,7 +1735,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/testing-anti-patterns/**"
+          "**/.claude/plugins/cache/superpowers/skills/testing-anti-patterns/**"
         ],
         "contentPatterns": [
           "test smell catalog",
@@ -1761,7 +1761,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/testing-skills-with-subagents/**"
+          "**/.claude/plugins/cache/superpowers/skills/testing-skills-with-subagents/**"
         ],
         "contentPatterns": [
           "skill test harness",
@@ -1787,7 +1787,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/using-git-worktrees/**"
+          "**/.claude/plugins/cache/superpowers/skills/using-git-worktrees/**"
         ],
         "contentPatterns": [
           "worktree add",
@@ -1827,7 +1827,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/verification-before-completion/**"
+          "**/.claude/plugins/cache/superpowers/skills/verification-before-completion/**"
         ],
         "contentPatterns": [
           "verification checklist",
@@ -1853,7 +1853,7 @@
       },
       "fileTriggers": {
         "pathPatterns": [
-          "/Users/dallascrilley/.claude/plugins/cache/superpowers/skills/writing-plans/**"
+          "**/.claude/plugins/cache/superpowers/skills/writing-plans/**"
         ],
         "contentPatterns": [
           "plan template",

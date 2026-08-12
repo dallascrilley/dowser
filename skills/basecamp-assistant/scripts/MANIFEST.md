@@ -1,7 +1,7 @@
 # Basecamp 4 API Helper Scripts - Manifest
 
 **Generated:** 2025-11-11
-**Location:** `/Users/dallascrilley/.claude/skills/basecamp-assistant/scripts/`
+**Location:** `$HOME/.claude/skills/basecamp-assistant/scripts/`
 **Status:** Production-Ready
 
 ---
@@ -155,7 +155,7 @@ This file - provides:
 ### Initial Setup
 ```bash
 # 1. Navigate to scripts directory
-cd /Users/dallascrilley/.claude/skills/basecamp-assistant/scripts/
+cd $HOME/.claude/skills/basecamp-assistant/scripts/
 
 # 2. Verify all scripts are executable
 ls -l *.sh  # Should show x permissions

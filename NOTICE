@@ -1,0 +1,96 @@
+Dowser
+Copyright (c) 2025-2026 Dallas Crilley
+
+This product includes third-party skill content and code redistributed under
+their original licenses. The root MIT license covers original work by Dallas
+Crilley (plugin hooks, search engine, scripts, and skills authored for this
+library). Third-party skill content remains under the licenses listed below.
+
+========================================================================
+Apache License 2.0
+========================================================================
+
+skills/skill-creator/
+  Source: Anthropic skill-creator skill materials
+  License file: skills/skill-creator/LICENSE.txt
+  Terms: Apache License 2.0
+
+========================================================================
+MIT License (attributed upstream)
+========================================================================
+
+Skills derived from or aligned with obra/superpowers (MIT):
+  https://github.com/obra/superpowers
+
+  Identified by workflow style and/or pathPatterns referencing the
+  superpowers plugin cache. Includes (non-exhaustive; see skill dirs):
+
+  brainstorming, condition-based-waiting, creating-skills, defense-in-depth,
+  designing-before-coding, dispatching-parallel-agents, encapsulating-complexity,
+  executing-plans, exploring-alternatives, finishing-a-development-branch,
+  keeping-routines-focused, localizing-variables, maintaining-consistent-abstractions,
+  naming-by-domain, naming-variables, receiving-code-review, reducing-complexity,
+  refactoring-safely, requesting-code-review, root-cause-tracing,
+  simplifying-control-flow, single-purpose-variables, subagent-driven-development,
+  systematic-debugging, test-driven-development, testing-anti-patterns,
+  testing-skills-with-subagents, using-git-worktrees, validating-inputs,
+  verification-before-completion, writing-evergreen-comments, writing-plans,
+  commenting-intent, gardening-skills-wiki, remembering-conversations
+
+  Copyright remains with the original Superpowers authors (Jesse Vincent /
+  obra and contributors). Redistributed under MIT as permitted by upstream.
+
+installing-skills/
+  Content describes installing obra/clank. Clank/superpowers ecosystem is MIT.
+  https://github.com/obra/clank
+
+skills/wordpress-management/
+  LICENSE file: MIT, Copyright (c) 2025 Dallas Crilley
+
+Skills with explicit `license: MIT` frontmatter (examples):
+  architecting-visualizations, claude-agent-sdk, claude-api, clerk-auth,
+  connectwise-api-assistant, creating-hammerspoon-scripts,
+  downloading-jwplayer-videos, google-gemini-embeddings, managing-context,
+  openai-responses, pattern-emergence, project-planning, react-hook-form-zod,
+  using-openai-codex-cli, web-browser, and others listing license: MIT in SKILL.md
+
+========================================================================
+Inspired-by / documentation references (not full redistributions)
+========================================================================
+
+agent-observability/
+  Inspired by @indydevdan multi-agent observability work; this skill uses a
+  filesystem + in-memory approach. Part of patterns seen in the broader PAI
+  (Personal AI Infrastructure) ecosystem (MIT-licensed projects by
+  Daniel Miessler). Absolute paths in examples were de-hardcoded for this
+  public release.
+
+fabric-patterns/
+  Documents how to use the Fabric CLI pattern library (danielmiessler/fabric).
+  The skill itself is a selector/wrapper, not a vendor of Fabric pattern files.
+
+claude-api / claude-agent-sdk /
+  Based on official Anthropic documentation and SDK patterns. Code samples
+  illustrate public APIs; not a copy of Anthropic proprietary source.
+
+========================================================================
+Unknown or self-reported license (shipped under repo MIT as curated content)
+========================================================================
+
+Most remaining skills under skills/ have no separate LICENSE file and no
+`license:` frontmatter. They are Dallas-curated skill writeups (personal
+integrations, workflow notes, and domain guides) published under the root MIT
+license of this repository.
+
+If you are an upstream author and believe a skill was redistributed without
+proper attribution or under the wrong terms, open an issue. Prefer remove or
+attribute over guessing rights: missing provenance skills can be stubbed or
+removed in a follow-up.
+
+========================================================================
+npm / runtime dependencies
+========================================================================
+
+See package.json. Notable:
+  fuse.js, gray-matter, glob, natural, sylvester, @xenova/transformers
+  Each retains its own license (typically MIT or Apache-2.0).
