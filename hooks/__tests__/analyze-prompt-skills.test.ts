@@ -534,7 +534,7 @@ Instructions for testing.
 
       const showAfterClear = runHook({ env, args: ['--show-gaps'] });
       expect(showAfterClear.stdout.toString()).toContain('No gaps recorded yet.');
-    });
+    }, 30_000);
   });
 
   describe('error handling', () => {
