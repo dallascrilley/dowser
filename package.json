@@ -10,12 +10,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dallascrilley/pai-skills.git"
+    "url": "git+https://github.com/dallascrilley/dowser.git"
   },
   "bugs": {
-    "url": "https://github.com/dallascrilley/pai-skills/issues"
+    "url": "https://github.com/dallascrilley/dowser/issues"
   },
-  "homepage": "https://github.com/dallascrilley/pai-skills#readme",
+  "homepage": "https://github.com/dallascrilley/dowser#readme",
   "keywords": [
     "claude-code",
     "skills",
@@ -29,7 +29,8 @@
     "test": "bun test hooks/__tests__",
     "test:garden": "bash ./scripts/check-frontmatter.sh skills",
     "check:skills": "bash ./scripts/garden.sh skills",
-    "evals": "bun run evals/run-evals.ts"
+    "evals": "bun run evals/run-evals.ts",
+    "test:all": "bun test"
   },
   "engines": {
     "bun": ">=1.0.0"
