@@ -26,8 +26,8 @@ This repository also ships the skill library under `skills/` (100+ domain and wo
 From a cold clone:
 
 ```bash
-git clone https://github.com/dallascrilley/pai-skills.git
-cd pai-skills
+git clone https://github.com/dallascrilley/dowser.git
+cd dowser
 bun install
 ```
 
@@ -37,7 +37,7 @@ Point Claude Code at this plugin directory (local path install). Exact UI labels
 2. `CLAUDE_PLUGIN_ROOT` resolves to that directory when hooks run.
 3. Dependencies are installed so `hooks/run-hook.sh` can `bun run` the TypeScript hooks.
 
-If you already manage plugins under `~/.claude/plugins/`, you can clone or symlink this repo as `~/.claude/plugins/dowser` (or keep a legacy `pai-skills` directory name; the search code still recognizes it).
+If you already manage plugins under `~/.claude/plugins/`, you can clone or symlink this repo as `~/.claude/plugins/dowser` (or keep a legacy `dowser` directory name; the search code still recognizes it).
 
 ```bash
 mkdir -p ~/.claude/plugins
@@ -46,7 +46,7 @@ ln -sfn "$(pwd)" ~/.claude/plugins/dowser
 
 Restart Claude Code or start a new session. On SessionStart, Dowser tries to load optional personal PAI context if you keep a `PAI/SKILL.md` (or `~/.claude/skills/PAI/SKILL.md`). Missing PAI context is a warning, not a failure: skill search still works.
 
-**Note:** The GitHub repository may still be named `pai-skills` until rename to Dowser completes. Clone URLs in this README track the current remote.
+**Note:** The GitHub repository may still be named `dowser` until rename to Dowser completes. Clone URLs in this README track the current remote.
 
 ## Quickstart (local smoke)
 
