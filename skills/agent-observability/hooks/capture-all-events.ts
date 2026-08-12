@@ -7,7 +7,7 @@
  * - PAI_DIR: Path to your PAI directory (defaults to ~/.claude/)
  *   Example: export PAI_DIR="/Users/yourname/.claude"
  *
- * This hook writes events to: /Users/dallascrilley/PAI/.claude/history/raw-outputs/YYYY-MM/YYYY-MM-DD_all-events.jsonl
+ * This hook writes events to: $HOME/.claude/history/raw-outputs/YYYY-MM/YYYY-MM-DD_all-events.jsonl
  */
 
 import { readFileSync, appendFileSync, mkdirSync, existsSync, writeFileSync } from 'fs';

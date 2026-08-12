@@ -157,7 +157,7 @@ The skill is designed to support these primary workflows:
 ## File Locations
 
 ```
-/Users/dallascrilley/.claude/skills/pandadoc-sales-manager/
+$HOME/.claude/skills/pandadoc-sales-manager/
 ├── analysis/
 │   ├── complete-analysis-and-design.md  (This comprehensive analysis)
 │   └── README.md                         (This file)
@@ -198,10 +198,10 @@ The skill is designed to support these primary workflows:
 ## Resources
 
 ### Documentation Sources Analyzed
-1. `/Users/dallascrilley/Code/docs/All_APIs/API_Docs/Pandadoc_API/Pandadoc_Cheat_Sheet.md`
-2. `/Users/dallascrilley/Code/docs/All_APIs/API_Docs/Pandadoc_API/Pandadoc_Endpoints_Full.md`
-3. `/Users/dallascrilley/Code/docs/All_APIs/API_Docs/Pandadoc_API/Pandadoc_Endpoints.md`
-4. `/Users/dallascrilley/Code/docs/All_APIs/API_Docs/Pandadoc_API/PandaDoc-API.md`
+1. `./docs/Pandadoc_API/Pandadoc_Cheat_Sheet.md`
+2. `./docs/Pandadoc_API/Pandadoc_Endpoints_Full.md`
+3. `./docs/Pandadoc_API/Pandadoc_Endpoints.md`
+4. `./docs/Pandadoc_API/PandaDoc-API.md`
 
 ### External Resources
 - **Official API Docs:** https://developers.pandadoc.com/reference/about

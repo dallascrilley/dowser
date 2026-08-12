@@ -1,10 +1,17 @@
 {
-  "name": "pai-skills",
+  "name": "dowser",
   "version": "1.0.0",
-  "description": "Personal skills library with 120+ domain-specific skills",
+  "description": "Surfaces the right skill from a curated Claude Code skill library",
   "author": {
     "name": "Dallas Crilley"
   },
   "license": "MIT",
-  "keywords": ["skills", "discovery", "fuzzy-matching", "tfidf", "hybrid-search"]
+  "keywords": [
+    "skills",
+    "discovery",
+    "fuzzy-matching",
+    "tfidf",
+    "hybrid-search",
+    "claude-code"
+  ]
 }

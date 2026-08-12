@@ -9,7 +9,7 @@
  * - PAI_DIR: Path to your PAI directory (defaults to ~/.claude/)
  *   Example: export PAI_DIR="/Users/yourname/.claude"
  *
- * Reads events from: /Users/dallascrilley/PAI/.claude/history/raw-outputs/YYYY-MM/YYYY-MM-DD_all-events.jsonl
+ * Reads events from: $HOME/.claude/history/raw-outputs/YYYY-MM/YYYY-MM-DD_all-events.jsonl
  */
 
 import { watch, existsSync } from 'fs';

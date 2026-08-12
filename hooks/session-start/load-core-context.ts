@@ -73,7 +73,7 @@ PAI Context Loading Warning
 PAI skill file not found at expected locations:
 ${triedPaths.map(p => `- ${p}`).join('\n')}
 
-The pai-skills plugin is active but PAI context was not loaded.
+The Dowser plugin is active but PAI context was not loaded.
 To fix: Create your PAI skill file at one of the paths above, or set PAI_DIR environment variable.
 </system-reminder>`;
 
@@ -131,7 +131,7 @@ PAI Context Loading Error
 
 An error occurred while loading PAI context: ${error instanceof Error ? error.message : String(error)}
 
-The pai-skills plugin is active but PAI context was not loaded.
+The Dowser plugin is active but PAI context was not loaded.
 Check the PAI skill file exists and is readable.
 </system-reminder>`;
 

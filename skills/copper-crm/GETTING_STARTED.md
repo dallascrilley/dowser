@@ -22,7 +22,7 @@ This guide walks you through setting up and using the Copper CRM API scripts.
 Copy the example configuration and fill in your credentials:
 
 ```bash
-cd /Users/dallascrilley/.claude/skills/copper-crm
+cd $HOME/.claude/skills/copper-crm
 cp templates/.env.example .env
 ```
 

@@ -171,7 +171,7 @@ Add to `~/.claude/settings.json` (see `settings.json.example` for full template)
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "/Users/dallascrilley/PAI/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type PreToolUse"
+        "command": "$HOME/.claude/skills/agent-observability/hooks/capture-all-events.ts --event-type PreToolUse"
       }]
     }],
     // ... other hooks

@@ -35,7 +35,7 @@ cw --version
 
 If not found, activate the virtual environment:
 ```bash
-cd /Users/dallascrilley/Code/personal-projects/connectwise-cli
+cd $HOME/Code/connectwise-cli
 source .venv/bin/activate
 ```
 
@@ -311,7 +311,7 @@ cw contacts list --search "email @company.com"
 **Solution:**
 ```bash
 # Activate virtual environment
-cd /Users/dallascrilley/Code/personal-projects/connectwise-cli
+cd $HOME/Code/connectwise-cli
 source .venv/bin/activate
 cw --version
 ```
@@ -635,7 +635,7 @@ cw --debug [command] 2>&1 | tee debug.log
 
 ## Documentation Location
 
-Full documentation: `/Users/dallascrilley/Code/personal-projects/connectwise-cli/docs/`
+Full documentation: `$HOME/Code/connectwise-cli/docs/`
 
 - `getting-started.md` - Installation and setup
 - `api-examples.md` - Comprehensive usage examples

@@ -97,7 +97,7 @@ cw agreements list --conditions "endDate<=[${DATE_60}] AND agreementStatus='Acti
 
 ## Dependencies
 
-**Prerequisites**: ConnectWise CLI installed at `/Users/dallascrilley/Code/claude-connectwise-cli`
+**Prerequisites**: ConnectWise CLI installed at `$HOME/Code/connectwise-cli`
 
 **Integrates With**: None (standalone skill)
 
@@ -119,7 +119,7 @@ connectwise-lookup/
 
 ## Official Documentation
 
-- **ConnectWise CLI Docs**: `/Users/dallascrilley/Code/claude-connectwise-cli/docs/`
+- **ConnectWise CLI Docs**: `$HOME/Code/connectwise-cli/docs/`
 - **ConnectWise Manage API**: https://developer.connectwise.com
 - **Context7 Library**: N/A
 

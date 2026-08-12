@@ -15,7 +15,7 @@ This document lists all deliverables created for the Basecamp 4 API skill, organ
 
 ## Phase 1: Configuration Templates (3 files)
 
-**Directory:** `/Users/dallascrilley/.claude/skills/basecamp-assistant/templates/`
+**Directory:** `$HOME/.claude/skills/basecamp-assistant/templates/`
 
 ### 1. basic.env.template
 - **Size:** 1,687 bytes
@@ -52,7 +52,7 @@ This document lists all deliverables created for the Basecamp 4 API skill, organ
 
 ## Phase 2: Reference Documentation (5 files)
 
-**Directory:** `/Users/dallascrilley/.claude/skills/basecamp-assistant/references/`
+**Directory:** `$HOME/.claude/skills/basecamp-assistant/references/`
 
 ### 1. api-reference.md
 - **Size:** 22,411 bytes (21.9 KB)
@@ -120,7 +120,7 @@ This document lists all deliverables created for the Basecamp 4 API skill, organ
 
 ## Phase 3: Helper Scripts (7 files + 1 README)
 
-**Directory:** `/Users/dallascrilley/.claude/skills/basecamp-assistant/scripts/`
+**Directory:** `$HOME/.claude/skills/basecamp-assistant/scripts/`
 
 ### Setup & Validation Scripts
 
@@ -226,7 +226,7 @@ This document lists all deliverables created for the Basecamp 4 API skill, organ
 ### By Directory
 
 ```
-/Users/dallascrilley/.claude/skills/basecamp-assistant/
+$HOME/.claude/skills/basecamp-assistant/
 ├── templates/
 │   ├── basic.env.template (1.7 KB)
 │   ├── development.env.template (3.2 KB)

@@ -582,7 +582,7 @@ function generateImprovementMarkdown(imp: Improvement, epics: Epic[], sequence: 
 
 function generateIndexMarkdown(data: PlanData): string {
   const lines: string[] = [
-    '# PAI-Skills Productivity Improvement Plan',
+    '# Dowser Productivity Improvement Plan',
     '',
     `> Generated: ${new Date().toISOString().split('T')[0]}`,
     '',

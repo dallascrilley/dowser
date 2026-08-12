@@ -1,7 +1,7 @@
 Bulk Import Helper - File Structure & Reference
 ================================================
 
-/Users/dallascrilley/.claude/skills/copper-crm/scripts/
+$HOME/.claude/skills/copper-crm/scripts/
 ├── bulk_import.py                 [MAIN SCRIPT]
 │   ├── ImportRecord (dataclass)       - CSV row data container
 │   ├── ImportResult (dataclass)       - Import result tracking
@@ -258,19 +258,19 @@ FILE LOCATIONS & PATHS
 ======================
 
 Main script:
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/bulk_import.py
+  $HOME/.claude/skills/copper-crm/scripts/bulk_import.py
 
 Documentation:
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/README.md
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/QUICKSTART.md
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/IMPLEMENTATION_GUIDE.md
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/FILE_STRUCTURE.txt
+  $HOME/.claude/skills/copper-crm/scripts/README.md
+  $HOME/.claude/skills/copper-crm/scripts/QUICKSTART.md
+  $HOME/.claude/skills/copper-crm/scripts/IMPLEMENTATION_GUIDE.md
+  $HOME/.claude/skills/copper-crm/scripts/FILE_STRUCTURE.txt
 
 Example data:
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/example_leads.csv
+  $HOME/.claude/skills/copper-crm/scripts/example_leads.csv
 
 Configuration:
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/requirements.txt
+  $HOME/.claude/skills/copper-crm/scripts/requirements.txt
 
 
 EXTENSIBILITY & CUSTOMIZATION

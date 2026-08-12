@@ -330,7 +330,7 @@ This skill includes:
 ## Pattern Database
 
 For the complete categorized list of all 242+ patterns with descriptions, see:
-`/Users/dallascrilley/PAI/.claude/skills/productivity/fabric-patterns/references/pattern-database.md`
+`$HOME/.claude/skills/productivity/fabric-patterns/references/pattern-database.md`
 
 ## Next Steps After Pattern Selection
 

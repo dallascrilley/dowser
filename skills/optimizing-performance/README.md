@@ -210,7 +210,7 @@ This skill was converted from the `performance-optimizer` Claude Code sub-agent 
 - ✅ Removed `model` field (skills inherit Claude Code capabilities)
 - ✅ Added practical CLI-based workflow examples
 
-**Original Source**: `/Users/dallascrilley/Code/amplifier/.claude/agents/performance-optimizer.md`
+**Original Source**: `(upstream: amplifier performance-optimizer agent)`
 
 **Preserved Excellence:**
 - Measure-first principle

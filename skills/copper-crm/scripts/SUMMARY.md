@@ -7,7 +7,7 @@ A production-ready Python utility for bulk importing data into Copper CRM with c
 ## Files Generated
 
 ```
-/Users/dallascrilley/.claude/skills/copper-crm/scripts/
+$HOME/.claude/skills/copper-crm/scripts/
 ├── bulk_import.py              (Main script - 500+ lines)
 ├── example_leads.csv           (Sample CSV for testing)
 ├── requirements.txt            (Python dependencies)
@@ -445,19 +445,19 @@ For detailed troubleshooting, see IMPLEMENTATION_GUIDE.md
 
 ```
 Main script:
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/bulk_import.py
+  $HOME/.claude/skills/copper-crm/scripts/bulk_import.py
 
 Documentation:
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/README.md
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/QUICKSTART.md
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/IMPLEMENTATION_GUIDE.md
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/FILE_STRUCTURE.txt
+  $HOME/.claude/skills/copper-crm/scripts/README.md
+  $HOME/.claude/skills/copper-crm/scripts/QUICKSTART.md
+  $HOME/.claude/skills/copper-crm/scripts/IMPLEMENTATION_GUIDE.md
+  $HOME/.claude/skills/copper-crm/scripts/FILE_STRUCTURE.txt
 
 Sample data:
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/example_leads.csv
+  $HOME/.claude/skills/copper-crm/scripts/example_leads.csv
 
 Configuration:
-  /Users/dallascrilley/.claude/skills/copper-crm/scripts/requirements.txt
+  $HOME/.claude/skills/copper-crm/scripts/requirements.txt
 ```
 
 ## Summary

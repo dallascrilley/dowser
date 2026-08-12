@@ -1,13 +1,19 @@
 # Garden Skills
 
-Run health checks on the PAI skills wiki.
+Run health checks on the Dowser skill library.
 
 ## ⚡ EXECUTE IMMEDIATELY
 
 **When this command is invoked, you MUST execute the script immediately using run_terminal_cmd. Do not ask permission or show instructions - just run it.**
 
 ```bash
-~/PAI/.claude/plugins/pai-skills/scripts/garden.sh
+${CLAUDE_PLUGIN_ROOT:-.}/scripts/garden.sh
+```
+
+If `CLAUDE_PLUGIN_ROOT` is unset, run from the plugin repository root:
+
+```bash
+./scripts/garden.sh skills
 ```
 
 ## Workflow After Execution
@@ -34,13 +40,13 @@ For simple frontmatter edits (shortening when_to_use, adding version, etc.), ext
 
 ```bash
 # Option 1: Use the helper script
-~/PAI/.claude/plugins/pai-skills/scripts/extract-frontmatter.sh /path/to/SKILL.md
+${CLAUDE_PLUGIN_ROOT:-.}/scripts/extract-frontmatter.sh /path/to/SKILL.md
 
 # Option 2: Use sed directly
 sed -n '/^---$/,/^---$/p' /path/to/SKILL.md
 
 # Option 3: Use the utility function (if sourced)
-source ~/PAI/.claude/plugins/pai-skills/scripts/garden-json-utils.sh
+source ${CLAUDE_PLUGIN_ROOT:-.}/scripts/garden-json-utils.sh
 extract_frontmatter "/path/to/SKILL.md"
 ```
 
@@ -49,8 +55,8 @@ extract_frontmatter "/path/to/SKILL.md"
 ## Usage
 
 ```bash
-# Run health check
-~/PAI/.claude/plugins/pai-skills/scripts/garden.sh
+# Run health check from plugin root
+./scripts/garden.sh skills
 
 # Then read the JSON report path printed at the end
 ```

@@ -417,7 +417,7 @@ Part of the PAI (Personal AI Infrastructure) project. See main PAI repository fo
 
 ## Related Projects
 
-- [PAI Skills Repository](https://github.com/danielmiessler/pai-skills)
+- [Dowser (this plugin)](https://github.com/dallascrilley/pai-skills)
 - [Claude Code Documentation](https://docs.anthropic.com/claude/docs)
 - [indydevdan's Agent Observability](https://github.com/indydevdan)
 
