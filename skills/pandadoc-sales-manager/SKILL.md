@@ -23,7 +23,9 @@ Streamline sales document workflows with PandaDoc API automation. Create proposa
 ### First-Time Setup
 
 1. **Set your API key:**
-  export PANDADOC_API_KEY="a1f67376274f328788df8bd7da0560b62191a358"
+   Supply `PANDADOC_API_KEY` through your environment or secret manager, then export it for the scripts:
+   ```bash
+   export PANDADOC_API_KEY="${PANDADOC_API_KEY:?Set PANDADOC_API_KEY in your environment}"
    ```
 
 2. **Verify authentication:**
