@@ -38,11 +38,10 @@ gh secret list | rg CLAUDE_CODE_OAUTH_TOKEN
 **If missing, set it:**
 
 ```bash
-# Get token value from COMMON_ENV.md
-OAUTH_TOKEN="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"
-
-# Set in current repository
-gh secret set CLAUDE_CODE_OAUTH_TOKEN --body "$OAUTH_TOKEN"
+# Supply CLAUDE_CODE_OAUTH_TOKEN through your environment or secret manager.
+# Set in the current repository using standard input.
+: "${CLAUDE_CODE_OAUTH_TOKEN:?Supply CLAUDE_CODE_OAUTH_TOKEN securely}" &&
+printf '%s' "$CLAUDE_CODE_OAUTH_TOKEN" | gh secret set CLAUDE_CODE_OAUTH_TOKEN
 
 # Verify it was set
 gh secret list | rg CLAUDE_CODE_OAUTH_TOKEN
@@ -51,9 +50,9 @@ gh secret list | rg CLAUDE_CODE_OAUTH_TOKEN
 **Alternative: API Key (if no Claude Pro/Max subscription)**
 
 ```bash
-# If using API key instead of OAuth token
-API_KEY="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"
-gh secret set ANTHROPIC_API_KEY --body "$API_KEY"
+# Supply ANTHROPIC_API_KEY through your environment or secret manager.
+: "${ANTHROPIC_API_KEY:?Supply ANTHROPIC_API_KEY securely}" &&
+printf '%s' "$ANTHROPIC_API_KEY" | gh secret set ANTHROPIC_API_KEY
 ```
 
 **Why OAuth Token is preferred:**
@@ -481,4 +480,4 @@ jobs:
 **Action Reference:** `docs/reference/claude-code-reference.md`
 **Test Scenarios:** `TEST_SCENARIOS.md` - Token efficiency metrics and known issues
 
-**Authentication Secrets:** `~/.config/ai-rules/COMMON_ENV.md`
+**Authentication Secrets:** Supply `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` through your environment or secret manager. Keep values out of source files and shell history.

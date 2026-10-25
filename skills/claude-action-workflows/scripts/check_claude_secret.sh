@@ -10,11 +10,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# OAuth token from COMMON_ENV.md
-DEFAULT_OAUTH_TOKEN="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"
-
-# API key from COMMON_ENV.md (fallback)
-DEFAULT_API_KEY="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"
+# Credentials must be supplied by the user through the environment or a secret manager.
+# No credential defaults are stored in this script.
 
 echo -e "${BLUE}🔐 Claude Code Action Secret Checker${NC}"
 echo ""
@@ -82,7 +79,12 @@ if [ "$OAUTH_SET" = false ] && [ "$API_KEY_SET" = false ]; then
         echo ""
         echo -e "${BLUE}Setting CLAUDE_CODE_OAUTH_TOKEN...${NC}"
 
-        if gh secret set CLAUDE_CODE_OAUTH_TOKEN --body "$DEFAULT_OAUTH_TOKEN"; then
+        if [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
+            echo -e "${RED}❌ Supply CLAUDE_CODE_OAUTH_TOKEN through your environment or secret manager first${NC}"
+            exit 1
+        fi
+
+        if printf '%s' "$CLAUDE_CODE_OAUTH_TOKEN" | gh secret set CLAUDE_CODE_OAUTH_TOKEN; then
             echo -e "${GREEN}✅ Successfully set CLAUDE_CODE_OAUTH_TOKEN${NC}"
             echo ""
             echo -e "${BLUE}📝 Note: This uses your Claude Pro/Max subscription${NC}"
@@ -98,10 +100,12 @@ if [ "$OAUTH_SET" = false ] && [ "$API_KEY_SET" = false ]; then
         echo "To set it manually:"
         echo ""
         echo -e "${YELLOW}For OAuth token (recommended):${NC}"
-        echo "  gh secret set CLAUDE_CODE_OAUTH_TOKEN --body \"$DEFAULT_OAUTH_TOKEN\""
+        echo '  : "${CLAUDE_CODE_OAUTH_TOKEN:?Supply CLAUDE_CODE_OAUTH_TOKEN securely}" &&'
+        echo "  printf '%s' \"\$CLAUDE_CODE_OAUTH_TOKEN\" | gh secret set CLAUDE_CODE_OAUTH_TOKEN"
         echo ""
         echo -e "${YELLOW}For API key (alternative):${NC}"
-        echo "  gh secret set ANTHROPIC_API_KEY --body \"$DEFAULT_API_KEY\""
+        echo '  : "${ANTHROPIC_API_KEY:?Supply ANTHROPIC_API_KEY securely}" &&'
+        echo "  printf '%s' \"\$ANTHROPIC_API_KEY\" | gh secret set ANTHROPIC_API_KEY"
     fi
 elif [ "$OAUTH_SET" = true ]; then
     echo -e "${GREEN}✅ Authentication configured (OAuth token)${NC}"
